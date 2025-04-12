@@ -2,6 +2,7 @@
 
 use core::num::traits::Zero;
 use executor::models::index::Fee;
+use executor::types::role::Role;
 
 // Constants
 
@@ -18,12 +19,12 @@ pub mod errors {
 #[generate_trait]
 pub impl FeeImpl of FeeTrait {
     #[inline]
-    fn new(id: felt252, numerator: u16, denominator: u16, receiver: felt252) -> Fee {
+    fn new(id: felt252, role: Role, numerator: u16, denominator: u16, receiver: felt252) -> Fee {
         // [Check] Inputs
         FeeAssert::assert_valid_id(id);
         FeeAssert::assert_valid_ratio(numerator, denominator);
         // [Return] Fee
-        Fee { id, numerator, denominator, receiver }
+        Fee { id, role: role.into(), numerator, denominator, receiver }
     }
 
     #[inline]
@@ -72,14 +73,14 @@ pub impl FeeAssert of AssertTrait {
 pub impl FeeDefault of Default<Fee> {
     #[inline]
     fn default() -> Fee {
-        Fee { id: 0, numerator: 0, denominator: 1, receiver: 0 }
+        Fee { id: 0, role: 0, numerator: 0, denominator: 1, receiver: 0 }
     }
 }
 
 pub impl FeeZero of Zero<Fee> {
     #[inline]
     fn zero() -> Fee {
-        Fee { id: 0, numerator: 0, denominator: 0, receiver: 0 }
+        Fee { id: 0, role: 0, numerator: 0, denominator: 0, receiver: 0 }
     }
 
     #[inline]
@@ -99,6 +100,7 @@ mod tests {
     // Local imports
 
     use super::{FeeTrait, FeeAssert, FeeZero, MAX_DENOMINATOR};
+    use executor::types::role::Role;
 
     // Constants
 
@@ -109,8 +111,10 @@ mod tests {
 
     #[test]
     fn test_fee_new() {
-        let fee = FeeTrait::new(IDENTIFIER, NUMERATOR, DENOMINATOR, RECEIVER);
+        let role = Role::Broker;
+        let fee = FeeTrait::new(IDENTIFIER, role, NUMERATOR, DENOMINATOR, RECEIVER);
         assert_eq!(fee.id, IDENTIFIER);
+        assert_eq!(fee.role, role.into());
         assert_eq!(fee.numerator, NUMERATOR);
         assert_eq!(fee.denominator, DENOMINATOR);
         assert_eq!(fee.receiver, RECEIVER);
@@ -118,13 +122,15 @@ mod tests {
 
     #[test]
     fn test_fee_compute() {
-        let fee = FeeTrait::new(IDENTIFIER, NUMERATOR, DENOMINATOR, RECEIVER);
+        let role = Role::Broker;
+        let fee = FeeTrait::new(IDENTIFIER, role, NUMERATOR, DENOMINATOR, RECEIVER);
         assert_eq!(fee.compute(100), 1);
     }
 
     #[test]
     fn test_fee_update_ratio() {
-        let mut fee = FeeTrait::new(IDENTIFIER, NUMERATOR, DENOMINATOR, RECEIVER);
+        let role = Role::Broker;
+        let mut fee = FeeTrait::new(IDENTIFIER, role, NUMERATOR, DENOMINATOR, RECEIVER);
         let new_numerator = NUMERATOR + 1;
         let new_denominator = DENOMINATOR - 1;
         fee.update_ratio(new_numerator, new_denominator);
@@ -134,7 +140,8 @@ mod tests {
 
     #[test]
     fn test_fee_update_receiver() {
-        let mut fee = FeeTrait::new(IDENTIFIER, NUMERATOR, DENOMINATOR, RECEIVER);
+        let role = Role::Broker;
+        let mut fee = FeeTrait::new(IDENTIFIER, role, NUMERATOR, DENOMINATOR, RECEIVER);
         let new_receiver = RECEIVER + 1;
         fee.update_receiver(new_receiver);
         assert_eq!(fee.receiver, new_receiver);
@@ -142,7 +149,8 @@ mod tests {
 
     #[test]
     fn test_fee_nullify() {
-        let mut fee = FeeTrait::new(IDENTIFIER, NUMERATOR, DENOMINATOR, RECEIVER);
+        let role = Role::Broker;
+        let mut fee = FeeTrait::new(IDENTIFIER, role, NUMERATOR, DENOMINATOR, RECEIVER);
         fee.nullify();
         assert_eq!(fee.is_zero(), true);
     }
@@ -150,25 +158,29 @@ mod tests {
     #[test]
     #[should_panic(expected: ('Fee: invalid id',))]
     fn test_fee_invalid_id() {
-        FeeTrait::new(0, NUMERATOR, DENOMINATOR, RECEIVER);
+        let role = Role::Broker;
+        FeeTrait::new(0, role, NUMERATOR, DENOMINATOR, RECEIVER);
     }
 
     #[test]
     #[should_panic(expected: ('Fee: invalid numerator',))]
     fn test_fee_invalid_numerator() {
-        FeeTrait::new(IDENTIFIER, DENOMINATOR + 1, DENOMINATOR, RECEIVER);
+        let role = Role::Broker;
+        FeeTrait::new(IDENTIFIER, role, DENOMINATOR + 1, DENOMINATOR, RECEIVER);
     }
 
     #[test]
     #[should_panic(expected: ('Fee: invalid denominator',))]
     fn test_fee_invalid_denominator() {
-        FeeTrait::new(IDENTIFIER, NUMERATOR, MAX_DENOMINATOR + 1, RECEIVER);
+        let role = Role::Broker;
+        FeeTrait::new(IDENTIFIER, role, NUMERATOR, MAX_DENOMINATOR + 1, RECEIVER);
     }
 
     #[test]
     #[should_panic(expected: ('Fee: invalid denominator',))]
     fn test_fee_null_denominator() {
-        FeeTrait::new(IDENTIFIER, NUMERATOR, 0, RECEIVER);
+        let role = Role::Broker;
+        FeeTrait::new(IDENTIFIER, role, NUMERATOR, 0, RECEIVER);
     }
 }
 

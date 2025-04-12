@@ -31,6 +31,7 @@ pub impl IntoU8Role of core::traits::Into<u8, Role> {
             2 => Role::Broker,
             3 => Role::Creator,
             4 => Role::Team,
+            _ => Role::None,
         }
     }
 }

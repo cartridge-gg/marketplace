@@ -22,6 +22,7 @@ pub impl IntoU8Status of core::traits::Into<u8, Status> {
         match self {
             0 => Status::None,
             1 => Status::Pause,
+            _ => Status::None,
         }
     }
 }
