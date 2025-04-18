@@ -3,6 +3,30 @@ description: "Setup tooling"
 runs:
   using: "composite"
   steps:
+    - name: Cache turbo
+      uses: actions/cache@v3
+      with:
+        path: |
+          .turbo
+          **/.turbo
+        key: ${{ runner.os }}-turbo-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-turbo-
+
+    - name: Cache scarb
+      uses: actions/cache@v3
+      with:
+        path: |
+          target/
+          **/target/
+        key: ${{ runner.os }}-scarb-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-scarb-
+
+    - uses: pnpm/action-setup@v3
+      with:
+        version: 10
+
     - name: Install dojoup
       run: curl -L https://install.dojoengine.org | bash
       shell: bash
@@ -12,4 +36,8 @@ runs:
         /home/runner/.config/.dojo/bin/dojoup --version ${{ env.DOJO_VERSION }}
         sudo mv /home/runner/.config/.dojo/bin/katana /usr/local/bin/
         sudo mv /home/runner/.config/.dojo/bin/sozo /usr/local/bin/
+      shell: bash
+
+    - name: Install packages
+      run: pnpm install --frozen-lockfile
       shell: bash
