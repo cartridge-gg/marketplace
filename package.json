@@ -1,0 +1,28 @@
+{
+	"name": "@cartridge-gg/marketplace",
+	"version": "0.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "turbo run test",
+		"test:watch": "turbo run test:watch",
+		"prepare": "husky",
+		"format": "turbo run format",
+		"format:check": "turbo run format:check",
+		"lint": "turbo run lint",
+		"lint:check": "turbo run lint:check",
+		"build:scarb": "turbo run build:scarb",
+		"build": "turbo run build"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.7.1",
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@commitlint/cli": "^19.8.0",
+		"@commitlint/config-conventional": "^19.8.0",
+		"husky": "^9.1.7",
+		"turbo": "^2.5.0"
+	}
+}
