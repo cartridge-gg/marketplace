@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+    "dev": "turbo watch dev",
 		"test": "turbo run test",
 		"test:watch": "turbo run test:watch",
 		"prepare": "husky",
@@ -12,7 +13,8 @@
 		"lint": "turbo run lint",
 		"lint:check": "turbo run lint:check",
 		"build:scarb": "turbo run build:scarb",
-		"build": "turbo run build"
+		"build": "turbo run build",
+		"build:deps": "turbo run build:deps"
 	},
 	"keywords": [],
 	"author": "",

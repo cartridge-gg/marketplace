@@ -1,1 +1,1 @@
-export const sdk = { init: false };
+export const sdk = { init: false, test: true };

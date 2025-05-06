@@ -5,6 +5,10 @@
 			"dependsOn": ["^build:scarb"],
 			"outputs": ["target/"]
 		},
+    "build:deps": {
+			"dependsOn": ["^build:deps"],
+			"outputs": ["dist/**", "target/"]
+    },
 		"build": {
 			"dependsOn": ["^build"],
 			"outputs": ["dist/**", "target/"]
@@ -24,7 +28,8 @@
 		},
 		"dev": {
 			"persistent": true,
-			"cache": false
+			"cache": false,
+      "dependsOn": ["^build:deps"]
 		}
 	}
 }
