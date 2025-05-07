@@ -1,6 +1,11 @@
 {
 	"$schema": "https://turbo.build/schema.json",
 	"tasks": {
+		"dev": {
+			"persistent": true,
+      "dependsOn": ["^build:deps"],
+      "outputs": ["dist/**"]
+		},
 		"build:scarb": {
 			"dependsOn": ["^build:scarb"],
 			"outputs": ["target/"]
@@ -25,11 +30,6 @@
 		"test:watch": {
 			"persistent": true,
 			"cache": false
-		},
-		"dev": {
-			"persistent": true,
-			"cache": false,
-      "dependsOn": ["^build:deps"]
 		}
 	}
 }

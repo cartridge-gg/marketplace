@@ -35,6 +35,9 @@ importers:
 
   apps/market:
     dependencies:
+      '@cartridge-gg/marketplace-sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
       '@tanstack/react-router':
         specifier: ^1.119.0
         version: 1.119.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)

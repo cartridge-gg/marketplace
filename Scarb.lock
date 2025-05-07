@@ -2,14 +2,6 @@
 version = 1
 
 [[package]]
-name = "contracts"
-version = "0.0.1"
-dependencies = [
- "dojo",
- "dojo_cairo_test",
-]
-
-[[package]]
 name = "dojo"
 version = "1.5.0"
 source = "git+https://github.com/dojoengine/dojo?tag=v1.5.0#812f17c9c57fd057d0bf1e648a591ea0ca9ea718"
@@ -36,6 +28,15 @@ version = "0.0.1"
 dependencies = [
  "dojo",
  "dojo_cairo_test",
+]
+
+[[package]]
+name = "marketplace"
+version = "0.0.0"
+dependencies = [
+ "dojo",
+ "dojo_cairo_test",
+ "orderbook",
 ]
 
 [[package]]
@@ -84,7 +85,7 @@ checksum = "sha256:fd348b31c4a4407add33adc3c2b8f26dca71dbd7431faaf726168f37a91db
 
 [[package]]
 name = "orderbook"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "dojo",
  "dojo_cairo_test",

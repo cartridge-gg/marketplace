@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cartridge-gg/marketplace-sdk": "workspace:*",
     "@tanstack/react-router": "^1.119.0",
     "@tanstack/react-router-devtools": "^1.119.1",
     "react": "^19.0.0",
