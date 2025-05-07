@@ -2,6 +2,14 @@
 version = 1
 
 [[package]]
+name = "contracts"
+version = "0.0.1"
+dependencies = [
+ "dojo",
+ "dojo_cairo_test",
+]
+
+[[package]]
 name = "dojo"
 version = "1.5.0"
 source = "git+https://github.com/dojoengine/dojo?tag=v1.5.0#812f17c9c57fd057d0bf1e648a591ea0ca9ea718"
