@@ -11,3 +11,7 @@ dojo_cairo_test.workspace = true
 cairo_test.workspace = true
 
 [lib]
+
+[[target.starknet-contract]]
+sierra = true
+build-external-contracts = ["dojo::world::world_contract::world"]

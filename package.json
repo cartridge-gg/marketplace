@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-    "dev": "turbo watch dev",
+		"dev": "turbo watch dev",
 		"test": "turbo run test",
 		"test:watch": "turbo run test:watch",
 		"prepare": "husky",
@@ -19,7 +19,7 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"packageManager": "pnpm@10.7.1",
+	"packageManager": "pnpm@10.10.0",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
 		"@commitlint/cli": "^19.8.0",

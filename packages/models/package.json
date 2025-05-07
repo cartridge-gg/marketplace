@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "DOJO_MANIFEST_PATH=../../contracts/Scarb.toml sozo build --typescript --bindings-output ./src"
+    "build": "sozo build --typescript --bindings-output src"
   },
   "keywords": [],
   "author": "",
