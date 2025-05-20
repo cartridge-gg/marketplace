@@ -1,5 +1,5 @@
 [workspace]
-members = ["packages/executor"]
+members = ["packages/executor", "packages/orderbook"]
 description = "Dojo marketplace library"
 homepage = "https://github.com/cartridge-gg/marketplace"
 cairo-version = "2.9.4"
@@ -9,10 +9,12 @@ version = "0.0.0"
 edition = "2024_07"
 
 [workspace.dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.4.0" }
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo", tag = "v1.4.0" }
-starknet = "2.9.4"
-cairo_test = "2.9.4"
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.0" }
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.0" }
+openzeppelin_token = "1.0.0"
+openzeppelin_introspection = "1.0.0"
+starknet = "2.10.1"
+cairo_test = "2.10.1"
 
 [workspace.tool.fmt]
 sort-module-level-items = true
