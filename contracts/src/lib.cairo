@@ -1,10 +1,7 @@
 pub mod constants;
 
 pub mod systems {
-    pub mod registry;
-    pub mod slot;
-    pub mod social;
-    pub mod wallet;
+    pub mod marketplace;
 }
 
 #[cfg(test)]

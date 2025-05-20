@@ -1,6 +1,6 @@
 // Internal imports
 
-use arcade::tests::setup::setup::spawn;
+use marketplace::tests::setup::setup::spawn;
 
 // Tests
 

@@ -44,7 +44,7 @@ pub mod SellableComponent {
             token_id: u256,
             quantity: felt252,
             price: felt252,
-            currency: felt252,
+            currency: ContractAddress,
             expiration: u64,
         ) {
             // [Check] Validity requirements
@@ -68,7 +68,7 @@ pub mod SellableComponent {
                 token_id: token_id,
                 quantity: quantity,
                 price: price,
-                currency: currency,
+                currency: currency.into(),
                 expiration: expiration,
                 now: time,
                 owner: caller_address.into(),
@@ -88,7 +88,7 @@ pub mod SellableComponent {
             order_id: u32,
             quantity: felt252,
             price: felt252,
-            currency: felt252,
+            currency: ContractAddress,
             expiration: u64,
         ) {
             // [Check] Order exists
@@ -117,7 +117,14 @@ pub mod SellableComponent {
             order.assert_is_allowed(caller);
 
             // [Effect] Update order
-            order.update(quantity, price, currency, expiration, starknet::get_block_timestamp());
+            order
+                .update(
+                    quantity: quantity,
+                    price: price,
+                    currency: currency.into(),
+                    expiration: expiration,
+                    now: starknet::get_block_timestamp(),
+                );
 
             // [Effect] Update models
             store.set_order(@order);
@@ -176,12 +183,11 @@ pub mod SellableComponent {
         fn execute(
             self: @ComponentState<TContractState>,
             world: WorldStorage,
-            spender: ContractAddress,
-            recipient: ContractAddress,
             order_id: u32,
             quantity: felt252,
             fee_num: u16,
             fee_den: u16,
+            fee_receiver: ContractAddress,
         ) {
             // [Check] Order exists
             let mut store = StoreTrait::new(world);
@@ -203,6 +209,7 @@ pub mod SellableComponent {
                 );
 
             // [Check] Execute requirements
+            let spender = starknet::get_caller_address();
             let currency: ContractAddress = order.currency.try_into().unwrap();
             let price: u256 = order.price.into();
             verifiable.assert_buy_validity(owner: spender, currency: currency, price: price);
@@ -214,25 +221,24 @@ pub mod SellableComponent {
             store.set_order(@order);
 
             // [Interaction] Process transfers
-            // Remove fees from price
-            let executive_price = price * (fee_den - fee_num).into() / fee_den.into();
+            let fee = price * fee_num.into() / fee_den.into();
             verifiable
-                .pay(
-                    spender: spender, recipient: owner, currency: currency, amount: executive_price,
-                );
+                .pay(spender: spender, recipient: owner, currency: currency, amount: price - fee);
+            verifiable
+                .pay(spender: spender, recipient: fee_receiver, currency: currency, amount: fee);
             verifiable
                 .transfer(
                     owner: owner,
                     collection: collection,
                     token_id: token_id,
                     value: value,
-                    recipient: recipient,
+                    recipient: spender,
                 );
 
             // [Event] Sale
             let time = starknet::get_block_timestamp();
             let from: felt252 = owner.into();
-            let to: felt252 = recipient.into();
+            let to: felt252 = spender.into();
             store.sale(order: order, from: from, to: to, time: time);
         }
     }

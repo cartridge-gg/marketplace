@@ -87,6 +87,9 @@ pub mod BuyableComponent {
             let mut order = store.order(order_id);
             order.assert_does_exist();
 
+            // [Check] Order category
+            order.assert_buy_order();
+
             // [Check] Caller is order owner
             let caller: felt252 = starknet::get_caller_address().into();
             order.assert_is_allowed(caller);
@@ -103,6 +106,9 @@ pub mod BuyableComponent {
             let mut store = StoreTrait::new(world);
             let mut order = store.order(order_id);
             order.assert_does_exist();
+
+            // [Check] Order category
+            order.assert_buy_order();
 
             // [Check] Inactive requirements
             let owner: ContractAddress = order.owner.try_into().unwrap();
@@ -124,17 +130,19 @@ pub mod BuyableComponent {
         fn execute(
             self: @ComponentState<TContractState>,
             world: WorldStorage,
-            owner: ContractAddress,
-            recipient: ContractAddress,
             order_id: u32,
             quantity: felt252,
             fee_num: u16,
             fee_den: u16,
+            fee_receiver: ContractAddress,
         ) {
             // [Check] Order exists
             let mut store = StoreTrait::new(world);
             let mut order = store.order(order_id);
             order.assert_does_exist();
+
+            // [Check] Order category
+            order.assert_buy_order();
 
             // [Check] Validity requirements
             let spender: ContractAddress = order.owner.try_into().unwrap();
@@ -148,6 +156,7 @@ pub mod BuyableComponent {
             verifiable.assert_buy_validity(owner: spender, currency: currency, price: price.into());
 
             // [Check] Execute requirements
+            let owner: ContractAddress = starknet::get_caller_address();
             verifiable
                 .assert_sell_validity(
                     owner: owner, collection: collection, token_id: token_id, value: value,
@@ -161,14 +170,24 @@ pub mod BuyableComponent {
 
             // [Interaction] Process transfers
             // Remove fees from price
-            let executive_price = price * (fee_den - fee_num).into() / fee_den.into();
-            verifiable.pay(spender, owner, currency, executive_price);
-            verifiable.transfer(owner, collection, token_id, value, recipient);
+            let fee = price * fee_num.into() / fee_den.into();
+            verifiable
+                .pay(spender: spender, recipient: owner, currency: currency, amount: price - fee);
+            verifiable
+                .pay(spender: spender, recipient: fee_receiver, currency: currency, amount: fee);
+            verifiable
+                .transfer(
+                    owner: owner,
+                    collection: collection,
+                    token_id: token_id,
+                    value: value,
+                    recipient: spender,
+                );
 
             // [Event] Sale
             let time = starknet::get_block_timestamp();
             let from: felt252 = owner.into();
-            let to: felt252 = recipient.into();
+            let to: felt252 = spender.into();
             store.sale(order: order, from: from, to: to, time: time);
         }
     }

@@ -14,20 +14,13 @@ pub mod setup {
 
     // External imports
 
-    use controller::models::{index as controller_models};
-    use provider::models::{index as provider_models};
-    use registry::models::{index as registry_models};
-    use social::models::{index as social_models};
-    use social::events::{index as social_events};
-    use achievement::events::{index as achievement_events};
+    use orderbook::models::{index as orderbook_models};
+    use orderbook::events::{index as orderbook_events};
 
     // Internal imports
 
-    use arcade::constants::NAMESPACE;
-    use arcade::systems::registry::{Registry, IRegistryDispatcher};
-    use arcade::systems::slot::{Slot, ISlotDispatcher};
-    use arcade::systems::social::{Social, ISocialDispatcher};
-    use arcade::systems::wallet::{Wallet, IWalletDispatcher};
+    use marketplace::constants::NAMESPACE;
+    use marketplace::systems::marketplace::{Marketplace, IMarketplaceDispatcher};
 
     // Constant
 
@@ -41,10 +34,7 @@ pub mod setup {
 
     #[derive(Copy, Drop)]
     pub struct Systems {
-        pub registry: IRegistryDispatcher,
-        pub slot: ISlotDispatcher,
-        pub social: ISocialDispatcher,
-        pub wallet: IWalletDispatcher,
+        pub marketplace: IMarketplaceDispatcher,
     }
 
     #[derive(Copy, Drop)]
@@ -57,25 +47,12 @@ pub mod setup {
         NamespaceDef {
             namespace: NAMESPACE(),
             resources: [
-                TestResource::Model(controller_models::m_Account::TEST_CLASS_HASH),
-                TestResource::Model(controller_models::m_Controller::TEST_CLASS_HASH),
-                TestResource::Model(controller_models::m_Signer::TEST_CLASS_HASH),
-                TestResource::Model(provider_models::m_Deployment::TEST_CLASS_HASH),
-                TestResource::Model(provider_models::m_Factory::TEST_CLASS_HASH),
-                TestResource::Model(provider_models::m_Team::TEST_CLASS_HASH),
-                TestResource::Model(provider_models::m_Teammate::TEST_CLASS_HASH),
-                TestResource::Model(registry_models::m_Access::TEST_CLASS_HASH),
-                TestResource::Model(registry_models::m_Achievement::TEST_CLASS_HASH),
-                TestResource::Model(registry_models::m_Game::TEST_CLASS_HASH),
-                TestResource::Model(social_models::m_Alliance::TEST_CLASS_HASH),
-                TestResource::Model(social_models::m_Guild::TEST_CLASS_HASH),
-                TestResource::Model(social_models::m_Member::TEST_CLASS_HASH),
-                TestResource::Event(social_events::e_Follow::TEST_CLASS_HASH),
-                TestResource::Event(achievement_events::e_TrophyPinning::TEST_CLASS_HASH),
-                TestResource::Contract(Registry::TEST_CLASS_HASH),
-                TestResource::Contract(Slot::TEST_CLASS_HASH),
-                TestResource::Contract(Social::TEST_CLASS_HASH),
-                TestResource::Contract(Wallet::TEST_CLASS_HASH),
+                TestResource::Model(orderbook_models::m_Book::TEST_CLASS_HASH),
+                TestResource::Model(orderbook_models::m_Order::TEST_CLASS_HASH),
+                TestResource::Event(orderbook_events::e_Listing::TEST_CLASS_HASH),
+                TestResource::Event(orderbook_events::e_Offer::TEST_CLASS_HASH),
+                TestResource::Event(orderbook_events::e_Sale::TEST_CLASS_HASH),
+                TestResource::Contract(Marketplace::TEST_CLASS_HASH),
             ]
                 .span(),
         }
@@ -83,16 +60,9 @@ pub mod setup {
 
     fn setup_contracts() -> Span<ContractDef> {
         [
-            ContractDefTrait::new(@NAMESPACE(), @"Registry")
+            ContractDefTrait::new(@NAMESPACE(), @"Marketplace")
                 .with_writer_of([dojo::utils::bytearray_hash(@NAMESPACE())].span())
                 .with_init_calldata(array![OWNER().into()].span()),
-            ContractDefTrait::new(@NAMESPACE(), @"Slot")
-                .with_writer_of([dojo::utils::bytearray_hash(@NAMESPACE())].span())
-                .with_init_calldata(array![].span()),
-            ContractDefTrait::new(@NAMESPACE(), @"Social")
-                .with_writer_of([dojo::utils::bytearray_hash(@NAMESPACE())].span()),
-            ContractDefTrait::new(@NAMESPACE(), @"Wallet")
-                .with_writer_of([dojo::utils::bytearray_hash(@NAMESPACE())].span()),
         ]
             .span()
     }
@@ -105,15 +75,9 @@ pub mod setup {
         let world = spawn_test_world([namespace_def].span());
         world.sync_perms_and_inits(setup_contracts());
         // [Setup] Systems
-        let (registry_address, _) = world.dns(@"Registry").unwrap();
-        let (slot_address, _) = world.dns(@"Slot").unwrap();
-        let (social_address, _) = world.dns(@"Social").unwrap();
-        let (wallet_address, _) = world.dns(@"Wallet").unwrap();
+        let (marketplace_address, _) = world.dns(@"Marketplace").unwrap();
         let systems = Systems {
-            registry: IRegistryDispatcher { contract_address: registry_address },
-            slot: ISlotDispatcher { contract_address: slot_address },
-            social: ISocialDispatcher { contract_address: social_address },
-            wallet: IWalletDispatcher { contract_address: wallet_address },
+            marketplace: IMarketplaceDispatcher { contract_address: marketplace_address },
         };
 
         // [Setup] Context
