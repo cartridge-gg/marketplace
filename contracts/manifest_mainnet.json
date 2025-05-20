@@ -1,9 +1,9 @@
 {
   "world": {
-    "class_hash": "0x75fc75bcd1a7f8b4bf64b74978b0f89c8cee44bb755c1dae6f82284756451ec",
-    "address": "0x65613bd4a3b58ebe84abed13a67ff9eaa1de29a640cb6598da54207a5551d87",
-    "seed": "Arcade-3",
-    "name": "Cartridge World",
+    "class_hash": "0x4c60dc46a8ca8bb47675b7b914053cef769afbf0e340523187336b72bd71d1f",
+    "address": "0x690ab03390b3e001ef389c71355919a3d7a648d26bc8760a552963965334a7a",
+    "seed": "Marketplace-0",
+    "name": "Cartridge Marketplace",
     "entrypoints": [
       "uuid",
       "set_metadata",
@@ -693,6 +693,22 @@
           },
           {
             "type": "function",
+            "name": "owners_count",
+            "inputs": [
+              {
+                "name": "resource",
+                "type": "core::felt252"
+              }
+            ],
+            "outputs": [
+              {
+                "type": "core::integer::u64"
+              }
+            ],
+            "state_mutability": "view"
+          },
+          {
+            "type": "function",
             "name": "is_writer",
             "inputs": [
               {
@@ -1312,12 +1328,12 @@
   },
   "contracts": [
     {
-      "address": "0x12af1568b4baf297638ca0ca8648625010158502940ef44c3d3604e3c0c2098",
-      "class_hash": "0x2e5ba498a20108d69ce7796e55d7b3f0077caad2d76923080d145f9e575ae12",
+      "address": "0x2462fcc60c8c5f804248f1a41c151949d3ea24cc9315f69d37796f57e4bd048",
+      "class_hash": "0x2b406c266f83f5d2a0e28dc330a8297a40066b84ff887d7d164d84e07bd1c42",
       "abi": [
         {
           "type": "impl",
-          "name": "Registry__ContractImpl",
+          "name": "Marketplace__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
         },
         {
@@ -1327,7 +1343,7 @@
         },
         {
           "type": "impl",
-          "name": "Registry__DeployedContractImpl",
+          "name": "Marketplace__DeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -1371,7 +1387,7 @@
           "inputs": [
             {
               "name": "owner",
-              "type": "core::felt252"
+              "type": "core::starknet::contract_address::ContractAddress"
             }
           ],
           "outputs": [],
@@ -1379,44 +1395,54 @@
         },
         {
           "type": "impl",
-          "name": "RegistryImpl",
-          "interface_name": "arcade::systems::registry::IRegistry"
+          "name": "MarketplaceImpl",
+          "interface_name": "marketplace::systems::marketplace::IMarketplace"
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
         },
         {
           "type": "interface",
-          "name": "arcade::systems::registry::IRegistry",
+          "name": "marketplace::systems::marketplace::IMarketplace",
           "items": [
             {
               "type": "function",
-              "name": "register_game",
+              "name": "list",
               "inputs": [
                 {
-                  "name": "world_address",
+                  "name": "collection",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "quantity",
                   "type": "core::felt252"
                 },
                 {
-                  "name": "namespace",
+                  "name": "price",
                   "type": "core::felt252"
                 },
                 {
-                  "name": "project",
-                  "type": "core::byte_array::ByteArray"
+                  "name": "currency",
+                  "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
-                  "name": "rpc",
-                  "type": "core::byte_array::ByteArray"
-                },
-                {
-                  "name": "policies",
-                  "type": "core::byte_array::ByteArray"
-                },
-                {
-                  "name": "metadata",
-                  "type": "core::byte_array::ByteArray"
-                },
-                {
-                  "name": "socials",
-                  "type": "core::byte_array::ByteArray"
+                  "name": "expiration",
+                  "type": "core::integer::u64"
                 }
               ],
               "outputs": [],
@@ -1424,35 +1450,27 @@
             },
             {
               "type": "function",
-              "name": "update_game",
+              "name": "edit_listing",
               "inputs": [
                 {
-                  "name": "world_address",
+                  "name": "order_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "quantity",
                   "type": "core::felt252"
                 },
                 {
-                  "name": "namespace",
+                  "name": "price",
                   "type": "core::felt252"
                 },
                 {
-                  "name": "project",
-                  "type": "core::byte_array::ByteArray"
+                  "name": "currency",
+                  "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
-                  "name": "rpc",
-                  "type": "core::byte_array::ByteArray"
-                },
-                {
-                  "name": "policies",
-                  "type": "core::byte_array::ByteArray"
-                },
-                {
-                  "name": "metadata",
-                  "type": "core::byte_array::ByteArray"
-                },
-                {
-                  "name": "socials",
-                  "type": "core::byte_array::ByteArray"
+                  "name": "expiration",
+                  "type": "core::integer::u64"
                 }
               ],
               "outputs": [],
@@ -1460,15 +1478,11 @@
             },
             {
               "type": "function",
-              "name": "publish_game",
+              "name": "cancel_listing",
               "inputs": [
                 {
-                  "name": "world_address",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "namespace",
-                  "type": "core::felt252"
+                  "name": "order_id",
+                  "type": "core::integer::u32"
                 }
               ],
               "outputs": [],
@@ -1476,15 +1490,11 @@
             },
             {
               "type": "function",
-              "name": "hide_game",
+              "name": "delete_listing",
               "inputs": [
                 {
-                  "name": "world_address",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "namespace",
-                  "type": "core::felt252"
+                  "name": "order_id",
+                  "type": "core::integer::u32"
                 }
               ],
               "outputs": [],
@@ -1492,14 +1502,14 @@
             },
             {
               "type": "function",
-              "name": "whitelist_game",
+              "name": "execute_listing",
               "inputs": [
                 {
-                  "name": "world_address",
-                  "type": "core::felt252"
+                  "name": "order_id",
+                  "type": "core::integer::u32"
                 },
                 {
-                  "name": "namespace",
+                  "name": "quantity",
                   "type": "core::felt252"
                 }
               ],
@@ -1508,15 +1518,31 @@
             },
             {
               "type": "function",
-              "name": "blacklist_game",
+              "name": "offer",
               "inputs": [
                 {
-                  "name": "world_address",
+                  "name": "collection",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "quantity",
                   "type": "core::felt252"
                 },
                 {
-                  "name": "namespace",
+                  "name": "price",
                   "type": "core::felt252"
+                },
+                {
+                  "name": "currency",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "expiration",
+                  "type": "core::integer::u64"
                 }
               ],
               "outputs": [],
@@ -1524,15 +1550,11 @@
             },
             {
               "type": "function",
-              "name": "remove_game",
+              "name": "cancel_offer",
               "inputs": [
                 {
-                  "name": "world_address",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "namespace",
-                  "type": "core::felt252"
+                  "name": "order_id",
+                  "type": "core::integer::u32"
                 }
               ],
               "outputs": [],
@@ -1540,23 +1562,11 @@
             },
             {
               "type": "function",
-              "name": "register_achievement",
+              "name": "delete_offer",
               "inputs": [
                 {
-                  "name": "world_address",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "namespace",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "identifier",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "points",
-                  "type": "core::integer::u16"
+                  "name": "order_id",
+                  "type": "core::integer::u32"
                 }
               ],
               "outputs": [],
@@ -1564,122 +1574,14 @@
             },
             {
               "type": "function",
-              "name": "update_achievement",
+              "name": "execute_offer",
               "inputs": [
                 {
-                  "name": "world_address",
-                  "type": "core::felt252"
+                  "name": "order_id",
+                  "type": "core::integer::u32"
                 },
                 {
-                  "name": "namespace",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "identifier",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "points",
-                  "type": "core::integer::u16"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "publish_achievement",
-              "inputs": [
-                {
-                  "name": "world_address",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "namespace",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "identifier",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "hide_achievement",
-              "inputs": [
-                {
-                  "name": "world_address",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "namespace",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "identifier",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "whitelist_achievement",
-              "inputs": [
-                {
-                  "name": "world_address",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "namespace",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "identifier",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "blacklist_achievement",
-              "inputs": [
-                {
-                  "name": "world_address",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "namespace",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "identifier",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "remove_achievement",
-              "inputs": [
-                {
-                  "name": "world_address",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "namespace",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "identifier",
+                  "name": "quantity",
                   "type": "core::felt252"
                 }
               ],
@@ -1780,25 +1682,31 @@
         },
         {
           "type": "event",
-          "name": "registry::components::initializable::InitializableComponent::Event",
+          "name": "orderbook::components::initializable::InitializableComponent::Event",
           "kind": "enum",
           "variants": []
         },
         {
           "type": "event",
-          "name": "registry::components::registerable::RegisterableComponent::Event",
+          "name": "orderbook::components::buyable::BuyableComponent::Event",
           "kind": "enum",
           "variants": []
         },
         {
           "type": "event",
-          "name": "registry::components::trackable::TrackableComponent::Event",
+          "name": "orderbook::components::sellable::SellableComponent::Event",
           "kind": "enum",
           "variants": []
         },
         {
           "type": "event",
-          "name": "arcade::systems::registry::Registry::Event",
+          "name": "orderbook::components::verifiable::VerifiableComponent::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "marketplace::systems::marketplace::Marketplace::Event",
           "kind": "enum",
           "variants": [
             {
@@ -1813,17 +1721,22 @@
             },
             {
               "name": "InitializableEvent",
-              "type": "registry::components::initializable::InitializableComponent::Event",
+              "type": "orderbook::components::initializable::InitializableComponent::Event",
               "kind": "flat"
             },
             {
-              "name": "RegisterableEvent",
-              "type": "registry::components::registerable::RegisterableComponent::Event",
+              "name": "BuyableEvent",
+              "type": "orderbook::components::buyable::BuyableComponent::Event",
               "kind": "flat"
             },
             {
-              "name": "TrackableEvent",
-              "type": "registry::components::trackable::TrackableComponent::Event",
+              "name": "SellableEvent",
+              "type": "orderbook::components::sellable::SellableComponent::Event",
+              "kind": "flat"
+            },
+            {
+              "name": "VerifiableEvent",
+              "type": "orderbook::components::verifiable::VerifiableComponent::Event",
               "kind": "flat"
             }
           ]
@@ -1832,1042 +1745,19 @@
       "init_calldata": [
         "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b"
       ],
-      "tag": "ARCADE-Registry",
-      "selector": "0x54d3bcd441104e039ceaec4a413e72de393b65f79d1df74dc3346dc7f861173",
+      "tag": "MARKETPLACE-Marketplace",
+      "selector": "0x7e652a77585fda1106743be3e39f39641266214d2f3c1e45f8aec559b5675d",
       "systems": [
         "dojo_init",
-        "register_game",
-        "update_game",
-        "publish_game",
-        "hide_game",
-        "whitelist_game",
-        "blacklist_game",
-        "remove_game",
-        "register_achievement",
-        "update_achievement",
-        "publish_achievement",
-        "hide_achievement",
-        "whitelist_achievement",
-        "blacklist_achievement",
-        "remove_achievement",
-        "upgrade"
-      ]
-    },
-    {
-      "address": "0x7ad90897d536f9c4b5cab45a3d1ac414e222c83c83e6868ad9a49ed2c00c0f",
-      "class_hash": "0x1718d25cb59c42414c40ea0ec00fe715c02013ccede953d76ddcfbf72351acc",
-      "abi": [
-        {
-          "type": "impl",
-          "name": "Slot__ContractImpl",
-          "interface_name": "dojo::contract::interface::IContract"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::interface::IContract",
-          "items": []
-        },
-        {
-          "type": "impl",
-          "name": "Slot__DeployedContractImpl",
-          "interface_name": "dojo::meta::interface::IDeployedResource"
-        },
-        {
-          "type": "struct",
-          "name": "core::byte_array::ByteArray",
-          "members": [
-            {
-              "name": "data",
-              "type": "core::array::Array::<core::bytes_31::bytes31>"
-            },
-            {
-              "name": "pending_word",
-              "type": "core::felt252"
-            },
-            {
-              "name": "pending_word_len",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::meta::interface::IDeployedResource",
-          "items": [
-            {
-              "type": "function",
-              "name": "dojo_name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "function",
-          "name": "dojo_init",
-          "inputs": [],
-          "outputs": [],
-          "state_mutability": "external"
-        },
-        {
-          "type": "impl",
-          "name": "SlotImpl",
-          "interface_name": "arcade::systems::slot::ISlot"
-        },
-        {
-          "type": "interface",
-          "name": "arcade::systems::slot::ISlot",
-          "items": [
-            {
-              "type": "function",
-              "name": "deploy",
-              "inputs": [
-                {
-                  "name": "service",
-                  "type": "core::integer::u8"
-                },
-                {
-                  "name": "project",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "tier",
-                  "type": "core::integer::u8"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "remove",
-              "inputs": [
-                {
-                  "name": "service",
-                  "type": "core::integer::u8"
-                },
-                {
-                  "name": "project",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "hire",
-              "inputs": [
-                {
-                  "name": "project",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account_id",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "role",
-                  "type": "core::integer::u8"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "fire",
-              "inputs": [
-                {
-                  "name": "project",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "WorldProviderImpl",
-          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
-        },
-        {
-          "type": "struct",
-          "name": "dojo::world::iworld::IWorldDispatcher",
-          "members": [
-            {
-              "name": "contract_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::world_provider::IWorldProvider",
-          "items": [
-            {
-              "type": "function",
-              "name": "world_dispatcher",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "dojo::world::iworld::IWorldDispatcher"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "UpgradeableImpl",
-          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::upgradeable::IUpgradeable",
-          "items": [
-            {
-              "type": "function",
-              "name": "upgrade",
-              "inputs": [
-                {
-                  "name": "new_class_hash",
-                  "type": "core::starknet::class_hash::ClassHash"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "constructor",
-          "name": "constructor",
-          "inputs": []
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "class_hash",
-              "type": "core::starknet::class_hash::ClassHash",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "Upgraded",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "provider::components::deployable::DeployableComponent::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "provider::components::groupable::GroupableComponent::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "arcade::systems::slot::Slot::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "UpgradeableEvent",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "WorldProviderEvent",
-              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "DeployableEvent",
-              "type": "provider::components::deployable::DeployableComponent::Event",
-              "kind": "flat"
-            },
-            {
-              "name": "GroupableEvent",
-              "type": "provider::components::groupable::GroupableComponent::Event",
-              "kind": "flat"
-            }
-          ]
-        }
-      ],
-      "init_calldata": [],
-      "tag": "ARCADE-Slot",
-      "selector": "0x16361cb59732e8b56d69550297b7d8f86c6d1be2fc71b5dde135aeb1d16f3f7",
-      "systems": [
-        "dojo_init",
-        "deploy",
-        "remove",
-        "hire",
-        "fire",
-        "upgrade"
-      ]
-    },
-    {
-      "address": "0x144f948e5d8084467a1bed5c4eaa87ee2057c6c2be06de428774a436c825f75",
-      "class_hash": "0x6566e0595e0c3f8cd4767c6641d61137f2330176b5e0b9eb9eeed7a5c9a3ab8",
-      "abi": [
-        {
-          "type": "impl",
-          "name": "Social__ContractImpl",
-          "interface_name": "dojo::contract::interface::IContract"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::interface::IContract",
-          "items": []
-        },
-        {
-          "type": "impl",
-          "name": "Social__DeployedContractImpl",
-          "interface_name": "dojo::meta::interface::IDeployedResource"
-        },
-        {
-          "type": "struct",
-          "name": "core::byte_array::ByteArray",
-          "members": [
-            {
-              "name": "data",
-              "type": "core::array::Array::<core::bytes_31::bytes31>"
-            },
-            {
-              "name": "pending_word",
-              "type": "core::felt252"
-            },
-            {
-              "name": "pending_word_len",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::meta::interface::IDeployedResource",
-          "items": [
-            {
-              "type": "function",
-              "name": "dojo_name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "SocialImpl",
-          "interface_name": "arcade::systems::social::ISocial"
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "arcade::systems::social::ISocial",
-          "items": [
-            {
-              "type": "function",
-              "name": "pin",
-              "inputs": [
-                {
-                  "name": "achievement_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "unpin",
-              "inputs": [
-                {
-                  "name": "achievement_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "follow",
-              "inputs": [
-                {
-                  "name": "target",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "unfollow",
-              "inputs": [
-                {
-                  "name": "target",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "create_alliance",
-              "inputs": [
-                {
-                  "name": "metadata",
-                  "type": "core::byte_array::ByteArray"
-                },
-                {
-                  "name": "socials",
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "open_alliance",
-              "inputs": [
-                {
-                  "name": "free",
-                  "type": "core::bool"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "close_alliance",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "crown_guild",
-              "inputs": [
-                {
-                  "name": "guild_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "hire_guild",
-              "inputs": [
-                {
-                  "name": "guild_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "fire_guild",
-              "inputs": [
-                {
-                  "name": "guild_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "request_alliance",
-              "inputs": [
-                {
-                  "name": "alliance_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "cancel_alliance",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "leave_alliance",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "create_guild",
-              "inputs": [
-                {
-                  "name": "metadata",
-                  "type": "core::byte_array::ByteArray"
-                },
-                {
-                  "name": "socials",
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "open_guild",
-              "inputs": [
-                {
-                  "name": "free",
-                  "type": "core::bool"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "close_guild",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "crown_member",
-              "inputs": [
-                {
-                  "name": "member_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "promote_member",
-              "inputs": [
-                {
-                  "name": "member_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "demote_member",
-              "inputs": [
-                {
-                  "name": "member_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "hire_member",
-              "inputs": [
-                {
-                  "name": "member_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "fire_member",
-              "inputs": [
-                {
-                  "name": "member_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "request_guild",
-              "inputs": [
-                {
-                  "name": "guild_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "cancel_guild",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "leave_guild",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "function",
-          "name": "dojo_init",
-          "inputs": [],
-          "outputs": [],
-          "state_mutability": "view"
-        },
-        {
-          "type": "impl",
-          "name": "WorldProviderImpl",
-          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
-        },
-        {
-          "type": "struct",
-          "name": "dojo::world::iworld::IWorldDispatcher",
-          "members": [
-            {
-              "name": "contract_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::world_provider::IWorldProvider",
-          "items": [
-            {
-              "type": "function",
-              "name": "world_dispatcher",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "dojo::world::iworld::IWorldDispatcher"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "UpgradeableImpl",
-          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::upgradeable::IUpgradeable",
-          "items": [
-            {
-              "type": "function",
-              "name": "upgrade",
-              "inputs": [
-                {
-                  "name": "new_class_hash",
-                  "type": "core::starknet::class_hash::ClassHash"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "constructor",
-          "name": "constructor",
-          "inputs": []
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "class_hash",
-              "type": "core::starknet::class_hash::ClassHash",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "Upgraded",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "achievement::components::pinnable::PinnableComponent::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "social::components::allianceable::AllianceableComponent::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "social::components::followable::FollowableComponent::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "social::components::guildable::GuildableComponent::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "arcade::systems::social::Social::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "UpgradeableEvent",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "WorldProviderEvent",
-              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "PinnableEvent",
-              "type": "achievement::components::pinnable::PinnableComponent::Event",
-              "kind": "flat"
-            },
-            {
-              "name": "AllianceableEvent",
-              "type": "social::components::allianceable::AllianceableComponent::Event",
-              "kind": "flat"
-            },
-            {
-              "name": "FollowableEvent",
-              "type": "social::components::followable::FollowableComponent::Event",
-              "kind": "flat"
-            },
-            {
-              "name": "GuildableEvent",
-              "type": "social::components::guildable::GuildableComponent::Event",
-              "kind": "flat"
-            }
-          ]
-        }
-      ],
-      "init_calldata": [],
-      "tag": "ARCADE-Social",
-      "selector": "0x28532a65d3bfdb030133a56031e467c489058fee53a3bd903adc719735aa6c5",
-      "systems": [
-        "pin",
-        "unpin",
-        "follow",
-        "unfollow",
-        "create_alliance",
-        "open_alliance",
-        "close_alliance",
-        "crown_guild",
-        "hire_guild",
-        "fire_guild",
-        "request_alliance",
-        "cancel_alliance",
-        "leave_alliance",
-        "create_guild",
-        "open_guild",
-        "close_guild",
-        "crown_member",
-        "promote_member",
-        "demote_member",
-        "hire_member",
-        "fire_member",
-        "request_guild",
-        "cancel_guild",
-        "leave_guild",
-        "upgrade"
-      ]
-    },
-    {
-      "address": "0x502d4def71dbba260f8f4c308b006daa367ff7648bf124685c5f6ae90e8eb10",
-      "class_hash": "0x12a869dfb44f540886161b7b18a1401a2a8ca8bec0f3796cd8399087bfe4bd9",
-      "abi": [
-        {
-          "type": "impl",
-          "name": "Wallet__ContractImpl",
-          "interface_name": "dojo::contract::interface::IContract"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::interface::IContract",
-          "items": []
-        },
-        {
-          "type": "impl",
-          "name": "Wallet__DeployedContractImpl",
-          "interface_name": "dojo::meta::interface::IDeployedResource"
-        },
-        {
-          "type": "struct",
-          "name": "core::byte_array::ByteArray",
-          "members": [
-            {
-              "name": "data",
-              "type": "core::array::Array::<core::bytes_31::bytes31>"
-            },
-            {
-              "name": "pending_word",
-              "type": "core::felt252"
-            },
-            {
-              "name": "pending_word_len",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::meta::interface::IDeployedResource",
-          "items": [
-            {
-              "type": "function",
-              "name": "dojo_name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "WalletImpl",
-          "interface_name": "arcade::systems::wallet::IWallet"
-        },
-        {
-          "type": "interface",
-          "name": "arcade::systems::wallet::IWallet",
-          "items": []
-        },
-        {
-          "type": "function",
-          "name": "dojo_init",
-          "inputs": [],
-          "outputs": [],
-          "state_mutability": "view"
-        },
-        {
-          "type": "impl",
-          "name": "WorldProviderImpl",
-          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
-        },
-        {
-          "type": "struct",
-          "name": "dojo::world::iworld::IWorldDispatcher",
-          "members": [
-            {
-              "name": "contract_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::world_provider::IWorldProvider",
-          "items": [
-            {
-              "type": "function",
-              "name": "world_dispatcher",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "dojo::world::iworld::IWorldDispatcher"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "UpgradeableImpl",
-          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::upgradeable::IUpgradeable",
-          "items": [
-            {
-              "type": "function",
-              "name": "upgrade",
-              "inputs": [
-                {
-                  "name": "new_class_hash",
-                  "type": "core::starknet::class_hash::ClassHash"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "constructor",
-          "name": "constructor",
-          "inputs": []
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "class_hash",
-              "type": "core::starknet::class_hash::ClassHash",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "Upgraded",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "controller::components::controllable::ControllableComponent::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "arcade::systems::wallet::Wallet::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "UpgradeableEvent",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "WorldProviderEvent",
-              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "ControllableEvent",
-              "type": "controller::components::controllable::ControllableComponent::Event",
-              "kind": "flat"
-            }
-          ]
-        }
-      ],
-      "init_calldata": [],
-      "tag": "ARCADE-Wallet",
-      "selector": "0x69ba9525fdd6458dfaea7f06bcfd0cf5fef14d66c5516cf8548c2e2b845c6a5",
-      "systems": [
+        "list",
+        "edit_listing",
+        "cancel_listing",
+        "delete_listing",
+        "execute_listing",
+        "offer",
+        "cancel_offer",
+        "delete_offer",
+        "execute_offer",
         "upgrade"
       ]
     }
@@ -2876,95 +1766,35 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x3deed15c48eec4b86fa2dd6a68b0e89bc19ed32c84f34b61fef996651110dca",
-      "tag": "ARCADE-Access",
-      "selector": "0x4de83c9f22c74953e76afcef63ce27a77e04d2304133da1ec46fa2e46a0c40f"
+      "class_hash": "0x106302d71839f2bb359317adb771597cd459069d56e8355ac154758e1ef15cd",
+      "tag": "MARKETPLACE-Book",
+      "selector": "0x6b71d0dbe436e76d464874d7990a0d38ccbaa4f75bbd8f5e44338a166653d9c"
     },
     {
       "members": [],
-      "class_hash": "0x36af2ee8694dafab960ecedd32953bc5c80eb588e39aa129f17387b8fcea2b",
-      "tag": "ARCADE-Account",
-      "selector": "0x7e96bc903044d45737e5ec7e23b596e8e7f110a1b1f80d413b53725c7bbb2f6"
-    },
-    {
-      "members": [],
-      "class_hash": "0x6850f31c0c97d445223ea59bfccdc0051e9b2dbdb13a70e975ab2621a39d6ee",
-      "tag": "ARCADE-Achievement",
-      "selector": "0x4909446396e41e99e20f04d9f5d9e83ab83beea6089c76d0fef29b034de9736"
-    },
-    {
-      "members": [],
-      "class_hash": "0x1df48e494d52cd03ff4ae2672f6b99d3f26faffa82843a5d637a0daabfceb44",
-      "tag": "ARCADE-Alliance",
-      "selector": "0x74a88ab0bed983c65d7e57761329312c125ef0be4ef7889f560153000132866"
-    },
-    {
-      "members": [],
-      "class_hash": "0x6130ab3b88a5f9052cf9a761eb2d2ceea6c6c896481f379f7040e0a49ad86bf",
-      "tag": "ARCADE-Controller",
-      "selector": "0x7b2fac00792560d241723d9852f29e952bb0ecc88219dd3fb86b61796dc5952"
-    },
-    {
-      "members": [],
-      "class_hash": "0x15aed39c5057dd8c0d96b5746d355e0dd0a1a7aa66fa146d384b3243b94c5f5",
-      "tag": "ARCADE-Deployment",
-      "selector": "0x5354f17394d652912bae10be363d24d155edbdb936fa275f855491253cb63a4"
-    },
-    {
-      "members": [],
-      "class_hash": "0x7390c815e920ff5b9889e5cef7d47191993e5cc5f661a9502686eb1759330a5",
-      "tag": "ARCADE-Factory",
-      "selector": "0x59995d7c14b165cb6738a67e319c6ad553a58d9c05f87f0c35190b13e1c223"
-    },
-    {
-      "members": [],
-      "class_hash": "0x236417190bb2138a857540770641cd536c4ffac26065b6f4184217d321a1a0a",
-      "tag": "ARCADE-Game",
-      "selector": "0x6143bc86ed1a08df992c568392c454a92ef7e7b5ba08e9bf75643cf5cfc8b14"
-    },
-    {
-      "members": [],
-      "class_hash": "0x5cacd4f58b1f06abe2ae3cfa27ccda71fedec6df09b8236f3044006d448d4c",
-      "tag": "ARCADE-Guild",
-      "selector": "0x95501f151f575b4fab06c5ceb7237739dd0608982727cbc226273aecf006aa"
-    },
-    {
-      "members": [],
-      "class_hash": "0x136979b486c9503aad5dbe86b4eda098370b678ab58c1162f423eee73cdb914",
-      "tag": "ARCADE-Member",
-      "selector": "0x7b9b4b91d2d7823ac5c041c32867f856e6393905bedb2c4b7f58d56bf13ec43"
-    },
-    {
-      "members": [],
-      "class_hash": "0x7d9377b7dba1748654858d5a909420ee0066bfbde575c81c01437883d5d6e80",
-      "tag": "ARCADE-Signer",
-      "selector": "0x79493096b3a4188aade984eaf8272a97748ee48111c1f7e6683a89f64406c1a"
-    },
-    {
-      "members": [],
-      "class_hash": "0x377b36328fd0f8136853af9cbb1ca3e8e1e5bc48d136c0a0b374ad2feca9651",
-      "tag": "ARCADE-Team",
-      "selector": "0x56407a8963e9ebbb56d8c167c40bc0bd8ce7e38ac48c632421d5cf3dc865a01"
-    },
-    {
-      "members": [],
-      "class_hash": "0x3f01ea4074ca995dd34d67f41ce8eba112d513bdb6d8d37b9fcea0967acc376",
-      "tag": "ARCADE-Teammate",
-      "selector": "0x56a4d220830ecdcb5e816e49c743a4e0f784b7bdea24737be188d1f1059308e"
+      "class_hash": "0x67c07e41f3ffdb91cd29783d15e4fc67b8944c765e2c102c5c6eba2595fe01",
+      "tag": "MARKETPLACE-Order",
+      "selector": "0x61b4c97fb2ee0697bed87a3f5f7e932e5af76c77c88682b9ae67552f32eff69"
     }
   ],
   "events": [
     {
       "members": [],
-      "class_hash": "0x267263506d39eeba83ba032276674b09df56edda2a83b0c0874a48e3492bac4",
-      "tag": "ARCADE-Follow",
-      "selector": "0x38866790c8a50b1c2d43786d8d06856b7ab65ce7a59e136bc47fbae18b147f1"
+      "class_hash": "0x243ea7e6abeceb9c8392c0d3f24b00382e50b671322c526df017ffd9651f439",
+      "tag": "MARKETPLACE-Listing",
+      "selector": "0x46941a9d898f53447b49e68db8c050602bd4ae1c96f3b7bf4652176fb731603"
     },
     {
       "members": [],
-      "class_hash": "0x2a5443928215a24cdf8524032fde759c4d25c083db1fb01ba1b0e9c7670f22d",
-      "tag": "ARCADE-TrophyPinning",
-      "selector": "0x7b9d51ffd54b6bfa69d849bf8f35fb7bb08820e792d3eeca9dd990f4905aacb"
+      "class_hash": "0x494aecee7094d990e20bc9074d08dbece1e9793abb71f405b936f0531ac0748",
+      "tag": "MARKETPLACE-Offer",
+      "selector": "0x2e8cc7c8726fe1500b19d4d0ef351d5b11f3a010a857c074825670c37507c32"
+    },
+    {
+      "members": [],
+      "class_hash": "0x1861c5f5dc716e4017a1b942231a6d7b89bcdb44fffdd58a796312dfdbfe62e",
+      "tag": "MARKETPLACE-Sale",
+      "selector": "0x5258de3665c1c16659a2c4c55edf557c5dd9f2ea0f94cc24c8cd3676a8e9c02"
     }
   ],
   "external_contracts": []
