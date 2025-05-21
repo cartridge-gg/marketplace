@@ -90,9 +90,9 @@ importers:
 
   packages/config: {}
 
-  packages/executor: {}
-
   packages/models: {}
+
+  packages/orderbook: {}
 
   packages/sdk:
     devDependencies:
