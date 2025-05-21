@@ -13,7 +13,7 @@ pub mod BuyableComponent {
     use orderbook::constants::BOOK_ID;
     use orderbook::store::StoreTrait;
     use orderbook::types::category::Category;
-    use orderbook::models::book::BookTrait;
+    use orderbook::models::book::{BookTrait, BookAssert};
     use orderbook::models::order::{OrderTrait, OrderAssert};
     use orderbook::components::verifiable::{
         VerifiableComponent, VerifiableComponent::InternalImpl as VerifiableImpl,
@@ -42,11 +42,16 @@ pub mod BuyableComponent {
             world: WorldStorage,
             collection: ContractAddress,
             token_id: u256,
-            quantity: felt252,
-            price: felt252,
+            quantity: u128,
+            price: u128,
             currency: ContractAddress,
             expiration: u64,
         ) {
+            // [Check] Book is not paused
+            let mut store = StoreTrait::new(world);
+            let mut book = store.book(BOOK_ID);
+            book.assert_not_paused();
+
             // [Check] Validity requirements
             let caller_address = starknet::get_caller_address();
             let verifiable = get_dep_component!(self, Verify);
@@ -56,8 +61,6 @@ pub mod BuyableComponent {
                 );
 
             // [Effect] Create order
-            let mut store = StoreTrait::new(world);
-            let mut book = store.book(BOOK_ID);
             let order_id = book.get_id();
             let time = starknet::get_block_timestamp();
             let order = OrderTrait::new(
@@ -82,8 +85,12 @@ pub mod BuyableComponent {
         }
 
         fn cancel(self: @ComponentState<TContractState>, world: WorldStorage, order_id: u32) {
-            // [Check] Order exists
+            // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
+            let book = store.book(BOOK_ID);
+            book.assert_not_paused();
+
+            // [Check] Order exists
             let mut order = store.order(order_id);
             order.assert_does_exist();
 
@@ -102,8 +109,12 @@ pub mod BuyableComponent {
         }
 
         fn delete(self: @ComponentState<TContractState>, world: WorldStorage, order_id: u32) {
-            // [Check] Order exists
+            // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
+            let book = store.book(BOOK_ID);
+            book.assert_not_paused();
+
+            // [Check] Order exists
             let mut order = store.order(order_id);
             order.assert_does_exist();
 
@@ -131,13 +142,15 @@ pub mod BuyableComponent {
             self: @ComponentState<TContractState>,
             world: WorldStorage,
             order_id: u32,
-            quantity: felt252,
-            fee_num: u16,
-            fee_den: u16,
-            fee_receiver: ContractAddress,
+            quantity: u128,
+            royalties: bool,
         ) {
-            // [Check] Order exists
+            // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
+            let book = store.book(BOOK_ID);
+            book.assert_not_paused();
+
+            // [Check] Order exists
             let mut order = store.order(order_id);
             order.assert_does_exist();
 
@@ -163,18 +176,40 @@ pub mod BuyableComponent {
                 );
 
             // [Effect] Execute order
-            order.execute();
+            let time = starknet::get_block_timestamp();
+            order.execute(quantity, time);
 
             // [Effect] Update models
             store.set_order(@order);
 
             // [Interaction] Process transfers
-            // Remove fees from price
-            let fee = price * fee_num.into() / fee_den.into();
+            let (orderbook_receiver, orderbook_fee) = book.fee(price);
+            let (creator_receiver, creator_fee) = if royalties {
+                verifiable.royalties(collection, token_id, price)
+            } else {
+                (starknet::get_contract_address(), 0)
+            };
             verifiable
-                .pay(spender: spender, recipient: owner, currency: currency, amount: price - fee);
+                .pay(
+                    spender: spender,
+                    recipient: orderbook_receiver.try_into().unwrap(),
+                    currency: currency,
+                    amount: orderbook_fee,
+                );
             verifiable
-                .pay(spender: spender, recipient: fee_receiver, currency: currency, amount: fee);
+                .pay(
+                    spender: spender,
+                    recipient: creator_receiver,
+                    currency: currency,
+                    amount: creator_fee,
+                );
+            verifiable
+                .pay(
+                    spender: spender,
+                    recipient: owner,
+                    currency: currency,
+                    amount: price - orderbook_fee - creator_fee,
+                );
             verifiable
                 .transfer(
                     owner: owner,
@@ -185,7 +220,6 @@ pub mod BuyableComponent {
                 );
 
             // [Event] Sale
-            let time = starknet::get_block_timestamp();
             let from: felt252 = owner.into();
             let to: felt252 = spender.into();
             store.sale(order: order, from: from, to: to, time: time);

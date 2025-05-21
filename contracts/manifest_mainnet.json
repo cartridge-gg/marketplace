@@ -1,8 +1,8 @@
 {
   "world": {
     "class_hash": "0x4c60dc46a8ca8bb47675b7b914053cef769afbf0e340523187336b72bd71d1f",
-    "address": "0x690ab03390b3e001ef389c71355919a3d7a648d26bc8760a552963965334a7a",
-    "seed": "Marketplace-0",
+    "address": "0x57c5df0f4bbde81bf39fd99fe1c942e4fef15b80af5d0d4b4cb6bf43a7acf46",
+    "seed": "Marketplace-1",
     "name": "Cartridge Marketplace",
     "entrypoints": [
       "uuid",
@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x2462fcc60c8c5f804248f1a41c151949d3ea24cc9315f69d37796f57e4bd048",
-      "class_hash": "0x2b406c266f83f5d2a0e28dc330a8297a40066b84ff887d7d164d84e07bd1c42",
+      "address": "0x67afac107a25f997b4a40624facbcccb8ba4b849e1ae4e9d6abf1eb743a2581",
+      "class_hash": "0x652fa2c14182a0e00f5c55d09d0f745f812af63875f0cfa96fe64462b9ab72",
       "abi": [
         {
           "type": "impl",
@@ -1386,12 +1386,89 @@
           "name": "dojo_init",
           "inputs": [
             {
+              "name": "fee_num",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "fee_receiver",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
               "name": "owner",
               "type": "core::starknet::contract_address::ContractAddress"
             }
           ],
           "outputs": [],
           "state_mutability": "external"
+        },
+        {
+          "type": "impl",
+          "name": "AdministrationImpl",
+          "interface_name": "marketplace::systems::marketplace::IAdministration"
+        },
+        {
+          "type": "interface",
+          "name": "marketplace::systems::marketplace::IAdministration",
+          "items": [
+            {
+              "type": "function",
+              "name": "grant_role",
+              "inputs": [
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "role_id",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "revoke_role",
+              "inputs": [
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "pause",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "resume",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_fee",
+              "inputs": [
+                {
+                  "name": "fee_num",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "fee_receiver",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
         },
         {
           "type": "impl",
@@ -1413,6 +1490,20 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "marketplace::systems::marketplace::IMarketplace",
           "items": [
@@ -1430,39 +1521,11 @@
                 },
                 {
                   "name": "quantity",
-                  "type": "core::felt252"
+                  "type": "core::integer::u128"
                 },
                 {
                   "name": "price",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "currency",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "expiration",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "edit_listing",
-              "inputs": [
-                {
-                  "name": "order_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "quantity",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "price",
-                  "type": "core::felt252"
+                  "type": "core::integer::u128"
                 },
                 {
                   "name": "currency",
@@ -1510,7 +1573,11 @@
                 },
                 {
                   "name": "quantity",
-                  "type": "core::felt252"
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "royalties",
+                  "type": "core::bool"
                 }
               ],
               "outputs": [],
@@ -1530,11 +1597,11 @@
                 },
                 {
                   "name": "quantity",
-                  "type": "core::felt252"
+                  "type": "core::integer::u128"
                 },
                 {
                   "name": "price",
-                  "type": "core::felt252"
+                  "type": "core::integer::u128"
                 },
                 {
                   "name": "currency",
@@ -1582,7 +1649,11 @@
                 },
                 {
                   "name": "quantity",
-                  "type": "core::felt252"
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "royalties",
+                  "type": "core::bool"
                 }
               ],
               "outputs": [],
@@ -1682,7 +1753,7 @@
         },
         {
           "type": "event",
-          "name": "orderbook::components::initializable::InitializableComponent::Event",
+          "name": "orderbook::components::manageable::ManageableComponent::Event",
           "kind": "enum",
           "variants": []
         },
@@ -1720,8 +1791,8 @@
               "kind": "nested"
             },
             {
-              "name": "InitializableEvent",
-              "type": "orderbook::components::initializable::InitializableComponent::Event",
+              "name": "ManageableEvent",
+              "type": "orderbook::components::manageable::ManageableComponent::Event",
               "kind": "flat"
             },
             {
@@ -1743,14 +1814,20 @@
         }
       ],
       "init_calldata": [
+        "0x1F4",
+        "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b",
         "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b"
       ],
       "tag": "MARKETPLACE-Marketplace",
       "selector": "0x7e652a77585fda1106743be3e39f39641266214d2f3c1e45f8aec559b5675d",
       "systems": [
         "dojo_init",
+        "grant_role",
+        "revoke_role",
+        "pause",
+        "resume",
+        "set_fee",
         "list",
-        "edit_listing",
         "cancel_listing",
         "delete_listing",
         "execute_listing",
@@ -1766,13 +1843,19 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x106302d71839f2bb359317adb771597cd459069d56e8355ac154758e1ef15cd",
+      "class_hash": "0x2efd3eed51d7f4eae3c0b7095d7e3bc33bea1ff32cb7557df768a181fc0e585",
+      "tag": "MARKETPLACE-Access",
+      "selector": "0x1ae32b3cefa0eb1bfc7bc7765d4b0c71fea05f8edfe72c2e4dfbfbf9ccf2aa5"
+    },
+    {
+      "members": [],
+      "class_hash": "0x7d509062796c252ee2323affb274acc2aec44961ce9368fdb1ce16987bddf39",
       "tag": "MARKETPLACE-Book",
       "selector": "0x6b71d0dbe436e76d464874d7990a0d38ccbaa4f75bbd8f5e44338a166653d9c"
     },
     {
       "members": [],
-      "class_hash": "0x67c07e41f3ffdb91cd29783d15e4fc67b8944c765e2c102c5c6eba2595fe01",
+      "class_hash": "0x62ce5f7bd53533d359ae32db851e1f53bd0419bc4e152191a213cdda2b847a",
       "tag": "MARKETPLACE-Order",
       "selector": "0x61b4c97fb2ee0697bed87a3f5f7e932e5af76c77c88682b9ae67552f32eff69"
     }
@@ -1780,19 +1863,19 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x243ea7e6abeceb9c8392c0d3f24b00382e50b671322c526df017ffd9651f439",
+      "class_hash": "0x84cc7ffd97ab5ae628f3050d36ef200370046fb8290de1f4626b663c961000",
       "tag": "MARKETPLACE-Listing",
       "selector": "0x46941a9d898f53447b49e68db8c050602bd4ae1c96f3b7bf4652176fb731603"
     },
     {
       "members": [],
-      "class_hash": "0x494aecee7094d990e20bc9074d08dbece1e9793abb71f405b936f0531ac0748",
+      "class_hash": "0x301c4766b0be1f08491932ed5d84958dee414d3c28db6764cc5ebaf1c45c634",
       "tag": "MARKETPLACE-Offer",
       "selector": "0x2e8cc7c8726fe1500b19d4d0ef351d5b11f3a010a857c074825670c37507c32"
     },
     {
       "members": [],
-      "class_hash": "0x1861c5f5dc716e4017a1b942231a6d7b89bcdb44fffdd58a796312dfdbfe62e",
+      "class_hash": "0x7e8703ca5fc3db3e4c92320c5d433e327a4821ab4c4a9ddaedf7923b2fb698d",
       "tag": "MARKETPLACE-Sale",
       "selector": "0x5258de3665c1c16659a2c4c55edf557c5dd9f2ea0f94cc24c8cd3676a8e9c02"
     }

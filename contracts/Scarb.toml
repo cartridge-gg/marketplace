@@ -22,6 +22,7 @@ cairo_test = "2.10.1"
 [[target.starknet-contract]]
 build-external-contracts = [
   "dojo::world::world_contract::world",
+  "orderbook::models::index::m_Access",
   "orderbook::models::index::m_Book",
   "orderbook::models::index::m_Order",
   "orderbook::events::index::e_Listing",

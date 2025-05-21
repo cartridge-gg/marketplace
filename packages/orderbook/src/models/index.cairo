@@ -1,5 +1,13 @@
 //! Models
 
+#[derive(Clone, Drop, Serde)]
+#[dojo::model]
+pub struct Access {
+    #[key]
+    pub address: felt252,
+    pub role: u8,
+}
+
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct Book {
@@ -8,7 +16,8 @@ pub struct Book {
     pub version: u8,
     pub paused: bool,
     pub counter: u32,
-    pub owner: felt252,
+    pub fee_num: u32,
+    pub fee_receiver: felt252,
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -21,8 +30,8 @@ pub struct Order {
     pub expiration: u64,
     pub collection: felt252,
     pub token_id: u256,
-    pub quantity: felt252,
-    pub price: felt252,
+    pub quantity: u128,
+    pub price: u128,
     pub currency: felt252,
     pub owner: felt252,
 }
