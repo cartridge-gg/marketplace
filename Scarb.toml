@@ -1,11 +1,11 @@
 [workspace]
-members = ["packages/executor", "packages/orderbook"]
+members = ["packages/executor", "packages/orderbook", "contracts"]
 description = "Dojo marketplace library"
 homepage = "https://github.com/cartridge-gg/marketplace"
-cairo-version = "2.9.4"
+cairo-version = "=2.10.1"
 
 [workspace.package]
-version = "0.0.0"
+version = "0.0.1"
 edition = "2024_07"
 
 [workspace.dependencies]
@@ -18,3 +18,7 @@ cairo_test = "2.10.1"
 
 [workspace.tool.fmt]
 sort-module-level-items = true
+
+[[target.starknet-contract]]
+sierra = true
+build-external-contracts = ["dojo::world::world_contract::world"]

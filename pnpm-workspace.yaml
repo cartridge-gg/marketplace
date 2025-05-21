@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+catalog:
+  "@dojoengine/core": 1.4.4
+  "@dojoengine/sdk": 1.4.4
+  "@dojoengine/torii-wasm": 1.4.4
+  tsup: 8.4.0
+  typescript: "5.8"
