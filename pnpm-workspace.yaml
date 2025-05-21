@@ -3,8 +3,9 @@ packages:
   - "packages/*"
 
 catalog:
-  "@dojoengine/core": 1.4.4
-  "@dojoengine/sdk": 1.4.4
-  "@dojoengine/torii-wasm": 1.4.4
+  "@dojoengine/core": 1.5.5
+  "@dojoengine/sdk": 1.5.5
+  "@dojoengine/torii-client": 1.5.5
+  starknet: 6.23.1
   tsup: 8.4.0
   typescript: "5.8"

@@ -23,10 +23,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.7.1",
+  "packageManager": "pnpm@10.10.0",
+  "dependencies": {
+    "@dojoengine/core": "catalog:",
+    "@dojoengine/sdk": "catalog:",
+    "@dojoengine/torii-client": "catalog:",
+    "starknet": "catalog:"
+  },
   "devDependencies": {
     "@cartridge-gg/marketplace-config": "workspace:*",
     "tsup": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "^3.1.4"
   }
 }
