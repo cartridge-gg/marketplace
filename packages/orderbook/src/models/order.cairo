@@ -30,8 +30,8 @@ pub impl OrderImpl of OrderTrait {
         category: Category,
         collection: felt252,
         token_id: u256,
-        quantity: felt252,
-        price: felt252,
+        quantity: u128,
+        price: u128,
         currency: felt252,
         expiration: u64,
         now: u64,
@@ -58,30 +58,14 @@ pub impl OrderImpl of OrderTrait {
     }
 
     #[inline]
-    fn update(
-        ref self: Order,
-        quantity: felt252,
-        price: felt252,
-        currency: felt252,
-        expiration: u64,
-        now: u64,
-    ) {
-        // [Check] Inputs
-        OrderAssert::assert_valid_price(price);
-        OrderAssert::assert_valid_currency(currency);
-        OrderAssert::assert_valid_expiration(expiration, now);
-        // [Update] Order
-        self.quantity = quantity;
-        self.price = price;
-        self.currency = currency;
-        self.expiration = expiration;
-    }
-
-    #[inline]
-    fn execute(ref self: Order) {
+    fn execute(ref self: Order, quantity: u128, now: u64) {
         // [Check] Order can be closed
-        self.assert_can_execute();
+        self.assert_can_execute(quantity, now);
         // [Update] Order
+        self.quantity -= quantity;
+        if self.quantity != 0 {
+            return;
+        };
         self.status = Status::Executed.into();
     }
 
@@ -136,7 +120,9 @@ pub impl OrderAssert of AssertTrait {
     }
 
     #[inline]
-    fn assert_can_execute(self: @Order) {
+    fn assert_can_execute(self: @Order, quantity: u128, now: u64) {
+        assert(*self.quantity >= quantity, errors::ORDER_CANNOT_EXECUTE);
+        assert(*self.expiration >= now, errors::ORDER_CANNOT_EXECUTE);
         assert(*self.status == Status::Placed.into(), errors::ORDER_CANNOT_EXECUTE);
     }
 
@@ -156,7 +142,7 @@ pub impl OrderAssert of AssertTrait {
     }
 
     #[inline]
-    fn assert_valid_price(price: felt252) {
+    fn assert_valid_price(price: u128) {
         assert(price != 0, errors::ORDER_INVALID_PRICE);
     }
 
@@ -182,8 +168,8 @@ pub mod tests {
     pub const ORDER_ID: u32 = 1;
     pub const COLLECTION: felt252 = 'COLLECTION';
     pub const TOKEN_ID: u256 = 42;
-    pub const QUANTITY: felt252 = 100;
-    pub const PRICE: felt252 = 1234;
+    pub const QUANTITY: u128 = 100;
+    pub const PRICE: u128 = 1234;
     pub const CURRENCY: felt252 = 'CURRENCY';
     pub const NOW: u64 = 1622547800;
     pub const EXPIRATION: u64 = NOW + ORDER_MINIMUM_DURATION;

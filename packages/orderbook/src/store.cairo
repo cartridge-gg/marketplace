@@ -8,6 +8,7 @@ use dojo::event::EventStorage;
 
 // Models imports
 
+use orderbook::models::access::Access;
 use orderbook::models::book::Book;
 use orderbook::models::order::Order;
 use orderbook::events::listing::ListingTrait;
@@ -32,6 +33,11 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline]
+    fn access(self: Store, address: felt252) -> Access {
+        self.world.read_model(address)
+    }
+
+    #[inline]
     fn book(self: Store, id: u32) -> Book {
         self.world.read_model(id)
     }
@@ -39,6 +45,11 @@ pub impl StoreImpl of StoreTrait {
     #[inline]
     fn order(self: Store, id: u32) -> Order {
         self.world.read_model(id)
+    }
+
+    #[inline]
+    fn set_access(ref self: Store, access: @Access) {
+        self.world.write_model(access);
     }
 
     #[inline]

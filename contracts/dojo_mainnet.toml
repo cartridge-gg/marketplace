@@ -2,7 +2,7 @@
 name = "Cartridge Marketplace"
 description = "Cartridge Marketplace"
 website = "https://github.com/dojoengine/dojo-starter"
-seed = "Marketplace-0"
+seed = "Marketplace-1"
 
 [world.socials]
 x = "https://x.com/ohayo_dojo"
@@ -15,7 +15,9 @@ default = "MARKETPLACE"
 
 [init_call_args]
 "MARKETPLACE-Marketplace" = [
-    "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b",
+    "0x1F4",                                                              # 5% fee
+    "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b", # Fee receiver
+    "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b", # Owner
 ]
 
 [writers]
@@ -24,8 +26,8 @@ default = "MARKETPLACE"
 [env]
 rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
 account_address = "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b"
-# world_address = "0x065613bd4a3b58ebe84abed13a67ff9eaa1de29a640cb6598da54207a5551d87"
-# world_block = 1287600
+world_address = "0x057c5df0f4bbde81bf39fd99fe1c942e4fef15b80af5d0d4b4cb6bf43a7acf46"
+world_block = 1420547
 ipfs_config.url = "https://ipfs.infura.io:5001"
 ipfs_config.username = "2EBrzr7ZASQZKH32sl2xWauXPSA"
 ipfs_config.password = "12290b883db9138a8ae3363b6739d220"

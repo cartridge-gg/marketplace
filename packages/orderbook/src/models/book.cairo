@@ -1,12 +1,13 @@
 // Internal imports
 
-pub use orderbook::constants::VERSION;
+pub use orderbook::constants::{VERSION, DEFAULT_FEE_DENOMINATOR};
 pub use orderbook::models::index::Book;
 
 // Errors
 
 pub mod errors {
-    pub const BOOK_INVALID_OWNER: felt252 = 'Book: invalid owner';
+    pub const BOOK_INVALID_ADDRESS: felt252 = 'Book: invalid address';
+    pub const BOOK_INVALID_FEE: felt252 = 'Book: invalid fee';
     pub const BOOK_IS_PAUSED: felt252 = 'Book: is paused';
     pub const BOOK_CANNOT_PAUSE: felt252 = 'Book: cannot be paused';
     pub const BOOK_CANNOT_RESUME: felt252 = 'Book: cannot be resumed';
@@ -15,11 +16,25 @@ pub mod errors {
 #[generate_trait]
 pub impl BookImpl of BookTrait {
     #[inline]
-    fn new(id: u32, owner: felt252) -> Book {
+    fn new(id: u32, fee_num: u32, fee_receiver: felt252) -> Book {
         // [Check] Inputs
-        BookAssert::assert_valid_owner(owner);
+        BookAssert::assert_valid_address(fee_receiver);
+        BookAssert::assert_valid_fee(fee_num);
         // [Return] Book
-        Book { id: id, version: VERSION, paused: false, counter: 0, owner: owner }
+        Book {
+            id: id,
+            version: VERSION,
+            paused: false,
+            counter: 0,
+            fee_num: fee_num,
+            fee_receiver: fee_receiver,
+        }
+    }
+
+    #[inline]
+    fn fee(self: Book, price: u256) -> (felt252, u256) {
+        // [Return] Fee
+        (self.fee_receiver, price * self.fee_num.into() / DEFAULT_FEE_DENOMINATOR.into())
     }
 
     #[inline]
@@ -45,13 +60,28 @@ pub impl BookImpl of BookTrait {
         // [Update] Book
         self.paused = false;
     }
+
+    #[inline]
+    fn set_fee(ref self: Book, fee_num: u32, fee_receiver: felt252) {
+        // [Check] Inputs
+        BookAssert::assert_valid_address(fee_receiver);
+        BookAssert::assert_valid_fee(fee_num);
+        // [Update] Book
+        self.fee_num = fee_num;
+        self.fee_receiver = fee_receiver;
+    }
 }
 
 #[generate_trait]
 pub impl BookAssert of AssertTrait {
     #[inline]
-    fn assert_valid_owner(owner: felt252) {
-        assert(owner != 0, errors::BOOK_INVALID_OWNER);
+    fn assert_valid_address(address: felt252) {
+        assert(address != 0, errors::BOOK_INVALID_ADDRESS);
+    }
+
+    #[inline]
+    fn assert_valid_fee(fee: u32) {
+        assert(fee <= DEFAULT_FEE_DENOMINATOR, errors::BOOK_INVALID_FEE);
     }
 
     #[inline]
@@ -79,15 +109,15 @@ mod tests {
 
     // Constants
 
-    const OWNER: felt252 = 'OWNER';
+    const FEE_NUM: u32 = 100;
+    const FEE_RECEIVER: felt252 = 'FEE_RECEIVER';
 
     #[test]
     fn test_book_new() {
-        let book = BookTrait::new(BOOK_ID, OWNER);
+        let book = BookTrait::new(BOOK_ID, FEE_NUM, FEE_RECEIVER);
         assert_eq!(book.id, BOOK_ID);
         assert_eq!(book.version, VERSION);
         assert_eq!(book.paused, false);
         assert_eq!(book.counter, 0);
-        assert_eq!(book.owner, OWNER);
     }
 }

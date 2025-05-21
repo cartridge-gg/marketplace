@@ -14,6 +14,9 @@ pub mod VerifiableComponent {
     use openzeppelin_token::erc1155::interface::{
         IERC1155_ID, IERC1155Dispatcher, IERC1155DispatcherTrait,
     };
+    use openzeppelin_token::common::erc2981::interface::{
+        IERC2981_ID, IERC2981Dispatcher, IERC2981DispatcherTrait,
+    };
 
     // Errors
 
@@ -23,6 +26,7 @@ pub mod VerifiableComponent {
         pub const VERIFIABLE_NOT_APPROVED: felt252 = 'Verifiable: not approved';
         pub const VERIFIABLE_INVALID_BALANCE: felt252 = 'Verifiable: invalid balance';
         pub const VERIFIABLE_NOT_INVALID: felt252 = 'Verifiable: not invalid';
+        pub const VERIFIABLE_INVALID_VALUE: felt252 = 'Verifiable: invalid value';
     }
 
     // Storage
@@ -68,6 +72,7 @@ pub mod VerifiableComponent {
                 assert(false, errors::VERIFIABLE_INVALID_COLLECTION);
             }
         }
+
         #[inline]
         fn pay(
             self: @ComponentState<TContractState>,
@@ -76,6 +81,10 @@ pub mod VerifiableComponent {
             currency: ContractAddress,
             amount: u256,
         ) {
+            // [Check] Skip if amount is zero
+            if amount == 0 {
+                return;
+            }
             let currency_dispatcher = IERC20Dispatcher { contract_address: currency };
             let caller = starknet::get_caller_address();
             if caller == spender {
@@ -86,6 +95,23 @@ pub mod VerifiableComponent {
             // [Interaction] ERC20 transfer from
             currency_dispatcher
                 .transfer_from(sender: spender, recipient: recipient, amount: amount);
+        }
+
+        #[inline]
+        fn royalties(
+            self: @ComponentState<TContractState>,
+            collection: ContractAddress,
+            token_id: u256,
+            sale_price: u256,
+        ) -> (ContractAddress, u256) {
+            let src5_dispatcher = ISRC5Dispatcher { contract_address: collection };
+            if src5_dispatcher.supports_interface(IERC2981_ID) {
+                // [Interaction] ERC2981 royalty
+                let collection_dispatcher = IERC2981Dispatcher { contract_address: collection };
+                return collection_dispatcher.royalty_info(token_id, sale_price);
+            };
+            // [Fallback] No royalties
+            (starknet::get_contract_address(), 0)
         }
 
         #[inline]
@@ -126,6 +152,7 @@ pub mod VerifiableComponent {
                     token_id: token_id,
                 );
                 assert(is_owner, errors::VERIFIABLE_NOT_OWNER);
+                assert(value == 0, errors::VERIFIABLE_INVALID_VALUE);
             } else {
                 // [Panic] Unsupported collection
                 assert(false, errors::VERIFIABLE_INVALID_COLLECTION);
@@ -173,7 +200,10 @@ pub mod VerifiableComponent {
                     account: owner,
                     token_id: token_id,
                 );
-                assert(has_expired || !is_owner || !is_approved, errors::VERIFIABLE_NOT_INVALID);
+                assert(
+                    has_expired || !is_owner || !is_approved || value != 0,
+                    errors::VERIFIABLE_NOT_INVALID,
+                );
             }
             // [Fallback] Unsupported collection is considered as inactive
         }
@@ -307,6 +337,21 @@ pub mod VerifiableComponent {
             value: u256,
         ) -> bool {
             collection.balance_of(account, token_id) >= value
+        }
+    }
+
+    #[generate_trait]
+    pub impl ERC2981Impl<
+        TContractState, +HasComponent<TContractState>,
+    > of ERC2981Trait<TContractState> {
+        #[inline]
+        fn royalty_info(
+            self: @ComponentState<TContractState>,
+            collection: IERC2981Dispatcher,
+            token_id: u256,
+            sale_price: u256,
+        ) -> (ContractAddress, u256) {
+            collection.royalty_info(token_id, sale_price)
         }
     }
 }
