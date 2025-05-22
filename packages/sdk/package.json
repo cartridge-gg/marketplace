@@ -4,8 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest --watch",
     "build": "pnpm run build:deps",
     "build:deps": "tsup",
     "lint": "biome lint --fix src",
