@@ -44,5 +44,6 @@ jobs:
           scarb-version: ${{ env.SCARB_VERSION }}
       - uses: ./.github/actions/setup
       - name: Test
+        working-directory: ./packages/orderbook
         run: pnpm run test
         shell: bash
