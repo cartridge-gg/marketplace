@@ -1,8 +1,29 @@
 {
-  "name": "@cartridge-gg/marketplace-sdk",
+  "name": "@cartridge/marketplace-sdk",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "browser": "dist/index.global.js",
+  "jsdelivr": "dist/index.global.js",
+  "unpkg": "dist/index.global.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "style": "module",
+      "parser": "typescript"
+    }
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest --watch",
@@ -12,13 +33,6 @@
     "lint:check": "biome lint src",
     "format": "biome format --fix src",
     "format:check": "biome format src"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    }
   },
   "keywords": [],
   "author": "",
@@ -31,7 +45,7 @@
     "starknet": "catalog:"
   },
   "devDependencies": {
-    "@cartridge-gg/marketplace-config": "workspace:*",
+    "@cartridge/marketplace-config": "workspace:*",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "^3.1.4"

@@ -1,5 +1,5 @@
 {
-  "name": "@cartridge-gg/marketplace-client",
+  "name": "@cartridge/marketplace-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,11 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@cartridge-gg/marketplace-sdk": "workspace:*",
+    "@cartridge/arcade": "0.0.0",
+    "@cartridge/marketplace-sdk": "workspace:*",
     "@tanstack/react-router": "^1.119.0",
     "@tanstack/react-router-devtools": "^1.119.1",
+    "@starknet-react/chains": "^3.1.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "starknet": "catalog:"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
@@ -22,12 +25,17 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react-swc": "^3.5.0",
     "eslint": "^9.22.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
-    "vite": "^6.3.1"
+    "vite": "^6.3.1",
+    "vite-plugin-mkcert": "^1.17.6",
+    "vite-plugin-top-level-await": "^1.4.4",
+    "vite-plugin-wasm": "^3.3.0",
+    "vite-plugin-pwa": "^1.0.0"
   }
 }

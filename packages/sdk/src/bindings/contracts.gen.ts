@@ -1,13 +1,5 @@
 import { DojoProvider, DojoCall } from "@dojoengine/core";
-import {
-	Account,
-	AccountInterface,
-	BigNumberish,
-	CairoOption,
-	CairoCustomEnum,
-	ByteArray,
-} from "starknet";
-import * as models from "./models.gen";
+import { Account, AccountInterface, BigNumberish } from "starknet";
 
 export function setupWorld(provider: DojoProvider) {
 	const build_Marketplace_cancelListing_calldata = (

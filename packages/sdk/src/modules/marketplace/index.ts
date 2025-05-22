@@ -231,6 +231,9 @@ export const Marketplace = {
 		if (Marketplace.isEntityQueryable(options)) {
 			await Marketplace.fetchEntities(callback, options);
 		}
+		if (Marketplace.isEventQueryable(options)) {
+			await Marketplace.fetchEvents(callback, options);
+		}
 	},
 
 	sub: async (
@@ -242,6 +245,9 @@ export const Marketplace = {
 		}
 		if (Marketplace.isEntityQueryable(options)) {
 			await Marketplace.subEntities(callback, options);
+		}
+		if (Marketplace.isEventQueryable(options)) {
+			await Marketplace.subEvents(callback, options);
 		}
 	},
 
