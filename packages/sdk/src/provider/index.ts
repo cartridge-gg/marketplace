@@ -7,7 +7,7 @@
 import { setupWorld } from "../bindings/contracts.gen";
 import { DojoProvider } from "@dojoengine/core";
 import * as torii from "@dojoengine/torii-client";
-import {
+import type {
 	Account,
 	AccountInterface,
 	AllowArray,

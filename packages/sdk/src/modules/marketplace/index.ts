@@ -1,5 +1,5 @@
 import { initSDK } from "..";
-import { constants } from "starknet";
+import type { constants } from "starknet";
 import { Access, AccessModel } from "./access";
 import { Book, BookModel } from "./book";
 import { Order, OrderModel } from "./order";
@@ -8,14 +8,14 @@ import { Offer, OfferEvent } from "./offer";
 import { Sale, SaleEvent } from "./sale";
 import {
 	ClauseBuilder,
-	ParsedEntity,
-	SDK,
-	StandardizedQueryResult,
-	SubscriptionCallbackArgs,
+	type ParsedEntity,
+	type SDK,
+	type StandardizedQueryResult,
+	type SubscriptionCallbackArgs,
 	ToriiQueryBuilder,
-	ToriiResponse,
+	type ToriiResponse,
 } from "@dojoengine/sdk";
-import { SchemaType } from "../../bindings";
+import type { SchemaType } from "../../bindings";
 import { NAMESPACE } from "../../constants";
 import { MarketplaceOptions, DefaultMarketplaceOptions } from "./options";
 

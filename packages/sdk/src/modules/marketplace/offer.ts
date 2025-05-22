@@ -1,6 +1,6 @@
 import { NAMESPACE } from "../../constants";
-import { SchemaType } from "../../bindings";
-import { ParsedEntity } from "@dojoengine/sdk";
+import type { SchemaType } from "../../bindings";
+import type { ParsedEntity } from "@dojoengine/sdk";
 import { OrderModel } from "..";
 
 const MODEL_NAME = "Offer";

@@ -1,11 +1,11 @@
-import { constants } from "starknet";
+import type { constants } from "starknet";
 import { configs } from "../../configs";
 import { NAMESPACE } from "../../constants";
 import { getContractByName } from "../../provider/helpers";
 import { Access } from "./access";
 import { Book } from "./book";
 import { Order } from "./order";
-import { DefaultMarketplaceOptions, MarketplaceOptions } from "./options";
+import { DefaultMarketplaceOptions, type MarketplaceOptions } from "./options";
 
 const CONTRACT_NAME = "Marketplace";
 const CONTRACT_TAG = `${NAMESPACE}-${CONTRACT_NAME}`;

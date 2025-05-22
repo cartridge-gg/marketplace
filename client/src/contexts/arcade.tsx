@@ -10,7 +10,6 @@ import {
 import {
   ArcadeProvider as ExternalProvider,
   Registry,
-  GameModel,
   RegistryModel,
   RegistryOptions,
   EditionModel,
@@ -21,8 +20,13 @@ import {
   shortString,
 } from "starknet";
 import { Chain } from "@starknet-react/chains";
+import * as torii from "@dojoengine/torii-client";
 
 const CHAIN_ID = constants.StarknetChainId.SN_MAIN;
+const IGNORES = [
+  "populariumdemo-game",
+  "dragark-mainnet-v11-3",
+];
 
 export interface ProjectProps {
   namespace: string;
@@ -36,8 +40,7 @@ interface ArcadeContextType {
   /** The Arcade client instance */
   chainId: string;
   provider: ExternalProvider;
-  games: GameModel[];
-  editions: EditionModel[];
+  clients: { [key: string]: torii.ToriiClient };
   chains: Chain[];
 }
 
@@ -54,11 +57,16 @@ export const ArcadeContext = createContext<ArcadeContextType | null>(null);
  */
 export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
   const currentValue = useContext(ArcadeContext);
-  const [games, setGames] = useState<{ [gameId: string]: GameModel }>({});
+
+  if (currentValue) {
+    throw new Error("ArcadeProvider can only be used once");
+  }
+
   const [editions, setEditions] = useState<{
     [editionId: string]: EditionModel;
   }>({});
   const [chains, setChains] = useState<Chain[]>([]);
+  const [clients, setClients] = useState<{ [key: string]: torii.ToriiClient }>({});
   const [initialized, setInitialized] = useState<boolean>(false);
 
   useEffect(() => {
@@ -100,10 +108,6 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
     getChains();
   }, [editions]);
 
-  if (currentValue) {
-    throw new Error("ArcadeProvider can only be used once");
-  }
-
   const provider = useMemo(
     // TODO: Update here to select either Mainnet or Sepolia
     () => new ExternalProvider(CHAIN_ID),
@@ -112,21 +116,7 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 
   const handleRegistryModels = useCallback((models: RegistryModel[]) => {
     models.forEach(async (model: RegistryModel) => {
-      if (GameModel.isType(model as GameModel)) {
-        const game = model as GameModel;
-        if (!game.exists()) {
-          setGames((prevGames) => {
-            const newGames = { ...prevGames };
-            delete newGames[game.identifier];
-            return newGames;
-          });
-          return;
-        }
-        setGames((prevGames) => ({
-          ...prevGames,
-          [game.identifier]: game,
-        }));
-      } else if (EditionModel.isType(model as EditionModel)) {
+      if (EditionModel.isType(model as EditionModel)) {
         const edition = model as EditionModel;
         if (!edition.exists()) {
           setEditions((prevEditions) => {
@@ -167,23 +157,27 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [initialized, handleRegistryModels]);
 
-  const sortedGames = useMemo(() => {
-    return Object.values(games).sort((a, b) => a.name.localeCompare(b.name));
-  }, [games]);
-
-  const sortedEditions = useMemo(() => {
-    return Object.values(editions)
-      .sort((a, b) => a.id - b.id)
-      .sort((a, b) => b.priority - a.priority);
-  }, [editions, sortedGames]);
+  useEffect(() => {
+    const getClients = async () => {
+      const clients: { [key: string]: torii.ToriiClient } = {};
+      await Promise.all(Object.values(editions).map(async (edition) => {
+        // FIXME: some old torii version not compatible with the dojo.js version
+        if (IGNORES.includes(edition.config.project)) return;
+        const url = `https://api.cartridge.gg/x/${edition.config.project}/torii`;
+        const client = await provider.getToriiClient(url);
+        clients[edition.config.project] = client;
+      }));
+      setClients(clients);
+    };
+    getClients();
+  }, [provider, editions]);
 
   return (
     <ArcadeContext.Provider
       value={{
         chainId: CHAIN_ID,
         provider,
-        games: sortedGames,
-        editions: sortedEditions,
+        clients,
         chains,
       }}
     >

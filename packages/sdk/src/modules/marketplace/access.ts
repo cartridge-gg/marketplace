@@ -1,7 +1,7 @@
 import { NAMESPACE } from "../../constants";
 import { getChecksumAddress } from "starknet";
-import { SchemaType } from "../../bindings";
-import { ParsedEntity } from "@dojoengine/sdk";
+import type { SchemaType } from "../../bindings";
+import type { ParsedEntity } from "@dojoengine/sdk";
 import { Role, RoleType } from "../../classes";
 
 const MODEL_NAME = "Access";

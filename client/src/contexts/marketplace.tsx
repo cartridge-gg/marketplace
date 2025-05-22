@@ -58,6 +58,11 @@ export const MarketplaceContext = createContext<MarketplaceContextType | null>(n
  */
 export const MarketplaceProvider = ({ children }: { children: ReactNode }) => {
   const currentValue = useContext(MarketplaceContext);
+
+  if (currentValue) {
+    throw new Error("MarketplaceProvider can only be used once");
+  }
+
   const [accesses, setAccesses] = useState<{ [accessId: string]: AccessModel }>({});
   const [books, setBooks] = useState<{ [bookId: string]: BookModel }>({});
   const [orders, setOrders] = useState<{ [orderId: string]: OrderModel }>({});
@@ -66,10 +71,6 @@ export const MarketplaceProvider = ({ children }: { children: ReactNode }) => {
   const [sales, setSales] = useState<{ [saleId: string]: SaleEvent }>({});
   const [initialized, setInitialized] = useState<boolean>(false);
 
-  if (currentValue) {
-    throw new Error("MarketplaceProvider can only be used once");
-  }
-
   const provider = useMemo(
     // TODO: Update here to select either Mainnet or Sepolia
     () => new ExternalProvider(CHAIN_ID),
@@ -77,7 +78,6 @@ export const MarketplaceProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const handleMarketplaceModels = useCallback((models: MarketplaceModel[]) => {
-    console.log(models)
     models.forEach(async (model: MarketplaceModel) => {
       if (AccessModel.isType(model as AccessModel)) {
         const access = model as AccessModel;
