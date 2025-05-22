@@ -1,5 +1,5 @@
 [workspace]
-members = ["packages/executor", "packages/orderbook", "contracts"]
+members = ["packages/orderbook", "contracts"]
 description = "Dojo marketplace library"
 homepage = "https://github.com/cartridge-gg/marketplace"
 cairo-version = "=2.10.1"
