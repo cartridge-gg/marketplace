@@ -1,5 +1,5 @@
 {
-  "name": "@cartridge-gg/marketplace-orderbook",
+  "name": "@cartridge/marketplace-orderbook",
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
