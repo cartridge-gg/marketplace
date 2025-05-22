@@ -1,6 +1,7 @@
 packages:
-  - "apps/*"
+  - "client"
   - "packages/*"
+  - "contracts"
 
 catalog:
   "@dojoengine/core": 1.5.5

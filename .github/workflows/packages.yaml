@@ -7,7 +7,6 @@ on:
 env:
   DOJO_VERSION: v1.5.0
   SCARB_VERSION: 2.10.1
-  WORKING_DIRECTORY: ./packages
 
 jobs:
   check:
@@ -20,7 +19,6 @@ jobs:
         with:
           scarb-version: ${{ env.SCARB_VERSION }}
       - name: Format
-        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: pnpm run format:check
         shell: bash
 
@@ -32,14 +30,19 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - name: Build
-        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: pnpm run build
         shell: bash
 
   test:
     needs: [check, build]
     runs-on: ubuntu-latest
-    name: Test package
+    strategy:
+      matrix:
+        package:
+          - packages/orderbook
+          - contracts
+          - packages/sdk
+    name: Test ${{ matrix.package }}
     steps:
       - uses: actions/checkout@v4
       - uses: software-mansion/setup-scarb@v1
@@ -47,6 +50,6 @@ jobs:
           scarb-version: ${{ env.SCARB_VERSION }}
       - uses: ./.github/actions/setup
       - name: Test
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ${{ matrix.package }}
         run: pnpm run test
         shell: bash

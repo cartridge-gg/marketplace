@@ -1,0 +1,254 @@
+import { initSDK } from "..";
+import { constants } from "starknet";
+import { Access, AccessModel } from "./access";
+import { Book, BookModel } from "./book";
+import { Order, OrderModel } from "./order";
+import { Listing, ListingEvent } from "./listing";
+import { Offer, OfferEvent } from "./offer";
+import { Sale, SaleEvent } from "./sale";
+import {
+	ClauseBuilder,
+	ParsedEntity,
+	SDK,
+	StandardizedQueryResult,
+	SubscriptionCallbackArgs,
+	ToriiQueryBuilder,
+	ToriiResponse,
+} from "@dojoengine/sdk";
+import { SchemaType } from "../../bindings";
+import { NAMESPACE } from "../../constants";
+import { MarketplaceOptions, DefaultMarketplaceOptions } from "./options";
+
+export * from "./policies";
+export {
+	AccessModel,
+	BookModel,
+	OrderModel,
+	ListingEvent,
+	OfferEvent,
+	SaleEvent,
+	MarketplaceOptions,
+};
+export type MarketplaceModel =
+	| AccessModel
+	| BookModel
+	| OrderModel
+	| ListingEvent
+	| OfferEvent
+	| SaleEvent;
+
+export const Marketplace = {
+	sdk: undefined as SDK<SchemaType> | undefined,
+	unsubEntities: undefined as (() => void) | undefined,
+
+	init: async (chainId: constants.StarknetChainId) => {
+		Marketplace.sdk = await initSDK(chainId);
+	},
+
+	isEntityQueryable(options: MarketplaceOptions) {
+		return options.access || options.book || options.order;
+	},
+
+	isEventQueryable(options: MarketplaceOptions) {
+		return options.listing || options.offer || options.sale;
+	},
+
+	getEntityQuery: (options: MarketplaceOptions = DefaultMarketplaceOptions) => {
+		const keys: `${string}-${string}`[] = [];
+		if (options.access) keys.push(`${NAMESPACE}-${Access.getModelName()}`);
+		if (options.book) keys.push(`${NAMESPACE}-${Book.getModelName()}`);
+		if (options.order) keys.push(`${NAMESPACE}-${Order.getModelName()}`);
+		const clauses = new ClauseBuilder().keys(keys, []);
+		return new ToriiQueryBuilder<SchemaType>()
+			.withClause(clauses.build())
+			.includeHashedKeys();
+	},
+
+	getEventQuery: (options: MarketplaceOptions = DefaultMarketplaceOptions) => {
+		const keys: `${string}-${string}`[] = [];
+		if (options.listing) keys.push(`${NAMESPACE}-${Listing.getModelName()}`);
+		if (options.offer) keys.push(`${NAMESPACE}-${Offer.getModelName()}`);
+		if (options.sale) keys.push(`${NAMESPACE}-${Sale.getModelName()}`);
+		const clauses = new ClauseBuilder().keys(keys, []);
+		return new ToriiQueryBuilder<SchemaType>()
+			.withClause(clauses.build())
+			.includeHashedKeys();
+	},
+
+	fetchEntities: async (
+		callback: (models: MarketplaceModel[]) => void,
+		options: MarketplaceOptions,
+	) => {
+		if (!Marketplace.sdk) return;
+
+		const wrappedCallback = async (entities?: ToriiResponse<SchemaType>) => {
+			if (!entities) return;
+			const models: MarketplaceModel[] = [];
+			const items = entities?.getItems();
+			await Promise.all(
+				items.map(async (entity: ParsedEntity<SchemaType>) => {
+					if (entity.models[NAMESPACE][Access.getModelName()]) {
+						models.push(Access.parse(entity));
+					}
+					if (entity.models[NAMESPACE][Book.getModelName()]) {
+						models.push(Book.parse(entity));
+					}
+					if (entity.models[NAMESPACE][Order.getModelName()]) {
+						models.push(Order.parse(entity));
+					}
+					return entity;
+				}),
+			);
+			callback(models);
+		};
+		const query = Marketplace.getEntityQuery(options);
+		try {
+			const entities = await Marketplace.sdk.getEntities({ query });
+			await wrappedCallback(entities);
+		} catch (error) {
+			console.error("Error fetching entities:", error);
+		}
+	},
+
+	fetchEvents: async (
+		callback: (models: MarketplaceModel[]) => void,
+		options: MarketplaceOptions,
+	) => {
+		if (!Marketplace.sdk) return;
+
+		const wrappedCallback = async (entities?: ToriiResponse<SchemaType>) => {
+			if (!entities) return;
+			const events: MarketplaceModel[] = [];
+			const items = entities?.getItems();
+			await Promise.all(
+				items.map(async (entity: ParsedEntity<SchemaType>) => {
+					if (entity.models[NAMESPACE][Listing.getModelName()]) {
+						events.push(Listing.parse(entity));
+					}
+					if (entity.models[NAMESPACE][Offer.getModelName()]) {
+						events.push(Offer.parse(entity));
+					}
+					if (entity.models[NAMESPACE][Sale.getModelName()]) {
+						events.push(Sale.parse(entity));
+					}
+					return entity;
+				}),
+			);
+			callback(events);
+		};
+		const query = Marketplace.getEntityQuery(options);
+		try {
+			const events = await Marketplace.sdk.getEventMessages({ query });
+			await wrappedCallback(events);
+		} catch (error) {
+			console.error("Error fetching events:", error);
+		}
+	},
+
+	subEntities: async (
+		callback: (models: MarketplaceModel[]) => void,
+		options: MarketplaceOptions,
+	) => {
+		if (!Marketplace.sdk) return;
+		const wrappedCallback = ({
+			data,
+			error,
+		}: SubscriptionCallbackArgs<
+			StandardizedQueryResult<SchemaType>,
+			Error
+		>) => {
+			if (error) {
+				console.error("Error subscribing to entities:", error);
+				return;
+			}
+			if (!data || data.length === 0 || BigInt(data[0].entityId) === 0n) return;
+			const entity = data[0];
+			const eraseable = !entity.models[NAMESPACE];
+			if (!!entity.models[NAMESPACE]?.[Access.getModelName()] || eraseable) {
+				callback([Access.parse(entity)]);
+			}
+			if (!!entity.models[NAMESPACE]?.[Book.getModelName()] || eraseable) {
+				callback([Book.parse(entity)]);
+			}
+			if (!!entity.models[NAMESPACE]?.[Order.getModelName()] || eraseable) {
+				callback([Order.parse(entity)]);
+			}
+		};
+
+		const query = Marketplace.getEntityQuery(options);
+		const [_, subscription] = await Marketplace.sdk.subscribeEntityQuery({
+			query,
+			callback: wrappedCallback,
+		});
+		Marketplace.unsubEntities = () => subscription.cancel();
+	},
+
+	subEvents: async (
+		callback: (models: MarketplaceModel[]) => void,
+		options: MarketplaceOptions,
+	) => {
+		if (!Marketplace.sdk) return;
+		const wrappedCallback = ({
+			data,
+			error,
+		}: SubscriptionCallbackArgs<
+			StandardizedQueryResult<SchemaType>,
+			Error
+		>) => {
+			if (error) {
+				console.error("Error subscribing to entities:", error);
+				return;
+			}
+			if (!data || data.length === 0 || BigInt(data[0].entityId) === 0n) return;
+			const entity = data[0];
+			const eraseable = !entity.models[NAMESPACE];
+			if (!!entity.models[NAMESPACE]?.[Listing.getModelName()] || eraseable) {
+				callback([Listing.parse(entity)]);
+			}
+			if (!!entity.models[NAMESPACE]?.[Offer.getModelName()] || eraseable) {
+				callback([Offer.parse(entity)]);
+			}
+			if (!!entity.models[NAMESPACE]?.[Sale.getModelName()] || eraseable) {
+				callback([Sale.parse(entity)]);
+			}
+		};
+
+		const query = Marketplace.getEventQuery(options);
+		const [_, subscription] = await Marketplace.sdk.subscribeEventQuery({
+			query,
+			callback: wrappedCallback,
+		});
+		Marketplace.unsubEntities = () => subscription.cancel();
+	},
+
+	fetch: async (
+		callback: (models: MarketplaceModel[]) => void,
+		options: MarketplaceOptions = DefaultMarketplaceOptions,
+	) => {
+		if (!Marketplace.sdk) {
+			throw new Error("SDK not initialized");
+		}
+		if (Marketplace.isEntityQueryable(options)) {
+			await Marketplace.fetchEntities(callback, options);
+		}
+	},
+
+	sub: async (
+		callback: (models: MarketplaceModel[]) => void,
+		options: MarketplaceOptions = DefaultMarketplaceOptions,
+	) => {
+		if (!Marketplace.sdk) {
+			throw new Error("SDK not initialized");
+		}
+		if (Marketplace.isEntityQueryable(options)) {
+			await Marketplace.subEntities(callback, options);
+		}
+	},
+
+	unsub: () => {
+		if (Marketplace.unsubEntities) {
+			Marketplace.unsubEntities();
+			Marketplace.unsubEntities = undefined;
+		}
+	},
+};

@@ -1,6 +1,6 @@
 [world]
 name = "Marketplace"
-description = "Cartridge.gg marketplace, powered by Dojo toolchain"
+description = "Cartridge marketplace, powered by Dojo toolchain"
 website = "https://github.com/cartridge-gg/marketplace"
 seed = "marketplace"
 
