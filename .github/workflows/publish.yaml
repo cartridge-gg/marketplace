@@ -5,9 +5,6 @@ on:
     tags:
       - "v*"
 
-env:
-  WORKING_DIRECTORY: ./kits/typescript
-
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -26,15 +23,12 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
-        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: pnpm install --frozen-lockfile
 
       - name: Build SDK
-        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: pnpm run build
 
       - name: Publish to npm
-        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
