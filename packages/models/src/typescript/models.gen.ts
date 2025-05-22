@@ -2,121 +2,213 @@ import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
 import { BigNumberish } from 'starknet';
 
-// Type definition for `contracts::models::CollectionStat` struct
-export interface CollectionStat {
-	identity: string;
-	collection: string;
-	floor_price: BigNumberish;
-	daily_volume: BigNumberish;
-	total_volume: BigNumberish;
-	owners: BigNumberish;
-	listed: BigNumberish;
-	daily_sales: BigNumberish;
-}
-
-// Type definition for `contracts::models::CollectionStatValue` struct
-export interface CollectionStatValue {
-	floor_price: BigNumberish;
-	daily_volume: BigNumberish;
-	total_volume: BigNumberish;
-	owners: BigNumberish;
-	listed: BigNumberish;
-	daily_sales: BigNumberish;
-}
-
-// Type definition for `executor::models::index::Executor` struct
-export interface Executor {
-	id: BigNumberish;
-	status: BigNumberish;
-	token: BigNumberish;
-	admin: BigNumberish;
-}
-
-// Type definition for `executor::models::index::ExecutorValue` struct
-export interface ExecutorValue {
-	status: BigNumberish;
-	token: BigNumberish;
-	admin: BigNumberish;
-}
-
-// Type definition for `executor::models::index::Fee` struct
-export interface Fee {
-	id: BigNumberish;
+// Type definition for `orderbook::models::index::Access` struct
+export interface Access {
+	address: BigNumberish;
 	role: BigNumberish;
-	numerator: BigNumberish;
-	denominator: BigNumberish;
-	receiver: BigNumberish;
 }
 
-// Type definition for `executor::models::index::FeeValue` struct
-export interface FeeValue {
-	numerator: BigNumberish;
-	denominator: BigNumberish;
-	receiver: BigNumberish;
+// Type definition for `orderbook::models::index::AccessValue` struct
+export interface AccessValue {
+	role: BigNumberish;
+}
+
+// Type definition for `orderbook::models::index::Book` struct
+export interface Book {
+	id: BigNumberish;
+	version: BigNumberish;
+	paused: boolean;
+	counter: BigNumberish;
+	fee_num: BigNumberish;
+	fee_receiver: BigNumberish;
+}
+
+// Type definition for `orderbook::models::index::BookValue` struct
+export interface BookValue {
+	version: BigNumberish;
+	paused: boolean;
+	counter: BigNumberish;
+	fee_num: BigNumberish;
+	fee_receiver: BigNumberish;
+}
+
+// Type definition for `orderbook::models::index::Order` struct
+export interface Order {
+	id: BigNumberish;
+	category: BigNumberish;
+	status: BigNumberish;
+	expiration: BigNumberish;
+	collection: BigNumberish;
+	token_id: BigNumberish;
+	quantity: BigNumberish;
+	price: BigNumberish;
+	currency: BigNumberish;
+	owner: BigNumberish;
+}
+
+// Type definition for `orderbook::models::index::OrderValue` struct
+export interface OrderValue {
+	category: BigNumberish;
+	status: BigNumberish;
+	expiration: BigNumberish;
+	collection: BigNumberish;
+	token_id: BigNumberish;
+	quantity: BigNumberish;
+	price: BigNumberish;
+	currency: BigNumberish;
+	owner: BigNumberish;
+}
+
+// Type definition for `orderbook::events::index::Listing` struct
+export interface Listing {
+	order_id: BigNumberish;
+	order: Order;
+	time: BigNumberish;
+}
+
+// Type definition for `orderbook::events::index::ListingValue` struct
+export interface ListingValue {
+	order: Order;
+	time: BigNumberish;
+}
+
+// Type definition for `orderbook::events::index::Offer` struct
+export interface Offer {
+	order_id: BigNumberish;
+	order: Order;
+	time: BigNumberish;
+}
+
+// Type definition for `orderbook::events::index::OfferValue` struct
+export interface OfferValue {
+	order: Order;
+	time: BigNumberish;
+}
+
+// Type definition for `orderbook::events::index::Sale` struct
+export interface Sale {
+	order_id: BigNumberish;
+	order: Order;
+	from: BigNumberish;
+	to: BigNumberish;
+	time: BigNumberish;
+}
+
+// Type definition for `orderbook::events::index::SaleValue` struct
+export interface SaleValue {
+	order: Order;
+	from: BigNumberish;
+	to: BigNumberish;
+	time: BigNumberish;
 }
 
 export interface SchemaType extends ISchemaType {
-	contracts: {
-		CollectionStat: CollectionStat,
-		CollectionStatValue: CollectionStatValue,
-	},
-	executor: {
-		Executor: Executor,
-		ExecutorValue: ExecutorValue,
-		Fee: Fee,
-		FeeValue: FeeValue,
+	orderbook: {
+		Access: Access,
+		AccessValue: AccessValue,
+		Book: Book,
+		BookValue: BookValue,
+		Order: Order,
+		OrderValue: OrderValue,
+		Listing: Listing,
+		ListingValue: ListingValue,
+		Offer: Offer,
+		OfferValue: OfferValue,
+		Sale: Sale,
+		SaleValue: SaleValue,
 	},
 }
 export const schema: SchemaType = {
-	contracts: {
-		CollectionStat: {
-			identity: "",
-			collection: "",
-			floor_price: 0,
-			daily_volume: 0,
-			total_volume: 0,
-			owners: 0,
-			listed: 0,
-			daily_sales: 0,
-		},
-		CollectionStatValue: {
-			floor_price: 0,
-			daily_volume: 0,
-			total_volume: 0,
-			owners: 0,
-			listed: 0,
-			daily_sales: 0,
-		},
-		Executor: {
-			id: 0,
-			status: 0,
-			token: 0,
-			admin: 0,
-		},
-		ExecutorValue: {
-			status: 0,
-			token: 0,
-			admin: 0,
-		},
-		Fee: {
-			id: 0,
+	orderbook: {
+		Access: {
+			address: 0,
 			role: 0,
-			numerator: 0,
-			denominator: 0,
-			receiver: 0,
 		},
-		FeeValue: {
-			numerator: 0,
-			denominator: 0,
-			receiver: 0,
+		AccessValue: {
+			role: 0,
+		},
+		Book: {
+			id: 0,
+			version: 0,
+			paused: false,
+			counter: 0,
+			fee_num: 0,
+			fee_receiver: 0,
+		},
+		BookValue: {
+			version: 0,
+			paused: false,
+			counter: 0,
+			fee_num: 0,
+			fee_receiver: 0,
+		},
+		Order: {
+			id: 0,
+			category: 0,
+			status: 0,
+			expiration: 0,
+			collection: 0,
+		token_id: 0,
+			quantity: 0,
+			price: 0,
+			currency: 0,
+			owner: 0,
+		},
+		OrderValue: {
+			category: 0,
+			status: 0,
+			expiration: 0,
+			collection: 0,
+		token_id: 0,
+			quantity: 0,
+			price: 0,
+			currency: 0,
+			owner: 0,
+		},
+		Listing: {
+			order_id: 0,
+		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			time: 0,
+		},
+		ListingValue: {
+		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			time: 0,
+		},
+		Offer: {
+			order_id: 0,
+		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			time: 0,
+		},
+		OfferValue: {
+		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			time: 0,
+		},
+		Sale: {
+			order_id: 0,
+		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			from: 0,
+			to: 0,
+			time: 0,
+		},
+		SaleValue: {
+		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			from: 0,
+			to: 0,
+			time: 0,
 		},
 	},
 };
 export enum ModelsMapping {
-	CollectionStat = 'contracts-CollectionStat',
-	CollectionStatValue = 'contracts-CollectionStatValue',
-	Executor = 'executor-Executor',
-	ExecutorValue = 'executor-ExecutorValue',
-	Fee = 'executor-Fee',
-	FeeValue = 'executor-FeeValue',
+	Access = 'orderbook-Access',
+	AccessValue = 'orderbook-AccessValue',
+	Book = 'orderbook-Book',
+	BookValue = 'orderbook-BookValue',
+	Order = 'orderbook-Order',
+	OrderValue = 'orderbook-OrderValue',
+	Listing = 'orderbook-Listing',
+	ListingValue = 'orderbook-ListingValue',
+	Offer = 'orderbook-Offer',
+	OfferValue = 'orderbook-OfferValue',
+	Sale = 'orderbook-Sale',
+	SaleValue = 'orderbook-SaleValue',
 }

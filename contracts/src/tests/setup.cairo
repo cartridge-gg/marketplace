@@ -24,8 +24,14 @@ pub mod setup {
 
     // Constant
 
+    const FEE_NUMERATOR: u32 = 0x1F4;
+
     fn OWNER() -> ContractAddress {
         starknet::contract_address_const::<'OWNER'>()
+    }
+
+    fn FEE_RECEIVER() -> ContractAddress {
+        starknet::contract_address_const::<'FEE_RECEIVER'>()
     }
 
     fn PLAYER() -> ContractAddress {
@@ -47,6 +53,7 @@ pub mod setup {
         NamespaceDef {
             namespace: NAMESPACE(),
             resources: [
+                TestResource::Model(orderbook_models::m_Access::TEST_CLASS_HASH),
                 TestResource::Model(orderbook_models::m_Book::TEST_CLASS_HASH),
                 TestResource::Model(orderbook_models::m_Order::TEST_CLASS_HASH),
                 TestResource::Event(orderbook_events::e_Listing::TEST_CLASS_HASH),
@@ -62,7 +69,9 @@ pub mod setup {
         [
             ContractDefTrait::new(@NAMESPACE(), @"Marketplace")
                 .with_writer_of([dojo::utils::bytearray_hash(@NAMESPACE())].span())
-                .with_init_calldata(array![OWNER().into()].span()),
+                .with_init_calldata(
+                    array![FEE_NUMERATOR.into(), FEE_RECEIVER().into(), OWNER().into()].span(),
+                ),
         ]
             .span()
     }

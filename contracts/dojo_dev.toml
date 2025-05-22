@@ -1,31 +1,20 @@
 [world]
-name = "Cartridge Marketplace"
-description = "Cartridge Marketplace"
-website = "https://github.com/dojoengine/dojo-starter"
-seed = "Marketplace-0"
+name = "Marketplace"
+description = "Cartridge marketplace, powered by Dojo toolchain"
+website = "https://github.com/cartridge-gg/marketplace"
+seed = "marketplace"
 
 [world.socials]
-x = "https://x.com/ohayo_dojo"
-discord = "https://discord.gg/FB2wR6uF"
-github = "https://github.com/dojoengine/dojo-starter"
-telegram = "https://t.me/dojoengine"
+x = "https://x.com/cartridge_gg"
+github = "https://github.com/cartridge-gg/marketplace"
 
 [namespace]
-default = "MARKETPLACE"
-
-[init_call_args]
-"MARKETPLACE-Marketplace" = [
-    "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b",
-]
-
-[writers]
-"MARKETPLACE" = ["MARKETPLACE-Marketplace"]
+default = "marketplace"
 
 [env]
-rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
-account_address = "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b"
-# world_address = "0x0690ab03390b3e001ef389c71355919a3d7a648d26bc8760a552963965334a7a"
-# world_block = 1418114
-ipfs_config.url = "https://ipfs.infura.io:5001"
-ipfs_config.username = "2EBrzr7ZASQZKH32sl2xWauXPSA"
-ipfs_config.password = "12290b883db9138a8ae3363b6739d220"
+rpc_url = "http://localhost:5050/"
+account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
+private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
+
+[writers]
+"marketplace" = []

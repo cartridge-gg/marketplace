@@ -3,17 +3,17 @@
 	"tasks": {
 		"dev": {
 			"persistent": true,
-      "dependsOn": ["^build:deps"],
-      "outputs": ["dist/**"]
+      		"dependsOn": ["^build:deps"],
+      		"outputs": ["dist/**"]
 		},
 		"build:scarb": {
 			"dependsOn": ["^build:scarb"],
 			"outputs": ["target/"]
 		},
-    "build:deps": {
+		"build:deps": {
 			"dependsOn": ["^build:deps"],
 			"outputs": ["dist/**", "target/"]
-    },
+		},
 		"build": {
 			"dependsOn": ["^build"],
 			"outputs": ["dist/**", "target/"]
