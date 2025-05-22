@@ -36,7 +36,13 @@ jobs:
   test:
     needs: [check, build]
     runs-on: ubuntu-latest
-    name: Test package
+    strategy:
+      matrix:
+        package:
+          - packages/orderbook
+          - contracts
+          - packages/sdk
+    name: Test ${{ matrix.package }}
     steps:
       - uses: actions/checkout@v4
       - uses: software-mansion/setup-scarb@v1
@@ -44,5 +50,6 @@ jobs:
           scarb-version: ${{ env.SCARB_VERSION }}
       - uses: ./.github/actions/setup
       - name: Test
+        working-directory: ${{ matrix.package }}
         run: pnpm run test
         shell: bash
