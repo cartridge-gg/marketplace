@@ -1,8 +1,9 @@
 import { NAMESPACE } from "../../constants";
 import { getChecksumAddress } from "starknet";
-import { SchemaType } from "../../bindings";
-import { ParsedEntity } from "@dojoengine/sdk";
+import type { SchemaType } from "../../bindings";
+import type { ParsedEntity } from "@dojoengine/sdk";
 import { Role, RoleType } from "../../classes";
+import { MarketplaceModel } from ".";
 
 const MODEL_NAME = "Access";
 
@@ -30,7 +31,7 @@ export class AccessModel {
 		return new AccessModel(identifier, "0x0", new Role(RoleType.None));
 	}
 
-	static isType(model: AccessModel) {
+	static isType(model: MarketplaceModel): boolean {
 		return model.type === MODEL_NAME;
 	}
 

@@ -1,7 +1,7 @@
 import { NAMESPACE } from "../../constants";
-import { SchemaType } from "../../bindings";
-import { ParsedEntity } from "@dojoengine/sdk";
-import { OrderModel } from "..";
+import type { SchemaType } from "../../bindings";
+import type { ParsedEntity } from "@dojoengine/sdk";
+import { MarketplaceModel, OrderModel } from "..";
 
 const MODEL_NAME = "Listing";
 
@@ -32,7 +32,7 @@ export class ListingEvent {
 		return new ListingEvent(identifier, 0, OrderModel.default(identifier), 0);
 	}
 
-	static isType(model: ListingEvent) {
+	static isType(model: MarketplaceModel): boolean {
 		return model.type === MODEL_NAME;
 	}
 

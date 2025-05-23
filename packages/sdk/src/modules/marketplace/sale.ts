@@ -1,7 +1,7 @@
 import { NAMESPACE } from "../../constants";
-import { SchemaType } from "../../bindings";
-import { ParsedEntity } from "@dojoengine/sdk";
-import { OrderModel } from "..";
+import type { SchemaType } from "../../bindings";
+import type { ParsedEntity } from "@dojoengine/sdk";
+import { MarketplaceModel, OrderModel } from "..";
 import { getChecksumAddress } from "starknet";
 
 const MODEL_NAME = "Sale";
@@ -47,7 +47,7 @@ export class SaleEvent {
 		);
 	}
 
-	static isType(model: SaleEvent) {
+	static isType(model: MarketplaceModel): boolean {
 		return model.type === MODEL_NAME;
 	}
 

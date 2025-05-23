@@ -1,5 +1,5 @@
-import { DojoProvider, DojoCall } from "@dojoengine/core";
-import { Account, AccountInterface, BigNumberish } from "starknet";
+import type { DojoProvider, DojoCall } from "@dojoengine/core";
+import type { Account, AccountInterface, BigNumberish } from "starknet";
 
 export function setupWorld(provider: DojoProvider) {
 	const build_Marketplace_cancelListing_calldata = (
