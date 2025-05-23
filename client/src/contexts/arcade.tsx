@@ -21,6 +21,7 @@ import {
 } from "starknet";
 import { Chain } from "@starknet-react/chains";
 import * as torii from "@dojoengine/torii-client";
+import { hydrateModel} from ".";
 
 const CHAIN_ID = constants.StarknetChainId.SN_MAIN;
 const IGNORES = [
@@ -116,21 +117,7 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 
   const handleRegistryModels = useCallback((models: RegistryModel[]) => {
     models.forEach(async (model: RegistryModel) => {
-      if (EditionModel.isType(model as EditionModel)) {
-        const edition = model as EditionModel;
-        if (!edition.exists()) {
-          setEditions((prevEditions) => {
-            const newEditions = { ...prevEditions };
-            delete newEditions[edition.identifier];
-            return newEditions;
-          });
-          return;
-        }
-        setEditions((prevEditions) => ({
-          ...prevEditions,
-          [edition.identifier]: edition,
-        }));
-      }
+      hydrateModel(model as EditionModel, EditionModel.isType, setEditions);
     });
   }, []);
 

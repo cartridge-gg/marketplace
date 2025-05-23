@@ -1,10 +1,12 @@
-@import "@cartridge/ui/themes/default.css";
-@import "@cartridge/ui/themes/dark.css";
-@import "@cartridge/ui/themes/fonts.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@source "../node_modules/@cartridge/ui";
+@
+
+
+/* @import "@cartridge/ui/themes/default.css"; */
+/* @import "@cartridge/ui/themes/dark.css"; */
+/* @import "@cartridge/ui/themes/fonts.css"; */
 
 #root {
   overflow: hidden;

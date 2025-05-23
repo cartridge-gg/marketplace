@@ -3,6 +3,7 @@ import { getChecksumAddress } from "starknet";
 import type { SchemaType } from "../../bindings";
 import type { ParsedEntity } from "@dojoengine/sdk";
 import { Category, CategoryType, Status, StatusType } from "../../classes";
+import { MarketplaceModel } from ".";
 
 const MODEL_NAME = "Order";
 
@@ -78,7 +79,7 @@ export class OrderModel {
 		);
 	}
 
-	static isType(model: OrderModel) {
+	static isType(model: MarketplaceModel): boolean {
 		return model.type === MODEL_NAME;
 	}
 

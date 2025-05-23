@@ -2,6 +2,7 @@ import { NAMESPACE } from "../../constants";
 import { getChecksumAddress } from "starknet";
 import type { SchemaType } from "../../bindings";
 import type { ParsedEntity } from "@dojoengine/sdk";
+import { MarketplaceModel } from ".";
 
 const MODEL_NAME = "Book";
 
@@ -57,7 +58,7 @@ export class BookModel {
 		);
 	}
 
-	static isType(model: BookModel) {
+	static isType(model: MarketplaceModel): boolean {
 		return model.type === MODEL_NAME;
 	}
 

@@ -15,7 +15,8 @@
 		"lint:check": "turbo run lint:check",
 		"build:scarb": "turbo run build:scarb",
 		"build": "turbo run build",
-		"build:deps": "turbo run build:deps"
+		"build:deps": "turbo run build:deps",
+    "type:check": "turbo run type:check"
 	},
 	"keywords": [],
 	"author": "",
