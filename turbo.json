@@ -30,6 +30,10 @@
 		"test:watch": {
 			"persistent": true,
 			"cache": false
-		}
+		},
+		"type:check": {
+			"persistent": true,
+			"cache": false
+    }
 	}
 }

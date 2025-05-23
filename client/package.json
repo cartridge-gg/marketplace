@@ -7,20 +7,22 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type:check": "tsc -b"
   },
   "dependencies": {
     "@cartridge/arcade": "0.0.0",
+    "@cartridge/ui": "catalog:",
     "@cartridge/marketplace-sdk": "workspace:*",
+    "@dojoengine/torii-client": "catalog:",
+    "@starknet-react/chains": "^3.1.2",
+    "@tailwindcss/vite": "^4.1.7",
     "@tanstack/react-router": "^1.119.0",
     "@tanstack/react-router-devtools": "^1.119.1",
-    "@starknet-react/chains": "^3.1.2",
-    "@dojoengine/torii-client": "catalog:",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.2",
-    "tailwindcss-animate": "^1.0.7",
-    "starknet": "catalog:"
+    "starknet": "catalog:",
+    "tailwindcss": "^4.1.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
@@ -34,14 +36,12 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "postcss": "^8.4.35",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.1",
     "vite-plugin-mkcert": "^1.17.6",
-    "vite-plugin-top-level-await": "^1.4.4",
-    "vite-plugin-wasm": "^3.3.0",
     "vite-plugin-pwa": "^1.0.0",
-    "tailwindcss": "^3.4.3"
+    "vite-plugin-top-level-await": "^1.4.4",
+    "vite-plugin-wasm": "^3.3.0"
   }
 }

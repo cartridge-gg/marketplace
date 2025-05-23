@@ -6,7 +6,7 @@
  */
 import { setupWorld } from "../bindings/contracts.gen";
 import { DojoProvider } from "@dojoengine/core";
-import * as torii from "@dojoengine/torii-client";
+import * as torii from "@dojoengine/torii-wasm";
 import type {
 	Account,
 	AccountInterface,

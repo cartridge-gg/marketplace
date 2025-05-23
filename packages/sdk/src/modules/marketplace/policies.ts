@@ -1,14 +1,13 @@
 import type { constants } from "starknet";
 import { configs } from "../../configs";
 import { NAMESPACE } from "../../constants";
-import { getContractByName } from "../../provider/helpers";
+import { getContractByName } from "@dojoengine/core";
 import { Access } from "./access";
 import { Book } from "./book";
 import { Order } from "./order";
 import { DefaultMarketplaceOptions, type MarketplaceOptions } from "./options";
 
 const CONTRACT_NAME = "Marketplace";
-const CONTRACT_TAG = `${NAMESPACE}-${CONTRACT_NAME}`;
 const CONTRACT_DESCRIPTION =
 	"Marketplace contract to manage asset listings and offers.";
 
@@ -17,7 +16,11 @@ export const getMarketplacePolicies = (
 	options: MarketplaceOptions = DefaultMarketplaceOptions,
 ) => {
 	const config = configs[chainId];
-	const address: string = getContractByName(config.manifest, CONTRACT_TAG);
+	const address: string = getContractByName(
+		config.manifest,
+		NAMESPACE,
+		CONTRACT_NAME,
+	);
 	return {
 		contracts: {
 			[address]: {

@@ -22,6 +22,7 @@ import {
 import {
   constants,
 } from "starknet";
+import {hydrateModel, MarketplaceStateInnerType} from ".";
 
 const CHAIN_ID = constants.StarknetChainId.SN_MAIN;
 
@@ -50,6 +51,7 @@ interface MarketplaceContextType {
  */
 export const MarketplaceContext = createContext<MarketplaceContextType | null>(null);
 
+
 /**
  * Provider component that makes Marketplace context available to child components.
  *
@@ -63,12 +65,12 @@ export const MarketplaceProvider = ({ children }: { children: ReactNode }) => {
     throw new Error("MarketplaceProvider can only be used once");
   }
 
-  const [accesses, setAccesses] = useState<{ [accessId: string]: AccessModel }>({});
-  const [books, setBooks] = useState<{ [bookId: string]: BookModel }>({});
-  const [orders, setOrders] = useState<{ [orderId: string]: OrderModel }>({});
-  const [listings, setListings] = useState<{ [listingId: string]: ListingEvent }>({});
-  const [offers, setOffers] = useState<{ [offerId: string]: OfferEvent }>({});
-  const [sales, setSales] = useState<{ [saleId: string]: SaleEvent }>({});
+  const [accesses, setAccesses] = useState<MarketplaceStateInnerType<AccessModel>>({});
+  const [books, setBooks] = useState<MarketplaceStateInnerType<BookModel>>({});
+  const [orders, setOrders] = useState<MarketplaceStateInnerType<OrderModel>>({});
+  const [listings, setListings] = useState<MarketplaceStateInnerType<ListingEvent>>({});
+  const [offers, setOffers] = useState<MarketplaceStateInnerType<OfferEvent>>({});
+  const [sales, setSales] = useState<MarketplaceStateInnerType<SaleEvent>>({});
   const [initialized, setInitialized] = useState<boolean>(false);
 
   const provider = useMemo(
@@ -79,73 +81,12 @@ export const MarketplaceProvider = ({ children }: { children: ReactNode }) => {
 
   const handleMarketplaceModels = useCallback((models: MarketplaceModel[]) => {
     models.forEach(async (model: MarketplaceModel) => {
-      if (AccessModel.isType(model as AccessModel)) {
-        const access = model as AccessModel;
-        if (!access.exists()) {
-          setAccesses((prevs) => {
-            const news = { ...prevs };
-            delete news[access.identifier];
-            return news;
-          });
-          return;
-        }
-        setAccesses((prevs) => ({ ...prevs, [access.identifier]: access }));
-      } else if (BookModel.isType(model as BookModel)) {
-        const book = model as BookModel;
-        if (!book.exists()) {
-          setBooks((prevs) => {
-            const news = { ...prevs };
-            delete news[book.identifier];
-            return news;
-          });
-          return;
-        }
-        setBooks((prevs) => ({ ...prevs, [book.identifier]: book }));
-      } else if (OrderModel.isType(model as OrderModel)) {
-        const order = model as OrderModel;
-        if (!order.exists()) {
-          setOrders((prevs) => {
-            const news = { ...prevs };
-            delete news[order.identifier];
-            return news;
-          });
-          return;
-        }
-        setOrders((prevs) => ({ ...prevs, [order.identifier]: order }));
-      } else if (ListingEvent.isType(model as ListingEvent)) {
-        const event = model as ListingEvent;
-        if (!event.exists()) {
-          setListings((prevs) => {
-            const news = { ...prevs };
-            delete news[event.identifier];
-            return news;
-          });
-          return;
-        }
-        setListings((prevs) => ({ ...prevs, [event.identifier]: event }));
-      } else if (OfferEvent.isType(model as OfferEvent)) {
-        const event = model as OfferEvent;
-        if (!event.exists()) {
-          setOffers((prevs) => {
-            const news = { ...prevs };
-            delete news[event.identifier];
-            return news;
-          });
-          return;
-        }
-        setOffers((prevs) => ({ ...prevs, [event.identifier]: event }));
-      } else if (SaleEvent.isType(model as SaleEvent)) {
-        const event = model as SaleEvent;
-        if (!event.exists()) {
-          setSales((prevs) => {
-            const news = { ...prevs };
-            delete news[event.identifier];
-            return news;
-          });
-          return;
-        }
-        setSales((prevs) => ({ ...prevs, [event.identifier]: event }));
-      }
+      hydrateModel(model as AccessModel, AccessModel.isType, setAccesses);
+      hydrateModel(model as BookModel, BookModel.isType, setBooks);
+      hydrateModel(model as OrderModel, OrderModel.isType, setOrders);
+      hydrateModel(model as ListingEvent, ListingEvent.isType, setListings);
+      hydrateModel(model as OfferEvent, OfferEvent.isType, setOffers);
+      hydrateModel(model as SaleEvent, SaleEvent.isType, setSales);
     });
   }, []);
 
