@@ -9,13 +9,11 @@
 /* @import "@cartridge/ui/themes/fonts.css"; */
 
 #root {
-  overflow: hidden;
   height: 100vh;
 }
 
 html,
 body {
-  overflow: hidden;
 }
 
 @layer base {

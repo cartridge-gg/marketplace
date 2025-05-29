@@ -1,56 +1,56 @@
 import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
+	createContext,
+	ReactNode,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
 } from "react";
 import {
-  MarketplaceProvider as ExternalProvider,
-  Marketplace,
-  MarketplaceModel,
-  AccessModel,
-  BookModel,
-  OrderModel,
-  ListingEvent,
-  OfferEvent,
-  SaleEvent,
-  MarketplaceOptions,
+	MarketplaceProvider as ExternalProvider,
+	Marketplace,
+	MarketplaceModel,
+	AccessModel,
+	BookModel,
+	OrderModel,
+	ListingEvent,
+	OfferEvent,
+	SaleEvent,
+	MarketplaceOptions,
 } from "@cartridge/marketplace-sdk";
-import {
-  constants,
-} from "starknet";
-import {hydrateModel, MarketplaceStateInnerType} from ".";
+import { constants } from "starknet";
+import { hydrateModel, MarketplaceStateInnerType } from ".";
 
 const CHAIN_ID = constants.StarknetChainId.SN_MAIN;
 
 export interface ProjectProps {
-  namespace: string;
-  project: string;
+	namespace: string;
+	project: string;
 }
 
 /**
  * Interface defining the shape of the Marketplace context.
  */
 interface MarketplaceContextType {
-  /** The Marketplace client instance */
-  chainId: string;
-  provider: ExternalProvider;
-  accesses: AccessModel[];
-  books: BookModel[];
-  orders: OrderModel[];
-  listings: ListingEvent[];
-  offers: OfferEvent[];
-  sales: SaleEvent[];
+	/** The Marketplace client instance */
+	chainId: string;
+	actions: ReturnType<typeof Marketplace.actions>;
+	provider: ExternalProvider;
+	accesses: AccessModel[];
+	books: BookModel[];
+	orders: OrderModel[];
+	listings: ListingEvent[];
+	offers: OfferEvent[];
+	sales: SaleEvent[];
 }
 
 /**
  * React context for sharing Marketplace-related data throughout the application.
  */
-export const MarketplaceContext = createContext<MarketplaceContextType | null>(null);
-
+export const MarketplaceContext = createContext<MarketplaceContextType | null>(
+	null,
+);
 
 /**
  * Provider component that makes Marketplace context available to child components.
@@ -59,77 +59,86 @@ export const MarketplaceContext = createContext<MarketplaceContextType | null>(n
  * @throws {Error} If MarketplaceProvider is used more than once in the component tree
  */
 export const MarketplaceProvider = ({ children }: { children: ReactNode }) => {
-  const currentValue = useContext(MarketplaceContext);
+	const currentValue = useContext(MarketplaceContext);
 
-  if (currentValue) {
-    throw new Error("MarketplaceProvider can only be used once");
-  }
+	if (currentValue) {
+		throw new Error("MarketplaceProvider can only be used once");
+	}
 
-  const [accesses, setAccesses] = useState<MarketplaceStateInnerType<AccessModel>>({});
-  const [books, setBooks] = useState<MarketplaceStateInnerType<BookModel>>({});
-  const [orders, setOrders] = useState<MarketplaceStateInnerType<OrderModel>>({});
-  const [listings, setListings] = useState<MarketplaceStateInnerType<ListingEvent>>({});
-  const [offers, setOffers] = useState<MarketplaceStateInnerType<OfferEvent>>({});
-  const [sales, setSales] = useState<MarketplaceStateInnerType<SaleEvent>>({});
-  const [initialized, setInitialized] = useState<boolean>(false);
+	const [accesses, setAccesses] = useState<
+		MarketplaceStateInnerType<AccessModel>
+	>({});
+	const [books, setBooks] = useState<MarketplaceStateInnerType<BookModel>>({});
+	const [orders, setOrders] = useState<MarketplaceStateInnerType<OrderModel>>(
+		{},
+	);
+	const [listings, setListings] = useState<
+		MarketplaceStateInnerType<ListingEvent>
+	>({});
+	const [offers, setOffers] = useState<MarketplaceStateInnerType<OfferEvent>>(
+		{},
+	);
+	const [sales, setSales] = useState<MarketplaceStateInnerType<SaleEvent>>({});
+	const [initialized, setInitialized] = useState<boolean>(false);
 
-  const provider = useMemo(
-    // TODO: Update here to select either Mainnet or Sepolia
-    () => new ExternalProvider(CHAIN_ID),
-    [],
-  );
+	const provider = useMemo(
+		// TODO: Update here to select either Mainnet or Sepolia
+		() => new ExternalProvider(CHAIN_ID),
+		[],
+	);
 
-  const handleMarketplaceModels = useCallback((models: MarketplaceModel[]) => {
-    models.forEach(async (model: MarketplaceModel) => {
-      hydrateModel(model as AccessModel, AccessModel.isType, setAccesses);
-      hydrateModel(model as BookModel, BookModel.isType, setBooks);
-      hydrateModel(model as OrderModel, OrderModel.isType, setOrders);
-      hydrateModel(model as ListingEvent, ListingEvent.isType, setListings);
-      hydrateModel(model as OfferEvent, OfferEvent.isType, setOffers);
-      hydrateModel(model as SaleEvent, SaleEvent.isType, setSales);
-    });
-  }, []);
+	const handleMarketplaceModels = useCallback((models: MarketplaceModel[]) => {
+		models.forEach(async (model: MarketplaceModel) => {
+			hydrateModel(model as AccessModel, AccessModel.isType, setAccesses);
+			hydrateModel(model as BookModel, BookModel.isType, setBooks);
+			hydrateModel(model as OrderModel, OrderModel.isType, setOrders);
+			hydrateModel(model as ListingEvent, ListingEvent.isType, setListings);
+			hydrateModel(model as OfferEvent, OfferEvent.isType, setOffers);
+			hydrateModel(model as SaleEvent, SaleEvent.isType, setSales);
+		});
+	}, []);
 
-  useEffect(() => {
-    if (initialized) return;
-    const initialize = async () => {
-      await Marketplace.init(CHAIN_ID);
-      setInitialized(true);
-    };
-    initialize();
-  }, [initialized, setInitialized]);
+	useEffect(() => {
+		if (initialized) return;
+		const initialize = async () => {
+			await Marketplace.init(CHAIN_ID);
+			setInitialized(true);
+		};
+		initialize();
+	}, [initialized, setInitialized]);
 
-  useEffect(() => {
-    if (!initialized) return;
-    const options: MarketplaceOptions = {
-      access: true,
-      book: true,
-      order: true,
-      listing: true,
-      offer: true,
-      sale: true,
-    };
-    Marketplace.fetch(handleMarketplaceModels, options);
-    Marketplace.sub(handleMarketplaceModels, options);
-    return () => {
-      Marketplace.unsub();
-    };
-  }, [initialized, handleMarketplaceModels]);
+	useEffect(() => {
+		if (!initialized) return;
+		const options: MarketplaceOptions = {
+			access: true,
+			book: true,
+			order: true,
+			listing: true,
+			offer: true,
+			sale: true,
+		};
+		Marketplace.fetch(handleMarketplaceModels, options);
+		Marketplace.sub(handleMarketplaceModels, options);
+		return () => {
+			Marketplace.unsub();
+		};
+	}, [initialized, handleMarketplaceModels]);
 
-  return (
-    <MarketplaceContext.Provider
-      value={{
-        chainId: CHAIN_ID,
-        provider,
-        accesses: Object.values(accesses),
-        books: Object.values(books),
-        orders: Object.values(orders),
-        listings: Object.values(listings),
-        offers: Object.values(offers),
-        sales: Object.values(sales),
-      }}
-    >
-      {children}
-    </MarketplaceContext.Provider>
-  );
+	return (
+		<MarketplaceContext.Provider
+			value={{
+				chainId: CHAIN_ID,
+				provider,
+				actions: Marketplace.actions,
+				accesses: Object.values(accesses),
+				books: Object.values(books),
+				orders: Object.values(orders),
+				listings: Object.values(listings),
+				offers: Object.values(offers),
+				sales: Object.values(sales),
+			}}
+		>
+			{children}
+		</MarketplaceContext.Provider>
+	);
 };

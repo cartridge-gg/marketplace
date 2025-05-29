@@ -272,7 +272,7 @@ export function setupWorld(provider: DojoProvider) {
 					currency,
 					expiration,
 				),
-				"marketplace",
+				"MARKETPLACE",
 			);
 		} catch (error) {
 			console.error(error);

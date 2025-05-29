@@ -15,9 +15,10 @@ import {
 	ToriiQueryBuilder,
 	type ToriiResponse,
 } from "@dojoengine/sdk";
-import type { SchemaType } from "../../bindings";
+import { setupWorld, type SchemaType } from "../../bindings";
 import { NAMESPACE } from "../../constants";
 import { MarketplaceOptions, DefaultMarketplaceOptions } from "./options";
+import { MarketplaceProvider } from "../../provider";
 
 export * from "./policies";
 export {
@@ -39,10 +40,12 @@ export type MarketplaceModel =
 
 export const Marketplace = {
 	sdk: undefined as SDK<SchemaType> | undefined,
+	actions: undefined as ReturnType<typeof setupWorld> | undefined,
 	unsubEntities: undefined as (() => void) | undefined,
 
 	init: async (chainId: constants.StarknetChainId) => {
 		Marketplace.sdk = await initSDK(chainId);
+		Marketplace.actions = setupWorld(new MarketplaceProvider(chainId));
 	},
 
 	isEntityQueryable(options: MarketplaceOptions) {
