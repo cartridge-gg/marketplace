@@ -21,6 +21,7 @@ import {
 } from "@cartridge/marketplace-sdk";
 import { constants } from "starknet";
 import { hydrateModel, MarketplaceStateInnerType } from ".";
+import { setupWorld } from "@cartridge/marketplace-sdk";
 
 const CHAIN_ID = constants.StarknetChainId.SN_MAIN;
 
@@ -35,7 +36,7 @@ export interface ProjectProps {
 interface MarketplaceContextType {
 	/** The Marketplace client instance */
 	chainId: string;
-	actions: ReturnType<typeof Marketplace.actions>;
+	actions: ReturnType<typeof setupWorld>;
 	provider: ExternalProvider;
 	accesses: AccessModel[];
 	books: BookModel[];
@@ -123,6 +124,12 @@ export const MarketplaceProvider = ({ children }: { children: ReactNode }) => {
 			Marketplace.unsub();
 		};
 	}, [initialized, handleMarketplaceModels]);
+
+	if (!Marketplace.actions) {
+		throw new Error(
+			'Marketplace has not properly been initialized. Missing "actions"',
+		);
+	}
 
 	return (
 		<MarketplaceContext.Provider

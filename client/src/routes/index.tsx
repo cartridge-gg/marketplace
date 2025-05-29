@@ -4,8 +4,6 @@ import { CollectibleAsset } from "@cartridge/ui";
 import { Token } from "@dojoengine/torii-client";
 import { useMemo } from "react";
 import { getChecksumAddress } from "starknet";
-import { useAccount } from "@starknet-react/core";
-import { Connection } from "../components/ui/connection";
 
 // Define metadata interface based on the expected structure
 interface CollectionMetadata {
@@ -91,15 +89,16 @@ function Collection({ collection }: { collection: Token }) {
 			>
 				<div className="relative">
 					<CollectibleAsset
+						title=""
 						image={imageUrl}
-						// @ts-ignore
+						// @ts-expect-error
 						count={collection.count}
 						className="w-full h-auto"
 					/>
-					{/* @ts-ignore */}
+					{/* @ts-expect-error */}
 					{collection.count && (
 						<div className="absolute bottom-2 right-2 bg-primary-500 text-white px-2 py-1 rounded-md text-sm font-medium">
-							{/* @ts-ignore */}
+							{/* @ts-expect-error */}
 							{collection.count} items
 						</div>
 					)}

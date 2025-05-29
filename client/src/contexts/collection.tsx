@@ -12,6 +12,7 @@ import { getChecksumAddress } from "starknet";
 
 export type Collection = Record<string, Token>;
 export type Collections = Record<string, Collection>;
+type WithCount<T> = T & { count: number };
 
 /**
  * Interface defining the shape of the Collection context.
@@ -49,7 +50,6 @@ function deduplicateCollections(collections: Collections): Collections {
 			res[project][contract] = collections[project][contract];
 		}
 	}
-	console.log("deduplicated collections", res);
 	return res;
 }
 
@@ -86,9 +86,12 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 						const tokens = await client.getTokens([], []);
 						const filtereds = tokens.items.filter((token) => !!token.metadata);
 
-						const collection: Record<string, Token> = filtereds.reduce(
-							(acc, curr, _idx, _list) => {
-								if (acc.hasOwnProperty(curr.contract_address)) {
+						const collection: Record<
+							string,
+							WithCount<Token>
+						> = filtereds.reduce(
+							(acc: Record<string, WithCount<Token>>, curr: Token) => {
+								if (Object.hasOwn(acc, curr.contract_address)) {
 									acc[curr.contract_address].count += 1;
 									return acc;
 								}
@@ -96,8 +99,10 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 									curr.contract_address,
 								);
 
-								acc[curr.contract_address] = curr;
-								acc[curr.contract_address].count = 1;
+								acc[curr.contract_address] = {
+									...curr,
+									count: 1,
+								};
 
 								return acc;
 							},

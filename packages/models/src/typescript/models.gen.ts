@@ -35,11 +35,11 @@ export interface BookValue {
 // Type definition for `orderbook::models::index::Order` struct
 export interface Order {
 	id: BigNumberish;
+	collection: BigNumberish;
+	token_id: BigNumberish;
 	category: BigNumberish;
 	status: BigNumberish;
 	expiration: BigNumberish;
-	collection: BigNumberish;
-	token_id: BigNumberish;
 	quantity: BigNumberish;
 	price: BigNumberish;
 	currency: BigNumberish;
@@ -48,11 +48,8 @@ export interface Order {
 
 // Type definition for `orderbook::models::index::OrderValue` struct
 export interface OrderValue {
-	category: BigNumberish;
 	status: BigNumberish;
 	expiration: BigNumberish;
-	collection: BigNumberish;
-	token_id: BigNumberish;
 	quantity: BigNumberish;
 	price: BigNumberish;
 	currency: BigNumberish;
@@ -144,22 +141,19 @@ export const schema: SchemaType = {
 		},
 		Order: {
 			id: 0,
+			collection: 0,
+		token_id: 0,
 			category: 0,
 			status: 0,
 			expiration: 0,
-			collection: 0,
-		token_id: 0,
 			quantity: 0,
 			price: 0,
 			currency: 0,
 			owner: 0,
 		},
 		OrderValue: {
-			category: 0,
 			status: 0,
 			expiration: 0,
-			collection: 0,
-		token_id: 0,
 			quantity: 0,
 			price: 0,
 			currency: 0,
@@ -167,31 +161,31 @@ export const schema: SchemaType = {
 		},
 		Listing: {
 			order_id: 0,
-		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
 			time: 0,
 		},
 		ListingValue: {
-		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
 			time: 0,
 		},
 		Offer: {
 			order_id: 0,
-		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
 			time: 0,
 		},
 		OfferValue: {
-		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
 			time: 0,
 		},
 		Sale: {
 			order_id: 0,
-		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
 			from: 0,
 			to: 0,
 			time: 0,
 		},
 		SaleValue: {
-		order: { id: 0, category: 0, status: 0, expiration: 0, collection: 0, token_id: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
 			from: 0,
 			to: 0,
 			time: 0,

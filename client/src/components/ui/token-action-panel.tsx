@@ -7,7 +7,7 @@ interface TokenActionsPanelProps {
 	token: Token;
 	collectionAddress: string;
 	tokenId: string;
-	isOwner?: boolean;
+	isOwner: boolean;
 }
 
 export function TokenActionsPanel({

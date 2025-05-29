@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMarketplaceActions, useOrders, useToken } from "../../../hooks";
 import { useCallback, useMemo } from "react";
-import { CollectibleAsset, toast } from "@cartridge/ui";
+import { CollectibleAsset } from "@cartridge/ui";
 import { getChecksumAddress } from "starknet";
 import { BackButton } from "../../../components/ui/back-button";
 import { TokenActionsPanel } from "../../../components/ui/token-action-panel";
@@ -80,11 +80,7 @@ export const Route = createFileRoute("/token/$collectionAddress/$tokenId")({
 function RouteComponent() {
 	const { collectionAddress, tokenId } = Route.useParams();
 	const { address } = useAccount();
-	const { token, balances, isOwner } = useToken(
-		collectionAddress,
-		tokenId,
-		address,
-	);
+	const { token, isOwner } = useToken(collectionAddress, tokenId, address);
 	const orders = useOrders();
 	const { executeOffer } = useMarketplaceActions();
 
@@ -105,7 +101,7 @@ function RouteComponent() {
 	const tokenName = useMemo(() => {
 		if (!token) return "Loading...";
 		const prefix = tokenMetadata.name ?? token.name;
-		const suffix = parseInt(token.token_id, 16);
+		const suffix = Number.parseInt(token.token_id, 16);
 		return `${prefix} #${suffix}`;
 	}, [token, tokenMetadata]);
 
@@ -115,7 +111,7 @@ function RouteComponent() {
 	}, [token, tokenMetadata]);
 
 	const handleAcceptOffer = useCallback(async (order: any) => {
-		await executeOffer(order.id, order.quantity, 5);
+		await executeOffer(order.id, order.quantity, 5, true);
 	}, []);
 
 	if (!token) {

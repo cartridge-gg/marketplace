@@ -123,7 +123,11 @@ function Token({ token }: { token: Token }) {
 				className="block h-full"
 			>
 				<div>
-					<CollectibleAsset image={imageUrl} className="w-full h-auto" />
+					<CollectibleAsset
+						title=""
+						image={imageUrl}
+						className="w-full h-auto"
+					/>
 				</div>
 				<div className="p-4">
 					<h3 className="text-lg font-semibold text-primary-500 mb-1">

@@ -2,7 +2,6 @@ import { Button } from "@cartridge/ui";
 import { TokenDetailsActionProps } from ".";
 
 export function ListTokenAction({
-	token,
 	collectionAddress,
 	tokenId,
 	isOwner,

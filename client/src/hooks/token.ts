@@ -101,49 +101,46 @@ export function useWalletTokens(accountAddress: string) {
 				const allTokens: Token[] = [];
 				const allBalances: TokenBalance[] = [];
 
-				const results = await fetchFromAllClients(
-					clients,
-					async (client, project) => {
-						// Get all token balances for the wallet
-						const allBalances = await fetchTokenBalancesForAccount(
-							client,
-							address,
-						);
+				const results = await fetchFromAllClients(clients, async (client) => {
+					// Get all token balances for the wallet
+					const allBalances = await fetchTokenBalancesForAccount(
+						client,
+						address,
+					);
 
-						if (allBalances.length === 0) {
-							return null;
-						}
+					if (allBalances.length === 0) {
+						return null;
+					}
 
-						// Filter to only include tokens with positive balance
-						const ownedBalances = filterPositiveBalances(allBalances);
+					// Filter to only include tokens with positive balance
+					const ownedBalances = filterPositiveBalances(allBalances);
 
-						if (ownedBalances.length === 0) {
-							return null;
-						}
+					if (ownedBalances.length === 0) {
+						return null;
+					}
 
-						// Get unique contract addresses and token IDs
-						const tokenIds = ownedBalances.map((b) => b.token_id);
-						const contractAddresses = getUniqueContractAddresses(ownedBalances);
+					// Get unique contract addresses and token IDs
+					const tokenIds = ownedBalances.map((b) => b.token_id);
+					const contractAddresses = getUniqueContractAddresses(ownedBalances);
 
-						// Fetch the actual tokens
-						const tokens = await fetchTokensByAddressesAndIds(
-							client,
-							contractAddresses,
-							tokenIds,
-						);
+					// Fetch the actual tokens
+					const tokens = await fetchTokensByAddressesAndIds(
+						client,
+						contractAddresses,
+						tokenIds,
+					);
 
-						// Filter tokens that have positive balance and parse metadata
-						const ownedTokens = matchTokensWithBalances(
-							tokens,
-							ownedBalances,
-						).map(parseTokenMetadata);
+					// Filter tokens that have positive balance and parse metadata
+					const ownedTokens = matchTokensWithBalances(
+						tokens,
+						ownedBalances,
+					).map(parseTokenMetadata);
 
-						return {
-							tokens: ownedTokens,
-							balances: ownedBalances,
-						};
-					},
-				);
+					return {
+						tokens: ownedTokens,
+						balances: ownedBalances,
+					};
+				});
 
 				// Flatten results
 				results.forEach((result) => {
@@ -190,32 +187,29 @@ export function useToken(
 
 	const fetchToken = useCallback(
 		async (address: string, tokenId: string) => {
-			const results = await fetchFromAllClients(
-				clients,
-				async (client, project) => {
-					const tokensResponse = await client.getTokens(
-						[address.toLowerCase()],
-						[tokenId],
-					);
-					const balancesResponse = await client.getTokenBalances(
-						[address.toLowerCase()],
-						[],
-						[tokenId],
-					);
+			const results = await fetchFromAllClients(clients, async (client) => {
+				const tokensResponse = await client.getTokens(
+					[address.toLowerCase()],
+					[tokenId],
+				);
+				const balancesResponse = await client.getTokenBalances(
+					[address.toLowerCase()],
+					[],
+					[tokenId],
+				);
 
-					if (
-						tokensResponse.items.length === 0 ||
-						balancesResponse.items.length === 0
-					) {
-						return null;
-					}
+				if (
+					tokensResponse.items.length === 0 ||
+					balancesResponse.items.length === 0
+				) {
+					return null;
+				}
 
-					return {
-						token: tokensResponse.items[0],
-						balances: balancesResponse.items,
-					};
-				},
-			);
+				return {
+					token: tokensResponse.items[0],
+					balances: balancesResponse.items,
+				};
+			});
 
 			if (results.length === 0) {
 				return null;

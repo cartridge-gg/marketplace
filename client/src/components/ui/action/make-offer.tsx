@@ -6,8 +6,6 @@ import { useAccount } from "@starknet-react/core";
 
 const STRK_ADDRESS =
 	"0x04718f5a0Fc34cC1AF16A1cdee98fFB20C31f5cD61D6Ab07201858f4287c938D";
-const LORDS_ADDRESS =
-	"0x0124aeb495b947201f5faC96fD1138E326AD86195B98df6DEc9009158A533B49";
 
 /**
  * Adds a specified number of days to a given date
@@ -25,16 +23,18 @@ function addDays(date: Date | string, days: number): number {
 }
 
 export function MakeOfferAction({
-	token,
 	collectionAddress,
 	tokenId,
-	isOwner,
 }: TokenDetailsActionProps) {
-	const { offer, provider } = useMarketplaceActions();
+	const { offer } = useMarketplaceActions();
 	const { account } = useAccount();
 
 	const handleMakeOffer = useCallback(async () => {
 		// Logic to accept the offer
+		if (!account) {
+			console.error("Not connected");
+			return;
+		}
 		await offer(
 			account,
 			collectionAddress,

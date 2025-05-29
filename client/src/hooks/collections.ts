@@ -1,6 +1,7 @@
 import { useContext, useState, useCallback, useEffect } from "react";
 import { CollectionContext } from "../contexts";
 import { useArcade } from "./arcade";
+import { Token, ToriiClient } from "@dojoengine/torii-wasm";
 export type { Collection, Collections } from "../contexts/collection";
 
 /**
@@ -28,11 +29,31 @@ export const useCollections = () => {
 
 	return { collections };
 };
+async function fetchCollectionFromClient(
+	clients: { [key: string]: ToriiClient },
+	client: string,
+	address: string,
+	count: number,
+	cursor: string | undefined,
+): Promise<{
+	items: Token[];
+	cursor: string | undefined;
+	client: string | undefined;
+}> {
+	const tokens = await clients[client].getTokens([address], [], count, cursor);
+	if (tokens.items.length !== 0) {
+		return {
+			items: tokens.items,
+			cursor: tokens.next_cursor,
+			client: client,
+		};
+	}
+	return { items: [], cursor: undefined, client: undefined };
+}
 
 export function useCollection(
 	collectionAddress: string,
 	pageSize: number = 50,
-	direction: string = "Forward",
 ) {
 	const { clients } = useArcade();
 	const [cursor, setCursor] = useState<string | undefined>(undefined);
@@ -40,43 +61,53 @@ export function useCollection(
 	const [collection, setCollection] = useState<Token[]>([]);
 
 	const fetchCollection = useCallback(
-		async (address: string, count: number, dir: string) => {
+		async (address: string, count: number, cursor: string | undefined) => {
+			if (client) {
+				return await fetchCollectionFromClient(
+					clients,
+					client,
+					address,
+					count,
+					cursor,
+				);
+			}
+
 			const collections = await Promise.all(
 				Object.keys(clients).map(async (project) => {
-					const tokens = await clients[project].getTokens(
-						[address],
-						[],
+					return await fetchCollectionFromClient(
+						clients,
+						project,
+						address,
 						count,
 						cursor,
 					);
-					if (tokens.items.length !== 0) {
-						return {
-							items: tokens.items,
-							cursor: tokens.next_cursor,
-							client: project,
-						};
-					}
 				}),
 			);
 			const filteredCollections = collections.filter(Boolean);
 			if (filteredCollections.length === 0) {
-				return [];
+				return { items: [], cursor: undefined, client: undefined };
 			}
-			return filteredCollections[0] ?? [];
+			return (
+				filteredCollections[0] ?? {
+					items: [],
+					cursor: undefined,
+					client: undefined,
+				}
+			);
 		},
-		[clients, cursor],
+		[clients, client],
 	);
 
-	const getPrevPage = useCallback(() => {});
-	const getNextPage = useCallback(() => {});
+	const getPrevPage = useCallback(() => {}, []);
+	const getNextPage = useCallback(() => {}, []);
 
 	useEffect(() => {
 		if (collection.length === 0) {
 			fetchCollection(collectionAddress, pageSize, cursor).then(
 				({ items, cursor, client }) => {
-					if (items) {
+					if (items.length > 0) {
 						setCollection(
-							items.map((i) => {
+							items.map((i: Token) => {
 								try {
 									i.metadata = JSON.parse(i.metadata);
 									return i;
