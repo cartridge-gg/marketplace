@@ -3,9 +3,8 @@ import { useAccount, useConnect } from "@starknet-react/core";
 import { useCallback } from "react";
 
 export function Connect() {
-	const { account } = useAccount();
+	const { account, isConnected } = useAccount();
 	const { connect, connectors } = useConnect();
-	const { isConnected } = useAccount();
 	const connectWallet = useCallback(async () => {
 		connect({ connector: connectors[0] });
 	}, [connect, connectors]);

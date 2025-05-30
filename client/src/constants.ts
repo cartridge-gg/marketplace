@@ -1,2 +1,2 @@
-export const DEFAULT_PROJECT = "arcade-mainnet";
-export const DEFAULT_PRESET = "arcade";
+export const DEFAULT_PROJECT = "marketplace-mainnet";
+export const DEFAULT_PRESET = "marketplace";

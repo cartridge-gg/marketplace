@@ -8,19 +8,19 @@ import {
 	ProfileOptions,
 	ProviderOptions,
 } from "@cartridge/controller";
-// import { getSocialPolicies, getRegistryPolicies } from "@cartridge/arcade";
+import { getMarketplacePolicies } from "@cartridge/marketplace-sdk";
 import { DEFAULT_PRESET, DEFAULT_PROJECT } from "../constants";
 import { ArcadeContext } from "./arcade";
 
-const chainId = constants.StarknetChainId.SN_MAIN;
+const CHAIN_ID = constants.StarknetChainId.SN_MAIN;
+const RPC_URL = "https://api.cartridge.gg/x/starknet/mainnet";
 
 const keychain: KeychainOptions = {
-	// policies: {
-	//   contracts: {
-	//     ...getSocialPolicies(chainId).contracts,
-	//     ...getRegistryPolicies(chainId).contracts,
-	//   },
-	// },
+	policies: {
+		contracts: {
+			...getMarketplacePolicies(CHAIN_ID).contracts,
+		},
+	},
 };
 
 const profile: ProfileOptions = {
@@ -48,15 +48,8 @@ export function StarknetProvider({ children }: PropsWithChildren) {
 			rpc: (chain: Chain) => {
 				switch (chain) {
 					case mainnet:
-						return { nodeUrl: "https://api.cartridge.gg/x/starknet/mainnet" };
-					case sepolia:
-						return { nodeUrl: "https://api.cartridge.gg/x/starknet/sepolia" };
 					default:
-						const found = chains.find((c) => c.id === chain.id);
-						if (!found) {
-							throw new Error(`Chain ${chain.id} not found`);
-						}
-						return { nodeUrl: found.rpcUrls.default.http[0] };
+						return { nodeUrl: RPC_URL };
 				}
 			},
 		});
@@ -68,12 +61,12 @@ export function StarknetProvider({ children }: PropsWithChildren) {
 				defaultChainId: constants.StarknetChainId.SN_MAIN,
 				chains: [
 					{
-						rpcUrl: import.meta.env.VITE_RPC_URL,
+						rpcUrl: RPC_URL,
 					},
 				],
 			};
 		return {
-			defaultChainId: chainId,
+			defaultChainId: CHAIN_ID,
 			chains: chains.map((chain) => ({ rpcUrl: chain.rpcUrls.public.http[0] })),
 		};
 	}, [chains]);
@@ -85,6 +78,11 @@ export function StarknetProvider({ children }: PropsWithChildren) {
 			...provider,
 			...keychain,
 			...profile,
+			policies: {
+				contracts: {
+					...getMarketplacePolicies(CHAIN_ID).contracts,
+				},
+			},
 		});
 		return controllerRef.current;
 	}, [controllerRef, provider]);
