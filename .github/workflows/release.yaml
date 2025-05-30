@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  repository_dispatch:
+    types: [release]
+
+env:
+  WORKING_DIRECTORY: ./packages/sdk
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install NPM Package
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: pnpm install
+
+      - name: Build NPM Package
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: pnpm run build
+
+      - name: Prepare NPM Package
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: |
+          npm pkg set name=@cartridge/marketplace
+          npm pkg set version=${{ github.event.client_payload.version }}
+          npm pkg set files='["*.js", "*.wasm", "*.d.ts"]'
+          npm pkg set main=marketplace.js
+          npm pkg set types=marketplace.d.ts
+          npm pkg set repository=https://github.com/cartridge-gg/marketplace
+          npm pkg set license=MIT
+
+      - name: Publish to NPM
+        if: ${{ !github.event.client_payload.dry_run }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: npm publish --access public --tag ${{ github.event.client_payload.tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        if: ${{ !github.event.client_payload.dry_run }}
+        uses: softprops/action-gh-release@v1
+        with:
+          name: v${{ github.event.client_payload.version }}
+          tag_name: v${{ github.event.client_payload.version }}
+          prerelease: ${{ github.event.client_payload.tag == 'prerelease' }}
+          files: |
+            marketplace/pkg/*.wasm
+            marketplace/pkg/*.js
+            marketplace/pkg/*.d.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
