@@ -29,7 +29,7 @@ export function useMarketplaceActions() {
 		resume,
 		revokeRole,
 		setFee,
-	} = ctx.actions.Marketplace;
+	} = ctx.provider.marketplace;
 	return {
 		cancelListing,
 		cancelOffer,

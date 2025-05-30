@@ -79,7 +79,7 @@ export const Route = createFileRoute("/token/$collectionAddress/$tokenId")({
 
 function RouteComponent() {
 	const { collectionAddress, tokenId } = Route.useParams();
-	const { address } = useAccount();
+	const { address, account } = useAccount();
 	const { token, isOwner } = useToken(collectionAddress, tokenId, address);
 	const orders = useOrders();
 	const { executeOffer } = useMarketplaceActions();
@@ -110,9 +110,24 @@ function RouteComponent() {
 		return tokenMetadata.image.replace("ipfs://", "https://ipfs.io/ipfs/");
 	}, [token, tokenMetadata]);
 
-	const handleAcceptOffer = useCallback(async (order: any) => {
-		await executeOffer(order.id, order.quantity, 5, true);
-	}, []);
+	const handleAcceptOffer = useCallback(
+		async (order: any) => {
+			if (!account) {
+				console.error("Log into controller first");
+				return;
+			}
+
+			await executeOffer(
+				account,
+				order.id,
+				collectionAddress,
+				tokenId,
+				order.quantity,
+				true,
+			);
+		},
+		[account, collectionAddress, tokenId, executeOffer],
+	);
 
 	if (!token) {
 		return (

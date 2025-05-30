@@ -78,11 +78,6 @@ export function StarknetProvider({ children }: PropsWithChildren) {
 			...provider,
 			...keychain,
 			...profile,
-			policies: {
-				contracts: {
-					...getMarketplacePolicies(CHAIN_ID).contracts,
-				},
-			},
 		});
 		return controllerRef.current;
 	}, [controllerRef, provider]);
