@@ -1,16 +1,10 @@
-import type { DojoProvider, DojoCall } from "@dojoengine/core";
-import type {
-	Account,
-	AccountInterface,
-	BigNumberish,
-} from "starknet";
+import { DojoProvider, DojoCall } from "@dojoengine/core";
+import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum, ByteArray } from "starknet";
+import * as models from "./models.gen";
 
 export function setupWorld(provider: DojoProvider) {
-	const build_Marketplace_cancel_calldata = (
-		orderId: BigNumberish,
-		collection: string,
-		tokenId: BigNumberish,
-	): DojoCall => {
+
+	const build_Marketplace_cancel_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "cancel",
@@ -18,12 +12,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_cancel = async (
-		snAccount: Account | AccountInterface,
-		orderId: BigNumberish,
-		collection: string,
-		tokenId: BigNumberish,
-	) => {
+	const Marketplace_cancel = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -36,11 +25,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_delete_calldata = (
-		orderId: BigNumberish,
-		collection: string,
-		tokenId: BigNumberish,
-	): DojoCall => {
+	const build_Marketplace_delete_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "delete",
@@ -48,12 +33,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_delete = async (
-		snAccount: Account | AccountInterface,
-		orderId: BigNumberish,
-		collection: string,
-		tokenId: BigNumberish,
-	) => {
+	const Marketplace_delete = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -66,13 +46,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_execute_calldata = (
-		orderId: BigNumberish,
-		collection: string,
-		tokenId: BigNumberish,
-		quantity: BigNumberish,
-		royalties: boolean,
-	): DojoCall => {
+	const build_Marketplace_execute_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish, quantity: BigNumberish, royalties: boolean): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "execute",
@@ -80,24 +54,11 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_execute = async (
-		snAccount: Account | AccountInterface,
-		orderId: BigNumberish,
-		collection: string,
-		tokenId: BigNumberish,
-		quantity: BigNumberish,
-		royalties: boolean,
-	) => {
+	const Marketplace_execute = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish, quantity: BigNumberish, royalties: boolean) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_Marketplace_execute_calldata(
-					orderId,
-					collection,
-					tokenId,
-					quantity,
-					royalties,
-				),
+				build_Marketplace_execute_calldata(orderId, collection, tokenId, quantity, royalties),
 				"MARKETPLACE",
 			);
 		} catch (error) {
@@ -106,9 +67,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_getValidities_calldata = (
-		orders: Array<[BigNumberish, string, BigNumberish]>,
-	): DojoCall => {
+	const build_Marketplace_getValidities_calldata = (orders: Array<[BigNumberish, string, BigNumberish]>): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "get_validities",
@@ -116,25 +75,16 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_getValidities = async (
-		orders: Array<[BigNumberish, string, BigNumberish]>,
-	) => {
+	const Marketplace_getValidities = async (orders: Array<[BigNumberish, string, BigNumberish]>) => {
 		try {
-			return await provider.call(
-				"MARKETPLACE",
-				build_Marketplace_getValidities_calldata(orders),
-			);
+			return await provider.call("MARKETPLACE", build_Marketplace_getValidities_calldata(orders));
 		} catch (error) {
 			console.error(error);
 			throw error;
 		}
 	};
 
-	const build_Marketplace_getValidity_calldata = (
-		orderId: BigNumberish,
-		collection: string,
-		tokenId: BigNumberish,
-	): DojoCall => {
+	const build_Marketplace_getValidity_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "get_validity",
@@ -142,26 +92,16 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_getValidity = async (
-		orderId: BigNumberish,
-		collection: string,
-		tokenId: BigNumberish,
-	) => {
+	const Marketplace_getValidity = async (orderId: BigNumberish, collection: string, tokenId: BigNumberish) => {
 		try {
-			return await provider.call(
-				"MARKETPLACE",
-				build_Marketplace_getValidity_calldata(orderId, collection, tokenId),
-			);
+			return await provider.call("MARKETPLACE", build_Marketplace_getValidity_calldata(orderId, collection, tokenId));
 		} catch (error) {
 			console.error(error);
 			throw error;
 		}
 	};
 
-	const build_Marketplace_grantRole_calldata = (
-		account: string,
-		roleId: BigNumberish,
-	): DojoCall => {
+	const build_Marketplace_grantRole_calldata = (account: string, roleId: BigNumberish): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "grant_role",
@@ -169,11 +109,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_grantRole = async (
-		snAccount: Account | AccountInterface,
-		account: string,
-		roleId: BigNumberish,
-	) => {
+	const Marketplace_grantRole = async (snAccount: Account | AccountInterface, account: string, roleId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -186,14 +122,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_list_calldata = (
-		collection: string,
-		tokenId: BigNumberish,
-		quantity: BigNumberish,
-		price: BigNumberish,
-		currency: string,
-		expiration: BigNumberish,
-	): DojoCall => {
+	const build_Marketplace_list_calldata = (collection: string, tokenId: BigNumberish, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "list",
@@ -201,26 +130,11 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_list = async (
-		snAccount: Account | AccountInterface,
-		collection: string,
-		tokenId: BigNumberish,
-		quantity: BigNumberish,
-		price: BigNumberish,
-		currency: string,
-		expiration: BigNumberish,
-	) => {
+	const Marketplace_list = async (snAccount: Account | AccountInterface, collection: string, tokenId: BigNumberish, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_Marketplace_list_calldata(
-					collection,
-					tokenId,
-					quantity,
-					price,
-					currency,
-					expiration,
-				),
+				build_Marketplace_list_calldata(collection, tokenId, quantity, price, currency, expiration),
 				"MARKETPLACE",
 			);
 		} catch (error) {
@@ -229,14 +143,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_offer_calldata = (
-		collection: string,
-		tokenId: BigNumberish,
-		quantity: BigNumberish,
-		price: BigNumberish,
-		currency: string,
-		expiration: BigNumberish,
-	): DojoCall => {
+	const build_Marketplace_offer_calldata = (collection: string, tokenId: BigNumberish, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "offer",
@@ -244,26 +151,11 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_offer = async (
-		snAccount: Account | AccountInterface,
-		collection: string,
-		tokenId: BigNumberish,
-		quantity: BigNumberish,
-		price: BigNumberish,
-		currency: string,
-		expiration: BigNumberish,
-	) => {
+	const Marketplace_offer = async (snAccount: Account | AccountInterface, collection: string, tokenId: BigNumberish, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_Marketplace_offer_calldata(
-					collection,
-					tokenId,
-					quantity,
-					price,
-					currency,
-					expiration,
-				),
+				build_Marketplace_offer_calldata(collection, tokenId, quantity, price, currency, expiration),
 				"MARKETPLACE",
 			);
 		} catch (error) {
@@ -322,10 +214,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_revokeRole = async (
-		snAccount: Account | AccountInterface,
-		account: string,
-	) => {
+	const Marketplace_revokeRole = async (snAccount: Account | AccountInterface, account: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -338,10 +227,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_setFee_calldata = (
-		feeNum: BigNumberish,
-		feeReceiver: string,
-	): DojoCall => {
+	const build_Marketplace_setFee_calldata = (feeNum: BigNumberish, feeReceiver: string): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "set_fee",
@@ -349,11 +235,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const Marketplace_setFee = async (
-		snAccount: Account | AccountInterface,
-		feeNum: BigNumberish,
-		feeReceiver: string,
-	) => {
+	const Marketplace_setFee = async (snAccount: Account | AccountInterface, feeNum: BigNumberish, feeReceiver: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -365,6 +247,8 @@ export function setupWorld(provider: DojoProvider) {
 			throw error;
 		}
 	};
+
+
 
 	return {
 		Marketplace: {

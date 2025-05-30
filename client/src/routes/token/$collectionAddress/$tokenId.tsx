@@ -82,7 +82,7 @@ function RouteComponent() {
 	const { address, account } = useAccount();
 	const { token, isOwner } = useToken(collectionAddress, tokenId, address);
 	const orders = useOrders();
-	const { executeOffer } = useMarketplaceActions();
+	const { execute } = useMarketplaceActions();
 
 	const tokenMetadata = useMemo<TokenMetadata>(() => {
 		if (!token || !token.metadata) return {};
@@ -117,7 +117,7 @@ function RouteComponent() {
 				return;
 			}
 
-			await executeOffer(
+			await execute(
 				account,
 				order.id,
 				collectionAddress,
@@ -126,7 +126,7 @@ function RouteComponent() {
 				true,
 			);
 		},
-		[account, collectionAddress, tokenId, executeOffer],
+		[account, collectionAddress, tokenId, execute],
 	);
 
 	if (!token) {

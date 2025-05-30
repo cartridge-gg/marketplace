@@ -16,12 +16,9 @@ export function useMarketplaceActions() {
 	const ctx = useMarketplce();
 
 	const {
-		cancelListing,
-		cancelOffer,
-		deleteListing,
-		deleteOffer,
-		executeListing,
-		executeOffer,
+		cancel,
+		remove,
+		execute,
 		grantRole,
 		list,
 		offer,
@@ -31,12 +28,9 @@ export function useMarketplaceActions() {
 		setFee,
 	} = ctx.provider.marketplace;
 	return {
-		cancelListing,
-		cancelOffer,
-		deleteListing,
-		deleteOffer,
-		executeListing,
-		executeOffer,
+		cancel,
+		remove,
+		execute,
 		grantRole,
 		list,
 		offer,

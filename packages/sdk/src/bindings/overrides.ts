@@ -1,5 +1,5 @@
 export enum OrderCategory {
-	None,
-	Buy,
-	Sell,
+	None = 0,
+	Buy = 1,
+	Sell = 2,
 }

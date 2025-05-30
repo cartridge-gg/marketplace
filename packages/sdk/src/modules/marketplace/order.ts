@@ -3,7 +3,7 @@ import { getChecksumAddress } from "starknet";
 import type { SchemaType } from "../../bindings";
 import type { ParsedEntity } from "@dojoengine/sdk";
 import { Category, CategoryType, Status, StatusType } from "../../classes";
-import { MarketplaceModel } from ".";
+import type { MarketplaceModel } from ".";
 
 const MODEL_NAME = "Order";
 
