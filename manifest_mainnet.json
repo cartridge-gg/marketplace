@@ -1329,7 +1329,7 @@
   "contracts": [
     {
       "address": "0x86ddfe3d8bec10e9d86847d41aff07e4e57f0f09630f04d9d0106db9802288",
-      "class_hash": "0x63aad235b60970998fe164ed211fe20c71bc986ed604fdbdd1072b1bde59aeb",
+      "class_hash": "0x7b8656b645e39b0b91d7bf37787cf8abdbe538f8c1ec4137e5b1e1c26b76b71",
       "abi": [
         {
           "type": "impl",
@@ -1472,8 +1472,8 @@
         },
         {
           "type": "impl",
-          "name": "MarketplaceImpl",
-          "interface_name": "marketplace::systems::marketplace::IMarketplace"
+          "name": "HelperImpl",
+          "interface_name": "marketplace::systems::marketplace::IHelper"
         },
         {
           "type": "struct",
@@ -1502,6 +1502,77 @@
               "type": "()"
             }
           ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<(core::integer::u32, core::starknet::contract_address::ContractAddress, core::integer::u256)>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<(core::integer::u32, core::starknet::contract_address::ContractAddress, core::integer::u256)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<(core::bool, core::felt252)>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<(core::bool, core::felt252)>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "marketplace::systems::marketplace::IHelper",
+          "items": [
+            {
+              "type": "function",
+              "name": "get_validity",
+              "inputs": [
+                {
+                  "name": "order_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "collection",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::bool, core::felt252)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_validities",
+              "inputs": [
+                {
+                  "name": "orders",
+                  "type": "core::array::Span::<(core::integer::u32, core::starknet::contract_address::ContractAddress, core::integer::u256)>"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<(core::bool, core::felt252)>"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "MarketplaceImpl",
+          "interface_name": "marketplace::systems::marketplace::IMarketplace"
         },
         {
           "type": "interface",
@@ -1541,74 +1612,6 @@
             },
             {
               "type": "function",
-              "name": "cancel_listing",
-              "inputs": [
-                {
-                  "name": "order_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "collection",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "delete_listing",
-              "inputs": [
-                {
-                  "name": "order_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "collection",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "execute_listing",
-              "inputs": [
-                {
-                  "name": "order_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "collection",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                },
-                {
-                  "name": "quantity",
-                  "type": "core::integer::u128"
-                },
-                {
-                  "name": "royalties",
-                  "type": "core::bool"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
               "name": "offer",
               "inputs": [
                 {
@@ -1641,7 +1644,7 @@
             },
             {
               "type": "function",
-              "name": "cancel_offer",
+              "name": "cancel",
               "inputs": [
                 {
                   "name": "order_id",
@@ -1661,7 +1664,7 @@
             },
             {
               "type": "function",
-              "name": "delete_offer",
+              "name": "delete",
               "inputs": [
                 {
                   "name": "order_id",
@@ -1681,7 +1684,7 @@
             },
             {
               "type": "function",
-              "name": "execute_offer",
+              "name": "execute",
               "inputs": [
                 {
                   "name": "order_id",
@@ -1876,13 +1879,10 @@
         "resume",
         "set_fee",
         "list",
-        "cancel_listing",
-        "delete_listing",
-        "execute_listing",
         "offer",
-        "cancel_offer",
-        "delete_offer",
-        "execute_offer",
+        "cancel",
+        "delete",
+        "execute",
         "upgrade"
       ]
     }

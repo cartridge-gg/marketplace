@@ -58,6 +58,16 @@ pub impl OrderImpl of OrderTrait {
     }
 
     #[inline]
+    fn is_buy_order(self: @Order) -> bool {
+        *self.category == Category::Buy.into()
+    }
+
+    #[inline]
+    fn is_sell_order(self: @Order) -> bool {
+        *self.category == Category::Sell.into()
+    }
+
+    #[inline]
     fn execute(ref self: Order, quantity: u128, now: u64) {
         // [Check] Order can be closed
         self.assert_can_execute(quantity, now);
@@ -106,12 +116,12 @@ pub impl OrderAssert of AssertTrait {
 
     #[inline]
     fn assert_buy_order(self: @Order) {
-        assert(*self.category == Category::Buy.into(), errors::ORDER_NOT_BUY);
+        assert(self.is_buy_order(), errors::ORDER_NOT_BUY);
     }
 
     #[inline]
     fn assert_sell_order(self: @Order) {
-        assert(*self.category == Category::Sell.into(), errors::ORDER_NOT_SELL);
+        assert(self.is_sell_order(), errors::ORDER_NOT_SELL);
     }
 
     #[inline]

@@ -57,7 +57,10 @@ pub mod BuyableComponent {
             let verifiable = get_dep_component!(self, Verify);
             verifiable
                 .assert_buy_validity(
-                    owner: caller_address, currency: currency, price: price.into(),
+                    owner: caller_address,
+                    expiration: expiration,
+                    currency: currency,
+                    price: price.into(),
                 );
 
             // [Effect] Create order
@@ -180,13 +183,23 @@ pub mod BuyableComponent {
             let currency: ContractAddress = order.currency.try_into().unwrap();
             let price: u256 = order.price.into();
             let verifiable = get_dep_component!(self, Verify);
-            verifiable.assert_buy_validity(owner: spender, currency: currency, price: price.into());
+            verifiable
+                .assert_buy_validity(
+                    owner: spender,
+                    expiration: order.expiration,
+                    currency: currency,
+                    price: price.into(),
+                );
 
             // [Check] Execute requirements
             let owner: ContractAddress = starknet::get_caller_address();
             verifiable
                 .assert_sell_validity(
-                    owner: owner, collection: collection, token_id: token_id, value: value,
+                    owner: owner,
+                    expiration: order.expiration,
+                    collection: collection,
+                    token_id: token_id,
+                    value: value,
                 );
 
             // [Effect] Execute order
@@ -237,6 +250,35 @@ pub mod BuyableComponent {
             let from: felt252 = owner.into();
             let to: felt252 = spender.into();
             store.sale(order: order, from: from, to: to, time: time);
+        }
+
+        fn get_validity(
+            self: @ComponentState<TContractState>,
+            world: WorldStorage,
+            order_id: u32,
+            collection: ContractAddress,
+            token_id: u256,
+        ) -> (bool, felt252) {
+            // [Return] Validity status
+            let mut store = StoreTrait::new(world);
+            let order = store.order(order_id, collection.into(), token_id);
+            let verifiable = get_dep_component!(self, Verify);
+            let owner: ContractAddress = starknet::get_caller_address();
+            let currency: ContractAddress = order.currency.try_into().unwrap();
+            let price: u256 = order.price.into();
+            verifiable.get_buy_validity(owner, order.expiration, currency, price)
+        }
+
+        fn is_buy_order(
+            self: @ComponentState<TContractState>,
+            world: WorldStorage,
+            order_id: u32,
+            collection: ContractAddress,
+            token_id: u256,
+        ) -> bool {
+            let mut store = StoreTrait::new(world);
+            let order = store.order(order_id, collection.into(), token_id);
+            order.is_buy_order()
         }
     }
 }
