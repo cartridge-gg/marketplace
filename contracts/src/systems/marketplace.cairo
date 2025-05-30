@@ -20,9 +20,26 @@ pub trait IMarketplace<TContractState> {
         currency: starknet::ContractAddress,
         expiration: u64,
     );
-    fn cancel_listing(ref self: TContractState, order_id: u32);
-    fn delete_listing(ref self: TContractState, order_id: u32);
-    fn execute_listing(ref self: TContractState, order_id: u32, quantity: u128, royalties: bool);
+    fn cancel_listing(
+        ref self: TContractState,
+        order_id: u32,
+        collection: starknet::ContractAddress,
+        token_id: u256,
+    );
+    fn delete_listing(
+        ref self: TContractState,
+        order_id: u32,
+        collection: starknet::ContractAddress,
+        token_id: u256,
+    );
+    fn execute_listing(
+        ref self: TContractState,
+        order_id: u32,
+        collection: starknet::ContractAddress,
+        token_id: u256,
+        quantity: u128,
+        royalties: bool,
+    );
     fn offer(
         ref self: TContractState,
         collection: starknet::ContractAddress,
@@ -32,9 +49,26 @@ pub trait IMarketplace<TContractState> {
         currency: starknet::ContractAddress,
         expiration: u64,
     );
-    fn cancel_offer(ref self: TContractState, order_id: u32);
-    fn delete_offer(ref self: TContractState, order_id: u32);
-    fn execute_offer(ref self: TContractState, order_id: u32, quantity: u128, royalties: bool);
+    fn cancel_offer(
+        ref self: TContractState,
+        order_id: u32,
+        collection: starknet::ContractAddress,
+        token_id: u256,
+    );
+    fn delete_offer(
+        ref self: TContractState,
+        order_id: u32,
+        collection: starknet::ContractAddress,
+        token_id: u256,
+    );
+    fn execute_offer(
+        ref self: TContractState,
+        order_id: u32,
+        collection: starknet::ContractAddress,
+        token_id: u256,
+        quantity: u128,
+        royalties: bool,
+    );
 }
 
 // Contracts
@@ -160,21 +194,30 @@ pub mod Marketplace {
             self.sellable.create(world, collection, token_id, quantity, price, currency, expiration)
         }
 
-        fn cancel_listing(ref self: ContractState, order_id: u32) {
+        fn cancel_listing(
+            ref self: ContractState, order_id: u32, collection: ContractAddress, token_id: u256,
+        ) {
             let world = self.world_storage();
-            self.sellable.cancel(world, order_id)
+            self.sellable.cancel(world, order_id, collection, token_id)
         }
 
-        fn delete_listing(ref self: ContractState, order_id: u32) {
+        fn delete_listing(
+            ref self: ContractState, order_id: u32, collection: ContractAddress, token_id: u256,
+        ) {
             let world = self.world_storage();
-            self.sellable.delete(world, order_id)
+            self.sellable.delete(world, order_id, collection, token_id)
         }
 
         fn execute_listing(
-            ref self: ContractState, order_id: u32, quantity: u128, royalties: bool,
+            ref self: ContractState,
+            order_id: u32,
+            collection: ContractAddress,
+            token_id: u256,
+            quantity: u128,
+            royalties: bool,
         ) {
             let world = self.world_storage();
-            self.sellable.execute(world, order_id, quantity, royalties)
+            self.sellable.execute(world, order_id, collection, token_id, quantity, royalties)
         }
 
         fn offer(
@@ -190,19 +233,30 @@ pub mod Marketplace {
             self.buyable.create(world, collection, token_id, quantity, price, currency, expiration)
         }
 
-        fn cancel_offer(ref self: ContractState, order_id: u32) {
+        fn cancel_offer(
+            ref self: ContractState, order_id: u32, collection: ContractAddress, token_id: u256,
+        ) {
             let world = self.world_storage();
-            self.buyable.cancel(world, order_id)
+            self.buyable.cancel(world, order_id, collection, token_id)
         }
 
-        fn delete_offer(ref self: ContractState, order_id: u32) {
+        fn delete_offer(
+            ref self: ContractState, order_id: u32, collection: ContractAddress, token_id: u256,
+        ) {
             let world = self.world_storage();
-            self.buyable.delete(world, order_id)
+            self.buyable.delete(world, order_id, collection, token_id)
         }
 
-        fn execute_offer(ref self: ContractState, order_id: u32, quantity: u128, royalties: bool) {
+        fn execute_offer(
+            ref self: ContractState,
+            order_id: u32,
+            collection: ContractAddress,
+            token_id: u256,
+            quantity: u128,
+            royalties: bool,
+        ) {
             let world = self.world_storage();
-            self.buyable.execute(world, order_id, quantity, royalties)
+            self.buyable.execute(world, order_id, collection, token_id, quantity, royalties)
         }
     }
 

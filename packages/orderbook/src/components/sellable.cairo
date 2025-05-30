@@ -85,14 +85,20 @@ pub mod SellableComponent {
             store.listing(order: order, time: time);
         }
 
-        fn cancel(self: @ComponentState<TContractState>, world: WorldStorage, order_id: u32) {
+        fn cancel(
+            self: @ComponentState<TContractState>,
+            world: WorldStorage,
+            order_id: u32,
+            collection: ContractAddress,
+            token_id: u256,
+        ) {
             // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
             let book = store.book(BOOK_ID);
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id);
+            let mut order = store.order(order_id, collection.into(), token_id);
             order.assert_does_exist();
 
             // [Check] Order category
@@ -109,14 +115,20 @@ pub mod SellableComponent {
             store.set_order(@order);
         }
 
-        fn delete(self: @ComponentState<TContractState>, world: WorldStorage, order_id: u32) {
+        fn delete(
+            self: @ComponentState<TContractState>,
+            world: WorldStorage,
+            order_id: u32,
+            collection: ContractAddress,
+            token_id: u256,
+        ) {
             // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
             let book = store.book(BOOK_ID);
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id);
+            let mut order = store.order(order_id, collection.into(), token_id);
             order.assert_does_exist();
 
             // [Check] Order category
@@ -147,6 +159,8 @@ pub mod SellableComponent {
             self: @ComponentState<TContractState>,
             world: WorldStorage,
             order_id: u32,
+            collection: ContractAddress,
+            token_id: u256,
             quantity: u128,
             royalties: bool,
         ) {
@@ -156,7 +170,7 @@ pub mod SellableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id);
+            let mut order = store.order(order_id, collection.into(), token_id);
             order.assert_does_exist();
 
             // [Check] Order category

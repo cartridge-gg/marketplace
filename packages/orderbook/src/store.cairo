@@ -43,8 +43,8 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline]
-    fn order(self: Store, id: u32) -> Order {
-        self.world.read_model(id)
+    fn order(self: Store, id: u32, collection: felt252, token_id: u256) -> Order {
+        self.world.read_model((id, collection, token_id))
     }
 
     #[inline]
