@@ -1,8 +1,8 @@
 {
   "world": {
     "class_hash": "0x4c60dc46a8ca8bb47675b7b914053cef769afbf0e340523187336b72bd71d1f",
-    "address": "0x57c5df0f4bbde81bf39fd99fe1c942e4fef15b80af5d0d4b4cb6bf43a7acf46",
-    "seed": "Marketplace-1",
+    "address": "0x63f36b6d15411e82ee9e4e9b17c3889f45c0c4714e7d53a3317dca197dceac5",
+    "seed": "Marketplace-1.0.0",
     "name": "Cartridge Marketplace",
     "entrypoints": [
       "uuid",
@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x67afac107a25f997b4a40624facbcccb8ba4b849e1ae4e9d6abf1eb743a2581",
-      "class_hash": "0x652fa2c14182a0e00f5c55d09d0f745f812af63875f0cfa96fe64462b9ab72",
+      "address": "0x86ddfe3d8bec10e9d86847d41aff07e4e57f0f09630f04d9d0106db9802288",
+      "class_hash": "0x7b8656b645e39b0b91d7bf37787cf8abdbe538f8c1ec4137e5b1e1c26b76b71",
       "abi": [
         {
           "type": "impl",
@@ -1472,8 +1472,8 @@
         },
         {
           "type": "impl",
-          "name": "MarketplaceImpl",
-          "interface_name": "marketplace::systems::marketplace::IMarketplace"
+          "name": "HelperImpl",
+          "interface_name": "marketplace::systems::marketplace::IHelper"
         },
         {
           "type": "struct",
@@ -1502,6 +1502,77 @@
               "type": "()"
             }
           ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<(core::integer::u32, core::starknet::contract_address::ContractAddress, core::integer::u256)>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<(core::integer::u32, core::starknet::contract_address::ContractAddress, core::integer::u256)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<(core::bool, core::felt252)>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<(core::bool, core::felt252)>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "marketplace::systems::marketplace::IHelper",
+          "items": [
+            {
+              "type": "function",
+              "name": "get_validity",
+              "inputs": [
+                {
+                  "name": "order_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "collection",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::bool, core::felt252)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_validities",
+              "inputs": [
+                {
+                  "name": "orders",
+                  "type": "core::array::Span::<(core::integer::u32, core::starknet::contract_address::ContractAddress, core::integer::u256)>"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<(core::bool, core::felt252)>"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "MarketplaceImpl",
+          "interface_name": "marketplace::systems::marketplace::IMarketplace"
         },
         {
           "type": "interface",
@@ -1541,50 +1612,6 @@
             },
             {
               "type": "function",
-              "name": "cancel_listing",
-              "inputs": [
-                {
-                  "name": "order_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "delete_listing",
-              "inputs": [
-                {
-                  "name": "order_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "execute_listing",
-              "inputs": [
-                {
-                  "name": "order_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "quantity",
-                  "type": "core::integer::u128"
-                },
-                {
-                  "name": "royalties",
-                  "type": "core::bool"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
               "name": "offer",
               "inputs": [
                 {
@@ -1617,11 +1644,19 @@
             },
             {
               "type": "function",
-              "name": "cancel_offer",
+              "name": "cancel",
               "inputs": [
                 {
                   "name": "order_id",
                   "type": "core::integer::u32"
+                },
+                {
+                  "name": "collection",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
                 }
               ],
               "outputs": [],
@@ -1629,11 +1664,19 @@
             },
             {
               "type": "function",
-              "name": "delete_offer",
+              "name": "delete",
               "inputs": [
                 {
                   "name": "order_id",
                   "type": "core::integer::u32"
+                },
+                {
+                  "name": "collection",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
                 }
               ],
               "outputs": [],
@@ -1641,11 +1684,19 @@
             },
             {
               "type": "function",
-              "name": "execute_offer",
+              "name": "execute",
               "inputs": [
                 {
                   "name": "order_id",
                   "type": "core::integer::u32"
+                },
+                {
+                  "name": "collection",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
                 },
                 {
                   "name": "quantity",
@@ -1828,13 +1879,10 @@
         "resume",
         "set_fee",
         "list",
-        "cancel_listing",
-        "delete_listing",
-        "execute_listing",
         "offer",
-        "cancel_offer",
-        "delete_offer",
-        "execute_offer",
+        "cancel",
+        "delete",
+        "execute",
         "upgrade"
       ]
     }
@@ -1855,7 +1903,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x62ce5f7bd53533d359ae32db851e1f53bd0419bc4e152191a213cdda2b847a",
+      "class_hash": "0x6e957bd2bd163efe69941a3f600fef2806fc6dbf7ebf98b270dc233242fded",
       "tag": "MARKETPLACE-Order",
       "selector": "0x61b4c97fb2ee0697bed87a3f5f7e932e5af76c77c88682b9ae67552f32eff69"
     }
@@ -1863,19 +1911,19 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x84cc7ffd97ab5ae628f3050d36ef200370046fb8290de1f4626b663c961000",
+      "class_hash": "0x363f065a221c1331b9a4593cbf26f7be1c5e9ab49b9f202660eaadb94653565",
       "tag": "MARKETPLACE-Listing",
       "selector": "0x46941a9d898f53447b49e68db8c050602bd4ae1c96f3b7bf4652176fb731603"
     },
     {
       "members": [],
-      "class_hash": "0x301c4766b0be1f08491932ed5d84958dee414d3c28db6764cc5ebaf1c45c634",
+      "class_hash": "0x417bc5b86cafbdfe4920e3361eabd7a2dac3dd4be4944aacdb8ca51f071fa27",
       "tag": "MARKETPLACE-Offer",
       "selector": "0x2e8cc7c8726fe1500b19d4d0ef351d5b11f3a010a857c074825670c37507c32"
     },
     {
       "members": [],
-      "class_hash": "0x7e8703ca5fc3db3e4c92320c5d433e327a4821ab4c4a9ddaedf7923b2fb698d",
+      "class_hash": "0x358dade42a75e9bba5f19dee32c7c7f08d4e49f034a49776e39dc5d8a3f0b4e",
       "tag": "MARKETPLACE-Sale",
       "selector": "0x5258de3665c1c16659a2c4c55edf557c5dd9f2ea0f94cc24c8cd3676a8e9c02"
     }

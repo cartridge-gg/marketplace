@@ -1,6 +1,6 @@
 import { createDojoConfig } from "@dojoengine/core";
 
-import mainnet from "../../../../contracts/manifest_mainnet.json";
+import mainnet from "../../../../manifest_mainnet.json";
 
 import { constants } from "starknet";
 

@@ -27,6 +27,7 @@ pub mod VerifiableComponent {
         pub const VERIFIABLE_INVALID_BALANCE: felt252 = 'Verifiable: invalid balance';
         pub const VERIFIABLE_NOT_INVALID: felt252 = 'Verifiable: not invalid';
         pub const VERIFIABLE_INVALID_VALUE: felt252 = 'Verifiable: invalid value';
+        pub const VERIFIABLE_EXPIRED: felt252 = 'Verifiable: expired';
     }
 
     // Storage
@@ -44,6 +45,102 @@ pub mod VerifiableComponent {
     pub impl InternalImpl<
         TContractState, +HasComponent<TContractState>,
     > of InternalTrait<TContractState> {
+        #[inline]
+        fn get_sell_validity(
+            self: @ComponentState<TContractState>,
+            owner: ContractAddress,
+            expiration: u64,
+            collection: ContractAddress,
+            token_id: u256,
+            value: u256,
+        ) -> (bool, felt252) {
+            // [Check] Expiration
+            if (expiration < starknet::get_block_timestamp()) {
+                return (false, errors::VERIFIABLE_EXPIRED);
+            }
+            let src5_dispatcher = ISRC5Dispatcher { contract_address: collection };
+            if src5_dispatcher.supports_interface(IERC1155_ID) {
+                // [Check] ERC1155 requirements
+                let collection_dispatcher = IERC1155Dispatcher { contract_address: collection };
+                // [Check] ERC1155 approval
+                let is_approved = ERC1155Impl::operator_is_approved(
+                    self: self, collection: collection_dispatcher, owner: owner, token_id: token_id,
+                );
+                if (!is_approved) {
+                    return (false, errors::VERIFIABLE_NOT_APPROVED);
+                }
+                // [Check] ERC1155 balance
+                let has_enough_balance = ERC1155Impl::has_enough_balance(
+                    self: self,
+                    collection: collection_dispatcher,
+                    account: owner,
+                    token_id: token_id,
+                    value: value,
+                );
+                if (!has_enough_balance) {
+                    return (false, errors::VERIFIABLE_INVALID_BALANCE);
+                }
+            } else if src5_dispatcher.supports_interface(IERC721_ID) {
+                // [Check] ERC721 requirements
+                let collection_dispatcher = IERC721Dispatcher { contract_address: collection };
+                // [Check] ERC721 approval
+                let is_approved = ERC721Impl::operator_is_approved(
+                    self: self, collection: collection_dispatcher, owner: owner, token_id: token_id,
+                );
+                if (!is_approved) {
+                    return (false, errors::VERIFIABLE_NOT_APPROVED);
+                }
+                // [Check] ERC721 owner
+                let is_owner = ERC721Impl::is_token_owner(
+                    self: self,
+                    collection: collection_dispatcher,
+                    account: owner,
+                    token_id: token_id,
+                );
+                if (!is_owner) {
+                    return (false, errors::VERIFIABLE_NOT_OWNER);
+                }
+                // [Check] ERC721 value
+                if (value != 0) {
+                    return (false, errors::VERIFIABLE_INVALID_VALUE);
+                }
+            } else {
+                // [Panic] Unsupported collection
+                return (false, errors::VERIFIABLE_INVALID_COLLECTION);
+            };
+            (true, 0)
+        }
+
+        #[inline]
+        fn get_buy_validity(
+            self: @ComponentState<TContractState>,
+            owner: ContractAddress,
+            expiration: u64,
+            currency: ContractAddress,
+            price: u256,
+        ) -> (bool, felt252) {
+            // [Check] Expiration
+            if (expiration < starknet::get_block_timestamp()) {
+                return (false, errors::VERIFIABLE_EXPIRED);
+            }
+            // [Check] ERC20 balance
+            let erc20_dispatcher = IERC20Dispatcher { contract_address: currency };
+            let has_enough_balance = ERC20Impl::has_enough_balance(
+                self: self, currency: erc20_dispatcher, account: owner, amount: price,
+            );
+            if (!has_enough_balance) {
+                return (false, errors::VERIFIABLE_INVALID_BALANCE);
+            }
+            // [Check] ERC20 approval
+            let spender_is_allowed = ERC20Impl::spender_is_allowed(
+                self: self, currency: erc20_dispatcher, owner: owner, amount: price,
+            );
+            if (!spender_is_allowed) {
+                return (false, errors::VERIFIABLE_NOT_APPROVED);
+            }
+            (true, 0)
+        }
+
         #[inline]
         fn transfer(
             self: @ComponentState<TContractState>,
@@ -118,45 +215,20 @@ pub mod VerifiableComponent {
         fn assert_sell_validity(
             self: @ComponentState<TContractState>,
             owner: ContractAddress,
+            expiration: u64,
             collection: ContractAddress,
             token_id: u256,
             value: u256,
         ) {
-            let src5_dispatcher = ISRC5Dispatcher { contract_address: collection };
-            if src5_dispatcher.supports_interface(IERC1155_ID) {
-                // [Check] ERC1155 requirements
-                let collection_dispatcher = IERC1155Dispatcher { contract_address: collection };
-                let is_approved = ERC1155Impl::operator_is_approved(
-                    self: self, collection: collection_dispatcher, owner: owner, token_id: token_id,
-                );
-                assert(is_approved, errors::VERIFIABLE_NOT_APPROVED);
-                let has_enough_balance = ERC1155Impl::has_enough_balance(
-                    self: self,
-                    collection: collection_dispatcher,
-                    account: owner,
+            let (is_valid, error) = self
+                .get_sell_validity(
+                    owner: owner,
+                    expiration: expiration,
+                    collection: collection,
                     token_id: token_id,
                     value: value,
                 );
-                assert(has_enough_balance, errors::VERIFIABLE_INVALID_BALANCE);
-            } else if src5_dispatcher.supports_interface(IERC721_ID) {
-                // [Check] ERC721 requirements
-                let collection_dispatcher = IERC721Dispatcher { contract_address: collection };
-                let is_approved = ERC721Impl::operator_is_approved(
-                    self: self, collection: collection_dispatcher, owner: owner, token_id: token_id,
-                );
-                assert(is_approved, errors::VERIFIABLE_NOT_APPROVED);
-                let is_owner = ERC721Impl::is_token_owner(
-                    self: self,
-                    collection: collection_dispatcher,
-                    account: owner,
-                    token_id: token_id,
-                );
-                assert(is_owner, errors::VERIFIABLE_NOT_OWNER);
-                assert(value == 0, errors::VERIFIABLE_INVALID_VALUE);
-            } else {
-                // [Panic] Unsupported collection
-                assert(false, errors::VERIFIABLE_INVALID_COLLECTION);
-            };
+            assert(is_valid, error);
         }
 
         #[inline]
@@ -168,62 +240,30 @@ pub mod VerifiableComponent {
             token_id: u256,
             value: u256,
         ) {
-            let has_expired = expiration < starknet::get_block_timestamp();
-            let src5_dispatcher = ISRC5Dispatcher { contract_address: collection };
-            if src5_dispatcher.supports_interface(IERC1155_ID) {
-                // [Check] ERC1155 requirements
-                let collection_dispatcher = IERC1155Dispatcher { contract_address: collection };
-                let is_approved = ERC1155Impl::operator_is_approved(
-                    self: self, collection: collection_dispatcher, owner: owner, token_id: token_id,
-                );
-                let has_enough_balance = ERC1155Impl::has_enough_balance(
-                    self: self,
-                    collection: collection_dispatcher,
-                    account: owner,
+            let (is_valid, _) = self
+                .get_sell_validity(
+                    owner: owner,
+                    expiration: expiration,
+                    collection: collection,
                     token_id: token_id,
                     value: value,
                 );
-                assert(
-                    has_expired || !is_approved || !has_enough_balance,
-                    errors::VERIFIABLE_NOT_INVALID,
-                );
-            } else if src5_dispatcher.supports_interface(IERC721_ID) {
-                // [Check] ERC721 requirements
-                let collection_dispatcher = IERC721Dispatcher { contract_address: collection };
-                let is_approved = ERC721Impl::operator_is_approved(
-                    self: self, collection: collection_dispatcher, owner: owner, token_id: token_id,
-                );
-                assert(is_approved, errors::VERIFIABLE_NOT_APPROVED);
-                let is_owner = ERC721Impl::is_token_owner(
-                    self: self,
-                    collection: collection_dispatcher,
-                    account: owner,
-                    token_id: token_id,
-                );
-                assert(
-                    has_expired || !is_owner || !is_approved || value != 0,
-                    errors::VERIFIABLE_NOT_INVALID,
-                );
-            }
-            // [Fallback] Unsupported collection is considered as inactive
+            assert(!is_valid, errors::VERIFIABLE_NOT_INVALID);
         }
 
         #[inline]
         fn assert_buy_validity(
             self: @ComponentState<TContractState>,
             owner: ContractAddress,
+            expiration: u64,
             currency: ContractAddress,
             price: u256,
         ) {
-            let erc20_dispatcher = IERC20Dispatcher { contract_address: currency };
-            let has_enough_balance = ERC20Impl::has_enough_balance(
-                self: self, currency: erc20_dispatcher, account: owner, amount: price,
-            );
-            assert(has_enough_balance, errors::VERIFIABLE_INVALID_BALANCE);
-            let spender_is_allowed = ERC20Impl::spender_is_allowed(
-                self: self, currency: erc20_dispatcher, owner: owner, amount: price,
-            );
-            assert(spender_is_allowed, errors::VERIFIABLE_NOT_APPROVED);
+            let (is_valid, error) = self
+                .get_buy_validity(
+                    owner: owner, expiration: expiration, currency: currency, price: price,
+                );
+            assert(is_valid, error);
         }
 
         #[inline]
@@ -234,18 +274,11 @@ pub mod VerifiableComponent {
             currency: ContractAddress,
             price: u256,
         ) {
-            let has_expired = expiration < starknet::get_block_timestamp();
-            let erc20_dispatcher = IERC20Dispatcher { contract_address: currency };
-            let has_enough_balance = ERC20Impl::has_enough_balance(
-                self: self, currency: erc20_dispatcher, account: owner, amount: price,
-            );
-            let spender_is_allowed = ERC20Impl::spender_is_allowed(
-                self: self, currency: erc20_dispatcher, owner: owner, amount: price,
-            );
-            assert(
-                has_expired || !has_enough_balance || !spender_is_allowed,
-                errors::VERIFIABLE_NOT_INVALID,
-            );
+            let (is_valid, _) = self
+                .get_buy_validity(
+                    owner: owner, expiration: expiration, currency: currency, price: price,
+                );
+            assert(!is_valid, errors::VERIFIABLE_NOT_INVALID);
         }
     }
 

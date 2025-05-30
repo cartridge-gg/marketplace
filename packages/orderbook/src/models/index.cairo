@@ -25,11 +25,14 @@ pub struct Book {
 pub struct Order {
     #[key]
     pub id: u32,
+    #[key]
+    pub collection: felt252,
+    #[key]
+    pub token_id: u256,
+    #[key]
     pub category: u8,
     pub status: u8,
     pub expiration: u64,
-    pub collection: felt252,
-    pub token_id: u256,
     pub quantity: u128,
     pub price: u128,
     pub currency: felt252,

@@ -16,14 +16,10 @@ export const getMarketplacePolicies = (
 	options: MarketplaceOptions = DefaultMarketplaceOptions,
 ) => {
 	const config = configs[chainId];
-	const address: string = getContractByName(
-		config.manifest,
-		NAMESPACE,
-		CONTRACT_NAME,
-	);
+	const contract = getContractByName(config.manifest, NAMESPACE, CONTRACT_NAME);
 	return {
 		contracts: {
-			[address]: {
+			[contract.address]: {
 				name: CONTRACT_NAME,
 				description: CONTRACT_DESCRIPTION,
 				methods: [

@@ -2,7 +2,7 @@
 cairo-version = "2.10.1"
 edition = "2024_07"
 name = "marketplace"
-version = "0.0.0"
+version = "0.0.1"
 
 [cairo]
 sierra-replace-ids = true

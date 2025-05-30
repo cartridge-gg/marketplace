@@ -3,7 +3,7 @@ import { getChecksumAddress } from "starknet";
 import type { SchemaType } from "../../bindings";
 import type { ParsedEntity } from "@dojoengine/sdk";
 import { Category, CategoryType, Status, StatusType } from "../../classes";
-import { MarketplaceModel } from ".";
+import type { MarketplaceModel } from ".";
 
 const MODEL_NAME = "Order";
 
@@ -118,36 +118,21 @@ export const Order = {
 
 	getMethods: () => [
 		{ name: "list", entrypoint: "list", description: "List an item." },
-		{
-			name: "cancel_listing",
-			entrypoint: "cancel_listing",
-			description: "Cancel a sell order.",
-		},
-		{
-			name: "delete_listing",
-			entrypoint: "delete_listing",
-			description: "Delete a sell order.",
-		},
-		{
-			name: "execute_listing",
-			entrypoint: "execute_listing",
-			description: "Execute a sell order.",
-		},
 		{ name: "offer", entrypoint: "offer", description: "Make an offer." },
 		{
-			name: "cancel_offer",
-			entrypoint: "cancel_offer",
-			description: "Cancel a buy order.",
+			name: "cancel",
+			entrypoint: "cancel",
+			description: "Cancel an order.",
 		},
 		{
-			name: "delete_offer",
-			entrypoint: "delete_offer",
-			description: "Delete a buy order.",
+			name: "delete",
+			entrypoint: "delete",
+			description: "Delete an order.",
 		},
 		{
-			name: "execute_offer",
-			entrypoint: "execute_offer",
-			description: "Execute a buy order.",
+			name: "execute",
+			entrypoint: "execute",
+			description: "Execute an order.",
 		},
 	],
 };

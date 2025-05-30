@@ -1,34 +1,34 @@
 import { RegistryModel } from "@cartridge/arcade";
-import {
-  MarketplaceModel,
-} from "@cartridge/marketplace-sdk";
+import { MarketplaceModel } from "@cartridge/marketplace-sdk";
 
 type SDKModel = RegistryModel | MarketplaceModel;
-type ExtractModel<T extends SDKModel> = T
+type ExtractModel<T extends SDKModel> = T;
 export type IsTypeFn<T extends SDKModel> = (model: ExtractModel<T>) => boolean;
 
-export type MarketplaceStateInnerType<T extends SDKModel> = { [key: string]: ExtractModel<T> };
+export type MarketplaceStateInnerType<T extends SDKModel> = {
+	[key: string]: ExtractModel<T>;
+};
 
 /**
  * Helper function to hydrate a model into the state
  */
 export function hydrateModel<T extends SDKModel>(
-  model: ExtractModel<T>,
-  modelClassTypeCheckFn: IsTypeFn<T>,
-  setModel: React.Dispatch<React.SetStateAction<MarketplaceStateInnerType<T>>>,
+	model: ExtractModel<T>,
+	modelClassTypeCheckFn: IsTypeFn<T>,
+	setModel: React.Dispatch<React.SetStateAction<MarketplaceStateInnerType<T>>>,
 ) {
-      if (modelClassTypeCheckFn(model)) {
-        const m = model as ExtractModel<T>;
-        if (!m.exists()) {
-          setModel((prevs) => {
-            const news = { ...prevs };
-            delete news[m.identifier];
-            return news;
-          });
-          return;
-        }
-        setModel((prevs) => ({ ...prevs, [m.identifier]: m }));
-      }  
+	if (modelClassTypeCheckFn(model)) {
+		const m = model as ExtractModel<T>;
+		if (!m.exists()) {
+			setModel((prevs) => {
+				const news = { ...prevs };
+				delete news[m.identifier];
+				return news;
+			});
+			return;
+		}
+		setModel((prevs) => ({ ...prevs, [m.identifier]: m }));
+	}
 }
 
 export { ArcadeContext } from "./arcade";

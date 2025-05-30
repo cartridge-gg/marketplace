@@ -10,6 +10,16 @@ pub trait IAdministration<TContractState> {
 }
 
 #[starknet::interface]
+pub trait IHelper<TContractState> {
+    fn get_validity(
+        self: @TContractState, order_id: u32, collection: starknet::ContractAddress, token_id: u256,
+    ) -> (bool, felt252);
+    fn get_validities(
+        self: @TContractState, orders: Span<(u32, starknet::ContractAddress, u256)>,
+    ) -> Span<(bool, felt252)>;
+}
+
+#[starknet::interface]
 pub trait IMarketplace<TContractState> {
     fn list(
         ref self: TContractState,
@@ -20,9 +30,6 @@ pub trait IMarketplace<TContractState> {
         currency: starknet::ContractAddress,
         expiration: u64,
     );
-    fn cancel_listing(ref self: TContractState, order_id: u32);
-    fn delete_listing(ref self: TContractState, order_id: u32);
-    fn execute_listing(ref self: TContractState, order_id: u32, quantity: u128, royalties: bool);
     fn offer(
         ref self: TContractState,
         collection: starknet::ContractAddress,
@@ -32,9 +39,26 @@ pub trait IMarketplace<TContractState> {
         currency: starknet::ContractAddress,
         expiration: u64,
     );
-    fn cancel_offer(ref self: TContractState, order_id: u32);
-    fn delete_offer(ref self: TContractState, order_id: u32);
-    fn execute_offer(ref self: TContractState, order_id: u32, quantity: u128, royalties: bool);
+    fn cancel(
+        ref self: TContractState,
+        order_id: u32,
+        collection: starknet::ContractAddress,
+        token_id: u256,
+    );
+    fn delete(
+        ref self: TContractState,
+        order_id: u32,
+        collection: starknet::ContractAddress,
+        token_id: u256,
+    );
+    fn execute(
+        ref self: TContractState,
+        order_id: u32,
+        collection: starknet::ContractAddress,
+        token_id: u256,
+        quantity: u128,
+        royalties: bool,
+    );
 }
 
 // Contracts
@@ -62,7 +86,7 @@ pub mod Marketplace {
 
     // Local imports
 
-    use super::{IAdministration, IMarketplace};
+    use super::{IAdministration, IHelper, IMarketplace};
 
     // Components
 
@@ -74,6 +98,10 @@ pub mod Marketplace {
     impl SellableImpl = SellableComponent::InternalImpl<ContractState>;
     component!(path: VerifiableComponent, storage: verifiable, event: VerifiableEvent);
     impl VerifiableImpl = VerifiableComponent::InternalImpl<ContractState>;
+
+    // Errors
+
+    pub const UNKNOWN_ORDER: felt252 = 'Marketplace: unknown order';
 
     // Storage
 
@@ -146,6 +174,33 @@ pub mod Marketplace {
     }
 
     #[abi(embed_v0)]
+    impl HelperImpl of IHelper<ContractState> {
+        fn get_validity(
+            self: @ContractState, order_id: u32, collection: ContractAddress, token_id: u256,
+        ) -> (bool, felt252) {
+            let world = self.world_storage();
+            if self.sellable.is_sell_order(world, order_id, collection, token_id) {
+                return self.sellable.get_validity(world, order_id, collection, token_id);
+            } else if self.buyable.is_buy_order(world, order_id, collection, token_id) {
+                return self.buyable.get_validity(world, order_id, collection, token_id);
+            } else {
+                return (false, UNKNOWN_ORDER);
+            }
+        }
+
+        fn get_validities(
+            self: @ContractState, mut orders: Span<(u32, ContractAddress, u256)>,
+        ) -> Span<(bool, felt252)> {
+            let mut validities: Array<(bool, felt252)> = array![];
+            while let Option::Some((order_id, collection, token_id)) = orders.pop_front() {
+                let validity = self.get_validity(*order_id, *collection, *token_id);
+                validities.append(validity);
+            };
+            validities.span()
+        }
+    }
+
+    #[abi(embed_v0)]
     impl MarketplaceImpl of IMarketplace<ContractState> {
         fn list(
             ref self: ContractState,
@@ -158,23 +213,6 @@ pub mod Marketplace {
         ) {
             let world = self.world_storage();
             self.sellable.create(world, collection, token_id, quantity, price, currency, expiration)
-        }
-
-        fn cancel_listing(ref self: ContractState, order_id: u32) {
-            let world = self.world_storage();
-            self.sellable.cancel(world, order_id)
-        }
-
-        fn delete_listing(ref self: ContractState, order_id: u32) {
-            let world = self.world_storage();
-            self.sellable.delete(world, order_id)
-        }
-
-        fn execute_listing(
-            ref self: ContractState, order_id: u32, quantity: u128, royalties: bool,
-        ) {
-            let world = self.world_storage();
-            self.sellable.execute(world, order_id, quantity, royalties)
         }
 
         fn offer(
@@ -190,19 +228,41 @@ pub mod Marketplace {
             self.buyable.create(world, collection, token_id, quantity, price, currency, expiration)
         }
 
-        fn cancel_offer(ref self: ContractState, order_id: u32) {
+        fn cancel(
+            ref self: ContractState, order_id: u32, collection: ContractAddress, token_id: u256,
+        ) {
             let world = self.world_storage();
-            self.buyable.cancel(world, order_id)
+            if self.sellable.is_sell_order(world, order_id, collection, token_id) {
+                return self.sellable.cancel(world, order_id, collection, token_id);
+            }
+            self.buyable.cancel(world, order_id, collection, token_id)
         }
 
-        fn delete_offer(ref self: ContractState, order_id: u32) {
+        fn delete(
+            ref self: ContractState, order_id: u32, collection: ContractAddress, token_id: u256,
+        ) {
             let world = self.world_storage();
-            self.buyable.delete(world, order_id)
+            if self.sellable.is_sell_order(world, order_id, collection, token_id) {
+                return self.sellable.delete(world, order_id, collection, token_id);
+            }
+            self.buyable.delete(world, order_id, collection, token_id)
         }
 
-        fn execute_offer(ref self: ContractState, order_id: u32, quantity: u128, royalties: bool) {
+        fn execute(
+            ref self: ContractState,
+            order_id: u32,
+            collection: ContractAddress,
+            token_id: u256,
+            quantity: u128,
+            royalties: bool,
+        ) {
             let world = self.world_storage();
-            self.buyable.execute(world, order_id, quantity, royalties)
+            if self.sellable.is_sell_order(world, order_id, collection, token_id) {
+                return self
+                    .sellable
+                    .execute(world, order_id, collection, token_id, quantity, royalties);
+            }
+            self.buyable.execute(world, order_id, collection, token_id, quantity, royalties)
         }
     }
 
