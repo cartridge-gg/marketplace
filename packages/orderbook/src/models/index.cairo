@@ -29,7 +29,6 @@ pub struct Order {
     pub collection: felt252,
     #[key]
     pub token_id: u256,
-    #[key]
     pub category: u8,
     pub status: u8,
     pub expiration: u64,

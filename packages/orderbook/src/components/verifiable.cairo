@@ -182,14 +182,8 @@ pub mod VerifiableComponent {
             if amount == 0 {
                 return;
             }
-            let currency_dispatcher = IERC20Dispatcher { contract_address: currency };
-            let caller = starknet::get_caller_address();
-            if caller == spender {
-                // [Interaction] ERC20 transfer
-                currency_dispatcher.transfer(recipient: recipient, amount: amount);
-                return;
-            }
             // [Interaction] ERC20 transfer from
+            let currency_dispatcher = IERC20Dispatcher { contract_address: currency };
             currency_dispatcher
                 .transfer_from(sender: spender, recipient: recipient, amount: amount);
         }
@@ -305,8 +299,8 @@ pub mod VerifiableComponent {
             owner: ContractAddress,
             amount: u256,
         ) -> bool {
-            let spender = starknet::get_caller_address();
-            owner == spender || currency.allowance(owner, spender) >= amount
+            let spender = starknet::get_contract_address();
+            currency.allowance(owner, spender) >= amount
         }
 
         #[inline]

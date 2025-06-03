@@ -1,8 +1,8 @@
 {
   "world": {
     "class_hash": "0x4c60dc46a8ca8bb47675b7b914053cef769afbf0e340523187336b72bd71d1f",
-    "address": "0x63f36b6d15411e82ee9e4e9b17c3889f45c0c4714e7d53a3317dca197dceac5",
-    "seed": "Marketplace-1.0.0",
+    "address": "0x4c020355028a33b80b9ed57d35b5677a0af777fb4b200e82869994054b51b69",
+    "seed": "Marketplace-0.0.3",
     "name": "Cartridge Marketplace",
     "entrypoints": [
       "uuid",
@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x86ddfe3d8bec10e9d86847d41aff07e4e57f0f09630f04d9d0106db9802288",
-      "class_hash": "0x7b8656b645e39b0b91d7bf37787cf8abdbe538f8c1ec4137e5b1e1c26b76b71",
+      "address": "0x42af595a1a748a2ee8b1c31f6ae58338267b5d6ccb584abb5874d24ad5e6e91",
+      "class_hash": "0x35436b927ec21082b406d5bd88f3c2ac544ec956dad85d7e58e43ca93c1e639",
       "abi": [
         {
           "type": "impl",
@@ -1903,7 +1903,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x6e957bd2bd163efe69941a3f600fef2806fc6dbf7ebf98b270dc233242fded",
+      "class_hash": "0x13c2e39b67f6aaf194964a60f5cab8439567f8aeb42a9d216bde5abfb97ee89",
       "tag": "MARKETPLACE-Order",
       "selector": "0x61b4c97fb2ee0697bed87a3f5f7e932e5af76c77c88682b9ae67552f32eff69"
     }
@@ -1911,19 +1911,19 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x363f065a221c1331b9a4593cbf26f7be1c5e9ab49b9f202660eaadb94653565",
+      "class_hash": "0x7df1b81b79cbc40bf2fe5ee12cb191a5b4c8f9f9633b298b0cbd68f52cb9522",
       "tag": "MARKETPLACE-Listing",
       "selector": "0x46941a9d898f53447b49e68db8c050602bd4ae1c96f3b7bf4652176fb731603"
     },
     {
       "members": [],
-      "class_hash": "0x417bc5b86cafbdfe4920e3361eabd7a2dac3dd4be4944aacdb8ca51f071fa27",
+      "class_hash": "0x50890290abe4ad207b5e4aaa6d203f0fc26bd370298d48d912b9bceb3b4e5d4",
       "tag": "MARKETPLACE-Offer",
       "selector": "0x2e8cc7c8726fe1500b19d4d0ef351d5b11f3a010a857c074825670c37507c32"
     },
     {
       "members": [],
-      "class_hash": "0x358dade42a75e9bba5f19dee32c7c7f08d4e49f034a49776e39dc5d8a3f0b4e",
+      "class_hash": "0x12f4ad7792579928637c44738a1e8e44208303467da7038a7f08d62689b47f9",
       "tag": "MARKETPLACE-Sale",
       "selector": "0x5258de3665c1c16659a2c4c55edf557c5dd9f2ea0f94cc24c8cd3676a8e9c02"
     }
