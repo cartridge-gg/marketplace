@@ -366,7 +366,7 @@ export function setupWorld(provider: DojoProvider) {
 		Marketplace: {
 			cancel: Marketplace_cancel,
 			buildCancelCalldata: build_Marketplace_cancel_calldata,
-			delete: Marketplace_delete,
+			remove: Marketplace_delete,
 			buildDeleteCalldata: build_Marketplace_delete_calldata,
 			execute: Marketplace_execute,
 			buildExecuteCalldata: build_Marketplace_execute_calldata,
