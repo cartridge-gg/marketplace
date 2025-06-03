@@ -1,5 +1,12 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { MarketplaceContext } from "../contexts/marketplace";
+import type { Account, AccountInterface, BigNumberish } from "starknet";
+import { CallData } from "starknet";
+import { useDojoSDK } from "@dojoengine/sdk/react";
+import { getContractByName } from "@dojoengine/core";
+import { NAMESPACE } from "@cartridge/marketplace-sdk";
+import type { OrderModel } from "@cartridge/marketplace-sdk";
+import { cairo } from "starknet";
 
 function useMarketplce() {
 	const ctx = useContext(MarketplaceContext);
@@ -12,7 +19,32 @@ function useMarketplce() {
 	return ctx;
 }
 
+export function useOrderValidity(order: OrderModel) {
+	const [isValid, setIsValid] = useState<boolean | null>(null);
+	const { getValidity } = useMarketplaceActions();
+
+	useEffect(() => {
+		const checkValidity = async () => {
+			try {
+				const validity = await getValidity(
+					order.id,
+					order.collection,
+					order.tokenId,
+				);
+				setIsValid(Boolean(validity));
+			} catch (error) {
+				console.error("Error checking order validity:", error);
+				setIsValid(false);
+			}
+		};
+		checkValidity();
+	}, [order, getValidity]);
+
+	return isValid;
+}
+
 export function useMarketplaceActions() {
+	const { config } = useDojoSDK();
 	const ctx = useMarketplce();
 
 	const {
@@ -20,13 +52,103 @@ export function useMarketplaceActions() {
 		remove,
 		execute,
 		grantRole,
-		list,
-		offer,
 		pause,
 		resume,
 		revokeRole,
 		setFee,
+		buildListCalldata,
+		getValidity,
 	} = ctx.provider.marketplace;
+	// Overidding offer action with approve to currency contract first
+	const offer = async (
+		snAccount: Account | AccountInterface,
+		collection: string,
+		tokenId: BigNumberish,
+		quantity: BigNumberish,
+		price: BigNumberish,
+		currency: string,
+		expiration: BigNumberish,
+	) => {
+		try {
+			return await ctx.provider.execute(
+				snAccount,
+				[
+					{
+						contractAddress: currency,
+						entrypoint: "approve",
+						calldata: CallData.compile({
+							spender: getContractByName(
+								config.manifest,
+								NAMESPACE,
+								"Marketplace",
+							).address,
+							amount: cairo.uint256(price),
+						}),
+					},
+					{
+						contractName: "Marketplace",
+						entrypoint: "offer",
+						calldata: [
+							collection,
+							tokenId,
+							quantity,
+							price,
+							currency,
+							expiration,
+						],
+					},
+				],
+				"MARKETPLACE",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	// Overidding list action with set_approval_for_all to marketplace contract first
+	const list = async (
+		snAccount: Account | AccountInterface,
+		collection: string,
+		tokenId: BigNumberish,
+		quantity: BigNumberish,
+		price: BigNumberish,
+		currency: string,
+		expiration: BigNumberish,
+	) => {
+		try {
+			return await ctx.provider.execute(
+				snAccount,
+				[
+					{
+						contractAddress: collection,
+						entrypoint: "set_approval_for_all",
+						calldata: CallData.compile({
+							operator: getContractByName(
+								config.manifest,
+								NAMESPACE,
+								"Marketplace",
+							).address,
+							approved: true,
+						}),
+					},
+					buildListCalldata(
+						collection,
+						tokenId,
+						quantity,
+						price,
+						currency,
+						expiration,
+					),
+				],
+				"MARKETPLACE",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	return {
 		cancel,
 		remove,
@@ -38,8 +160,10 @@ export function useMarketplaceActions() {
 		resume,
 		revokeRole,
 		setFee,
+		getValidity,
 	};
 }
+
 export function useOrders() {
 	const ctx = useMarketplce();
 	return ctx.orders;

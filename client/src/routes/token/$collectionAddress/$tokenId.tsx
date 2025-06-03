@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMarketplaceActions, useOrders, useToken } from "../../../hooks";
+import { useMarketplaceActions, useToken } from "../../../hooks";
 import { useCallback, useMemo } from "react";
 import { CollectibleAsset } from "@cartridge/ui";
 import { getChecksumAddress } from "starknet";
 import { BackButton } from "../../../components/ui/back-button";
 import { TokenActionsPanel } from "../../../components/ui/token-action-panel";
 import { useAccount } from "@starknet-react/core";
+import { TokenOrdersPanel } from "../../../components/ui/order/list";
+import { useTokenOrders } from "../../../queries";
 
 // Define metadata interface based on the expected structure
 interface TokenMetadata {
@@ -20,59 +22,6 @@ interface TokenMetadata {
 	[key: string]: any;
 }
 
-interface TokenOrdersPanelProps {
-	orders: any[];
-}
-
-interface TokenOrdersPanelProps {
-	orders: any[];
-	isOwner: boolean;
-	onAcceptOffer?: (order: any) => void;
-}
-
-function TokenOrdersPanel({
-	orders,
-	isOwner,
-	onAcceptOffer,
-}: TokenOrdersPanelProps) {
-	if (!orders || orders.length === 0) return null;
-
-	return (
-		<div className="mt-4 p-4 bg-background-300 rounded-lg">
-			<h2 className="text-xl font-semibold mb-4 text-primary-400">
-				Active Orders
-			</h2>
-			<div className="space-y-3">
-				{orders.map((order, index) => (
-					<div key={index} className="bg-background-200 p-3 rounded-md">
-						<div className="flex justify-between items-center">
-							<div>
-								<p className="text-sm text-gray-500">Price</p>
-								<p className="font-medium">{order.price} STRK</p>
-							</div>
-							<div>
-								<p className="text-sm text-gray-500">By</p>
-								<p className="font-medium truncate" title={order.owner}>
-									{order.owner.substring(0, 8)}...
-									{order.owner.substring(order.owner.length - 6)}
-								</p>
-							</div>
-							{isOwner && onAcceptOffer && (
-								<button
-									onClick={() => onAcceptOffer(order)}
-									className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors"
-								>
-									Accept Offer
-								</button>
-							)}
-						</div>
-					</div>
-				))}
-			</div>
-		</div>
-	);
-}
-
 export const Route = createFileRoute("/token/$collectionAddress/$tokenId")({
 	component: RouteComponent,
 });
@@ -81,7 +30,9 @@ function RouteComponent() {
 	const { collectionAddress, tokenId } = Route.useParams();
 	const { address, account } = useAccount();
 	const { token, isOwner } = useToken(collectionAddress, tokenId, address);
-	const orders = useOrders();
+
+	const { data: orders } = useTokenOrders(collectionAddress, tokenId);
+
 	const { execute } = useMarketplaceActions();
 
 	const tokenMetadata = useMemo<TokenMetadata>(() => {
@@ -155,7 +106,7 @@ function RouteComponent() {
 							isOwner={isOwner}
 						/>
 						<TokenOrdersPanel
-							orders={orders}
+							orders={orders || []}
 							isOwner={isOwner}
 							onAcceptOffer={handleAcceptOffer}
 						/>

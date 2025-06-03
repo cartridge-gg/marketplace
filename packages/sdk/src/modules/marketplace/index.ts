@@ -23,6 +23,7 @@ export * from "./policies";
 export {
 	AccessModel,
 	BookModel,
+	Order as SDKOrder,
 	OrderModel,
 	ListingEvent,
 	OfferEvent,

@@ -100,7 +100,8 @@ pub mod BuyableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id, collection.into(), token_id);
+            let mut order = store
+                .order(order_id, collection.into(), token_id, Category::Buy.into());
             order.assert_does_exist();
 
             // [Check] Order category
@@ -130,7 +131,8 @@ pub mod BuyableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id, collection.into(), token_id);
+            let mut order = store
+                .order(order_id, collection.into(), token_id, Category::Buy.into());
             order.assert_does_exist();
 
             // [Check] Order category
@@ -159,6 +161,7 @@ pub mod BuyableComponent {
             order_id: u32,
             collection: ContractAddress,
             token_id: u256,
+            category: u8,
             quantity: u128,
             royalties: bool,
         ) {
@@ -168,7 +171,7 @@ pub mod BuyableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id, collection.into(), token_id);
+            let mut order = store.order(order_id, collection.into(), token_id, category);
             order.assert_does_exist();
 
             // [Check] Order category
@@ -261,7 +264,7 @@ pub mod BuyableComponent {
         ) -> (bool, felt252) {
             // [Return] Validity status
             let mut store = StoreTrait::new(world);
-            let order = store.order(order_id, collection.into(), token_id);
+            let order = store.order(order_id, collection.into(), token_id, Category::Buy.into());
             let verifiable = get_dep_component!(self, Verify);
             let owner: ContractAddress = starknet::get_caller_address();
             let currency: ContractAddress = order.currency.try_into().unwrap();
@@ -277,7 +280,7 @@ pub mod BuyableComponent {
             token_id: u256,
         ) -> bool {
             let mut store = StoreTrait::new(world);
-            let order = store.order(order_id, collection.into(), token_id);
+            let order = store.order(order_id, collection.into(), token_id, Category::Buy.into());
             order.is_buy_order()
         }
     }

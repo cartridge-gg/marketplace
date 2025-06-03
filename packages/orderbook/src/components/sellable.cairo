@@ -102,7 +102,8 @@ pub mod SellableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id, collection.into(), token_id);
+            let mut order = store
+                .order(order_id, collection.into(), token_id, Category::Sell.into());
             order.assert_does_exist();
 
             // [Check] Order category
@@ -132,7 +133,8 @@ pub mod SellableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id, collection.into(), token_id);
+            let mut order = store
+                .order(order_id, collection.into(), token_id, Category::Sell.into());
             order.assert_does_exist();
 
             // [Check] Order category
@@ -165,6 +167,7 @@ pub mod SellableComponent {
             order_id: u32,
             collection: ContractAddress,
             token_id: u256,
+            category: u8,
             quantity: u128,
             royalties: bool,
         ) {
@@ -174,7 +177,7 @@ pub mod SellableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id, collection.into(), token_id);
+            let mut order = store.order(order_id, collection.into(), token_id, category);
             order.assert_does_exist();
 
             // [Check] Order category
@@ -263,7 +266,7 @@ pub mod SellableComponent {
         ) -> (bool, felt252) {
             // [Return] Validity status
             let mut store = StoreTrait::new(world);
-            let order = store.order(order_id, collection.into(), token_id);
+            let order = store.order(order_id, collection.into(), token_id, Category::Sell.into());
             let verifiable = get_dep_component!(self, Verify);
             let owner: ContractAddress = starknet::get_caller_address();
             let collection: ContractAddress = order.collection.try_into().unwrap();
@@ -279,7 +282,7 @@ pub mod SellableComponent {
             token_id: u256,
         ) -> bool {
             let mut store = StoreTrait::new(world);
-            let order = store.order(order_id, collection.into(), token_id);
+            let order = store.order(order_id, collection.into(), token_id, Category::Sell.into());
             order.is_sell_order()
         }
     }

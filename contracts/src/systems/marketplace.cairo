@@ -56,6 +56,7 @@ pub trait IMarketplace<TContractState> {
         order_id: u32,
         collection: starknet::ContractAddress,
         token_id: u256,
+        category: u8,
         quantity: u128,
         royalties: bool,
     );
@@ -253,6 +254,7 @@ pub mod Marketplace {
             order_id: u32,
             collection: ContractAddress,
             token_id: u256,
+            category: u8,
             quantity: u128,
             royalties: bool,
         ) {
@@ -260,9 +262,11 @@ pub mod Marketplace {
             if self.sellable.is_sell_order(world, order_id, collection, token_id) {
                 return self
                     .sellable
-                    .execute(world, order_id, collection, token_id, quantity, royalties);
+                    .execute(world, order_id, collection, token_id, category, quantity, royalties);
             }
-            self.buyable.execute(world, order_id, collection, token_id, quantity, royalties)
+            self
+                .buyable
+                .execute(world, order_id, collection, token_id, category, quantity, royalties)
         }
     }
 
