@@ -2,7 +2,7 @@
 cairo-version = "2.10.1"
 edition = "2024_07"
 name = "marketplace"
-version = "0.0.1"
+version = "0.0.3"
 
 [cairo]
 sierra-replace-ids = true
@@ -11,12 +11,12 @@ sierra-replace-ids = true
 dev = "sozo clean && sozo build --typescript && sozo migrate plan && sozo migrate apply"
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.0" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.1" }
 orderbook = { path = ".." }
 starknet = "2.10.1"
 
 [dev-dependencies]
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.0" }
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.1" }
 cairo_test = "2.10.1"
 
 [[target.starknet-contract]]
