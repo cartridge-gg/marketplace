@@ -48,6 +48,7 @@ export interface Order {
 
 // Type definition for `orderbook::models::index::OrderValue` struct
 export interface OrderValue {
+	category: BigNumberish;
 	status: BigNumberish;
 	expiration: BigNumberish;
 	quantity: BigNumberish;
@@ -152,6 +153,7 @@ export const schema: SchemaType = {
 			owner: 0,
 		},
 		OrderValue: {
+			category: 0,
 			status: 0,
 			expiration: 0,
 			quantity: 0,
