@@ -61,6 +61,7 @@ fn test_marketplace_list_erc721() {
             order_id: ORDER_ID,
             collection: contracts.erc721.contract_address,
             token_id: TOKEN_ID,
+            asset_id: TOKEN_ID,
             quantity: 0,
             royalties: true,
         );
@@ -108,6 +109,7 @@ fn test_marketplace_offer_erc721() {
             order_id: ORDER_ID,
             collection: contracts.erc721.contract_address,
             token_id: TOKEN_ID,
+            asset_id: TOKEN_ID,
             quantity: 0,
             royalties: true,
         );

@@ -1329,7 +1329,7 @@
   "contracts": [
     {
       "address": "0x3a186ba14cd5c0e47adb22bba3e9b3285a399c4437739e7c61b6ef677b13e0d",
-      "class_hash": "0x73f373be2c2d0c14e83e890835fcf5f052b3a31d164ef10e175f2f807262d5",
+      "class_hash": "0x41ca0c8893d91219a45705f9cdcb98e9f8ce3111a06276267fc40ad0a9da74e",
       "abi": [
         {
           "type": "impl",
@@ -1648,6 +1648,34 @@
             },
             {
               "type": "function",
+              "name": "intent",
+              "inputs": [
+                {
+                  "name": "collection",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "quantity",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "price",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "currency",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "expiration",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
               "name": "cancel",
               "inputs": [
                 {
@@ -1700,6 +1728,10 @@
                 },
                 {
                   "name": "token_id",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "asset_id",
                   "type": "core::integer::u256"
                 },
                 {
@@ -1884,6 +1916,7 @@
         "set_fee",
         "list",
         "offer",
+        "intent",
         "cancel",
         "remove",
         "execute",

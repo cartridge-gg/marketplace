@@ -62,7 +62,7 @@ pub impl OrderImpl of OrderTrait {
 
     #[inline]
     fn is_buy_order(self: @Order) -> bool {
-        *self.category == Category::Buy.into()
+        *self.category == Category::Buy.into() || self.is_buy_any()
     }
 
     #[inline]

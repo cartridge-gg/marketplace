@@ -188,6 +188,57 @@ pub mod VerifiableComponent {
                 .transfer_from(sender: spender, recipient: recipient, amount: amount);
         }
 
+        fn process(
+            self: @ComponentState<TContractState>,
+            spender: ContractAddress,
+            owner: ContractAddress,
+            collection: ContractAddress,
+            token_id: u256,
+            value: u256,
+            currency: ContractAddress,
+            price: u256,
+            expiration: u64,
+            ref fees: Span<(ContractAddress, u256)>,
+        ) {
+            // [Check] Process requirements
+            self
+                .assert_buy_validity(
+                    owner: spender, expiration: expiration, currency: currency, price: price,
+                );
+            self
+                .assert_sell_validity(
+                    owner: owner,
+                    expiration: expiration,
+                    collection: collection,
+                    token_id: token_id,
+                    value: value,
+                );
+
+            // [Interaction] Pay fees
+            let mut remaining = price;
+            while let Option::Some((recipient, amount)) = fees.pop_front() {
+                remaining -= *amount;
+                self
+                    .pay(
+                        spender: spender,
+                        recipient: *recipient,
+                        currency: currency,
+                        amount: *amount,
+                    );
+            };
+            // [Interaction] Pay owner
+            self.pay(spender: spender, recipient: owner, currency: currency, amount: remaining);
+            // [Interaction] Transfer asset
+            self
+                .transfer(
+                    owner: owner,
+                    collection: collection,
+                    token_id: token_id,
+                    value: value,
+                    recipient: spender,
+                );
+        }
+
         #[inline]
         fn royalties(
             self: @ComponentState<TContractState>,

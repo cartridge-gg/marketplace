@@ -40,6 +40,14 @@ pub trait IMarketplace<TContractState> {
         currency: starknet::ContractAddress,
         expiration: u64,
     );
+    fn intent(
+        ref self: TContractState,
+        collection: starknet::ContractAddress,
+        quantity: u128,
+        price: u128,
+        currency: starknet::ContractAddress,
+        expiration: u64,
+    );
     fn cancel(
         ref self: TContractState,
         order_id: u32,
@@ -57,6 +65,7 @@ pub trait IMarketplace<TContractState> {
         order_id: u32,
         collection: starknet::ContractAddress,
         token_id: u256,
+        asset_id: u256,
         quantity: u128,
         royalties: bool,
     );
@@ -227,7 +236,25 @@ pub mod Marketplace {
             expiration: u64,
         ) {
             let world = self.world_storage();
-            self.buyable.create(world, collection, token_id, quantity, price, currency, expiration)
+            self
+                .buyable
+                .create(
+                    world, collection, token_id, quantity, price, currency, expiration, any: false,
+                )
+        }
+
+        fn intent(
+            ref self: ContractState,
+            collection: ContractAddress,
+            quantity: u128,
+            price: u128,
+            currency: ContractAddress,
+            expiration: u64,
+        ) {
+            let world = self.world_storage();
+            self
+                .buyable
+                .create(world, collection, 0, quantity, price, currency, expiration, any: true)
         }
 
         fn cancel(
@@ -255,6 +282,7 @@ pub mod Marketplace {
             order_id: u32,
             collection: ContractAddress,
             token_id: u256,
+            asset_id: u256,
             quantity: u128,
             royalties: bool,
         ) {
@@ -262,7 +290,9 @@ pub mod Marketplace {
             if self.sellable.is_sell_order(world, order_id, collection, token_id) {
                 return self.sellable.execute(world, order_id, collection, token_id, quantity);
             }
-            self.buyable.execute(world, order_id, collection, token_id, quantity, royalties)
+            self
+                .buyable
+                .execute(world, order_id, collection, token_id, asset_id, quantity, royalties)
         }
     }
 

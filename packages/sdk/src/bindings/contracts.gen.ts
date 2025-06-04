@@ -36,13 +36,14 @@ export function setupWorld(provider: DojoProvider) {
 		orderId: BigNumberish,
 		collection: string,
 		tokenId: BigNumberish,
+		assetId: BigNumberish,
 		quantity: BigNumberish,
 		royalties: boolean,
 	): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "execute",
-			calldata: [orderId, collection, tokenId, quantity, royalties],
+			calldata: [orderId, collection, tokenId, assetId, quantity, royalties],
 		};
 	};
 
@@ -51,6 +52,7 @@ export function setupWorld(provider: DojoProvider) {
 		orderId: BigNumberish,
 		collection: string,
 		tokenId: BigNumberish,
+		assetId: BigNumberish,
 		quantity: BigNumberish,
 		royalties: boolean,
 	) => {
@@ -61,6 +63,7 @@ export function setupWorld(provider: DojoProvider) {
 					orderId,
 					collection,
 					tokenId,
+					assetId,
 					quantity,
 					royalties,
 				),
@@ -144,6 +147,46 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_Marketplace_grantRole_calldata(account, roleId),
+				"MARKETPLACE",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_Marketplace_intent_calldata = (
+		collection: string,
+		quantity: BigNumberish,
+		price: BigNumberish,
+		currency: string,
+		expiration: BigNumberish,
+	): DojoCall => {
+		return {
+			contractName: "Marketplace",
+			entrypoint: "intent",
+			calldata: [collection, quantity, price, currency, expiration],
+		};
+	};
+
+	const Marketplace_intent = async (
+		snAccount: Account | AccountInterface,
+		collection: string,
+		quantity: BigNumberish,
+		price: BigNumberish,
+		currency: string,
+		expiration: BigNumberish,
+	) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_Marketplace_intent_calldata(
+					collection,
+					quantity,
+					price,
+					currency,
+					expiration,
+				),
 				"MARKETPLACE",
 			);
 		} catch (error) {
@@ -385,6 +428,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildGetValidityCalldata: build_Marketplace_getValidity_calldata,
 			grantRole: Marketplace_grantRole,
 			buildGrantRoleCalldata: build_Marketplace_grantRole_calldata,
+			intent: Marketplace_intent,
+			buildIntentCalldata: build_Marketplace_intent_calldata,
 			list: Marketplace_list,
 			buildListCalldata: build_Marketplace_list_calldata,
 			offer: Marketplace_offer,

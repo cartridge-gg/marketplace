@@ -46,6 +46,7 @@ pub mod BuyableComponent {
             price: u128,
             currency: ContractAddress,
             expiration: u64,
+            any: bool,
         ) {
             // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
@@ -67,9 +68,14 @@ pub mod BuyableComponent {
             let order_id = book.get_id();
             let time = starknet::get_block_timestamp();
             // [Info] Royalties set to false since it is overridden by the seller
+            let category = if any {
+                Category::BuyAny
+            } else {
+                Category::Buy
+            };
             let order = OrderTrait::new(
                 id: order_id,
-                category: Category::Buy,
+                category: category,
                 collection: collection.into(),
                 token_id: token_id,
                 royalties: false,
@@ -102,8 +108,7 @@ pub mod BuyableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store
-                .order(order_id, collection.into(), token_id, Category::Buy.into());
+            let mut order = store.order(order_id, collection.into(), token_id);
             order.assert_does_exist();
 
             // [Check] Order category
@@ -133,8 +138,7 @@ pub mod BuyableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store
-                .order(order_id, collection.into(), token_id, Category::Buy.into());
+            let mut order = store.order(order_id, collection.into(), token_id);
             order.assert_does_exist();
 
             // [Check] Order category
@@ -163,7 +167,7 @@ pub mod BuyableComponent {
             order_id: u32,
             collection: ContractAddress,
             token_id: u256,
-            category: u8,
+            asset_id: u256,
             quantity: u128,
             royalties: bool,
         ) {
@@ -173,82 +177,56 @@ pub mod BuyableComponent {
             book.assert_not_paused();
 
             // [Check] Order exists
-            let mut order = store.order(order_id, collection.into(), token_id, category);
+            let mut order = store.order(order_id, collection.into(), token_id);
             order.assert_does_exist();
 
             // [Check] Order category
             order.assert_buy_order();
 
-            // [Check] Validity requirements
+            // [Check] Order data
             let spender: ContractAddress = order.owner.try_into().unwrap();
             let collection: ContractAddress = order.collection.try_into().unwrap();
-            let token_id: u256 = order.token_id;
             let value: u256 = order.quantity.into();
-
             let currency: ContractAddress = order.currency.try_into().unwrap();
             let price: u256 = order.price.into();
             let verifiable = get_dep_component!(self, Verify);
-            verifiable
-                .assert_buy_validity(
-                    owner: spender,
-                    expiration: order.expiration,
-                    currency: currency,
-                    price: price.into(),
-                );
-
-            // [Check] Execute requirements
             let owner: ContractAddress = starknet::get_caller_address();
-            verifiable
-                .assert_sell_validity(
-                    owner: owner,
-                    expiration: order.expiration,
-                    collection: collection,
-                    token_id: token_id,
-                    value: value,
-                );
+            // [Info] In case of buy any order, the token id is the asset id
+            let token_id: u256 = if order.is_buy_any() {
+                asset_id
+            } else {
+                order.token_id
+            };
 
             // [Effect] Execute order
             let time = starknet::get_block_timestamp();
             order.execute(quantity, time);
-
-            // [Effect] Update models
             store.set_order(@order);
 
-            // [Interaction] Process transfers
+            // [Interaction] Process sale
             let (orderbook_receiver, orderbook_fee) = book.fee(price);
+            // [Info] Royalties are toggled by the seller (executor of the order)
             let (creator_receiver, creator_fee) = if royalties {
                 verifiable.royalties(collection, token_id, price)
             } else {
                 (starknet::get_contract_address(), 0)
             };
+            let mut fees = array![
+                (orderbook_receiver.try_into().unwrap(), orderbook_fee),
+                (creator_receiver, creator_fee),
+            ]
+                .span();
             verifiable
-                .pay(
+                .process(
                     spender: spender,
-                    recipient: orderbook_receiver.try_into().unwrap(),
-                    currency: currency,
-                    amount: orderbook_fee,
-                );
-            verifiable
-                .pay(
-                    spender: spender,
-                    recipient: creator_receiver,
-                    currency: currency,
-                    amount: creator_fee,
-                );
-            verifiable
-                .pay(
-                    spender: spender,
-                    recipient: owner,
-                    currency: currency,
-                    amount: price - orderbook_fee - creator_fee,
-                );
-            verifiable
-                .transfer(
                     owner: owner,
                     collection: collection,
                     token_id: token_id,
                     value: value,
-                    recipient: spender,
+                    currency: currency,
+                    price: price,
+                    expiration: order.expiration,
+                    ref fees: fees,
                 );
 
             // [Event] Sale
@@ -266,7 +244,7 @@ pub mod BuyableComponent {
         ) -> (bool, felt252) {
             // [Return] Validity status
             let mut store = StoreTrait::new(world);
-            let order = store.order(order_id, collection.into(), token_id, Category::Buy.into());
+            let order = store.order(order_id, collection.into(), token_id);
             let verifiable = get_dep_component!(self, Verify);
             let owner: ContractAddress = starknet::get_caller_address();
             let currency: ContractAddress = order.currency.try_into().unwrap();
@@ -282,7 +260,7 @@ pub mod BuyableComponent {
             token_id: u256,
         ) -> bool {
             let mut store = StoreTrait::new(world);
-            let order = store.order(order_id, collection.into(), token_id, Category::Buy.into());
+            let order = store.order(order_id, collection.into(), token_id);
             order.is_buy_order()
         }
     }
