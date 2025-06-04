@@ -79,7 +79,7 @@ pub mod VerifiableComponent {
                     value: value,
                 );
                 if (!has_enough_balance) {
-                    return (false, errors::SALE_INVALID_BALANCE);
+                    return (false, errors::SALE_INVALID_VALUE);
                 }
             } else if src5_dispatcher.supports_interface(IERC721_ID) {
                 // [Check] ERC721 requirements

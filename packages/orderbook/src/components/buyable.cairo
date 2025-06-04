@@ -186,11 +186,12 @@ pub mod BuyableComponent {
             // [Check] Order data
             let spender: ContractAddress = order.owner.try_into().unwrap();
             let collection: ContractAddress = order.collection.try_into().unwrap();
-            let value: u256 = order.quantity.into();
+            let value: u256 = quantity.into();
             let currency: ContractAddress = order.currency.try_into().unwrap();
-            let price: u256 = order.price.into();
             let verifiable = get_dep_component!(self, Verify);
             let owner: ContractAddress = starknet::get_caller_address();
+            // [Info] Price is a unit price in case or ERC1155 otherwise the asset price
+            let price: u256 = core::cmp::max(order.price.into(), order.price.into() * value);
             // [Info] In case of buy any order, the token id is the asset id
             let token_id: u256 = if order.is_buy_any() {
                 asset_id
