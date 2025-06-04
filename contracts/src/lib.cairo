@@ -8,12 +8,23 @@ pub mod systems {
 mod tests {
     mod setup;
     mod test_setup;
-    mod test_marketplace;
 
     pub mod mocks {
         pub mod account;
         pub mod erc20;
         pub mod erc721;
         pub mod erc1155;
+    }
+
+    pub mod marketplace {
+        pub mod erc721 {
+            mod test_intent_execute;
+            mod test_list_execute;
+            mod test_list_cancel;
+            mod test_list_remove;
+            mod test_offer_cancel;
+            mod test_offer_execute;
+            mod test_offer_remove;
+        }
     }
 }

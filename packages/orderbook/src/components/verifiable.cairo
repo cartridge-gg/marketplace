@@ -21,13 +21,14 @@ pub mod VerifiableComponent {
     // Errors
 
     pub mod errors {
-        pub const VERIFIABLE_INVALID_COLLECTION: felt252 = 'Verifiable: invalid collection';
-        pub const VERIFIABLE_NOT_OWNER: felt252 = 'Verifiable: not owner';
-        pub const VERIFIABLE_NOT_APPROVED: felt252 = 'Verifiable: not approved';
-        pub const VERIFIABLE_INVALID_BALANCE: felt252 = 'Verifiable: invalid balance';
-        pub const VERIFIABLE_NOT_INVALID: felt252 = 'Verifiable: not invalid';
-        pub const VERIFIABLE_INVALID_VALUE: felt252 = 'Verifiable: invalid value';
-        pub const VERIFIABLE_EXPIRED: felt252 = 'Verifiable: expired';
+        pub const SALE_INVALID_COLLECTION: felt252 = 'Sale: invalid collection';
+        pub const SALE_NOT_OWNER: felt252 = 'Sale: not owner';
+        pub const SALE_NOT_APPROVED: felt252 = 'Sale: not approved';
+        pub const SALE_NOT_ALLOWED: felt252 = 'Sale: not allowed';
+        pub const SALE_INVALID_BALANCE: felt252 = 'Sale: invalid balance';
+        pub const SALE_NOT_INVALID: felt252 = 'Sale: not invalid';
+        pub const SALE_INVALID_VALUE: felt252 = 'Sale: invalid value';
+        pub const SALE_EXPIRED: felt252 = 'Sale: expired';
     }
 
     // Storage
@@ -56,7 +57,7 @@ pub mod VerifiableComponent {
         ) -> (bool, felt252) {
             // [Check] Expiration
             if (expiration < starknet::get_block_timestamp()) {
-                return (false, errors::VERIFIABLE_EXPIRED);
+                return (false, errors::SALE_EXPIRED);
             }
             let src5_dispatcher = ISRC5Dispatcher { contract_address: collection };
             if src5_dispatcher.supports_interface(IERC1155_ID) {
@@ -67,7 +68,7 @@ pub mod VerifiableComponent {
                     self: self, collection: collection_dispatcher, owner: owner, token_id: token_id,
                 );
                 if (!is_approved) {
-                    return (false, errors::VERIFIABLE_NOT_APPROVED);
+                    return (false, errors::SALE_NOT_APPROVED);
                 }
                 // [Check] ERC1155 balance
                 let has_enough_balance = ERC1155Impl::has_enough_balance(
@@ -78,7 +79,7 @@ pub mod VerifiableComponent {
                     value: value,
                 );
                 if (!has_enough_balance) {
-                    return (false, errors::VERIFIABLE_INVALID_BALANCE);
+                    return (false, errors::SALE_INVALID_BALANCE);
                 }
             } else if src5_dispatcher.supports_interface(IERC721_ID) {
                 // [Check] ERC721 requirements
@@ -88,7 +89,7 @@ pub mod VerifiableComponent {
                     self: self, collection: collection_dispatcher, owner: owner, token_id: token_id,
                 );
                 if (!is_approved) {
-                    return (false, errors::VERIFIABLE_NOT_APPROVED);
+                    return (false, errors::SALE_NOT_APPROVED);
                 }
                 // [Check] ERC721 owner
                 let is_owner = ERC721Impl::is_token_owner(
@@ -98,15 +99,15 @@ pub mod VerifiableComponent {
                     token_id: token_id,
                 );
                 if (!is_owner) {
-                    return (false, errors::VERIFIABLE_NOT_OWNER);
+                    return (false, errors::SALE_NOT_OWNER);
                 }
                 // [Check] ERC721 value
                 if (value != 0) {
-                    return (false, errors::VERIFIABLE_INVALID_VALUE);
+                    return (false, errors::SALE_INVALID_VALUE);
                 }
             } else {
                 // [Panic] Unsupported collection
-                return (false, errors::VERIFIABLE_INVALID_COLLECTION);
+                return (false, errors::SALE_INVALID_COLLECTION);
             };
             (true, 0)
         }
@@ -121,7 +122,7 @@ pub mod VerifiableComponent {
         ) -> (bool, felt252) {
             // [Check] Expiration
             if (expiration < starknet::get_block_timestamp()) {
-                return (false, errors::VERIFIABLE_EXPIRED);
+                return (false, errors::SALE_EXPIRED);
             }
             // [Check] ERC20 balance
             let erc20_dispatcher = IERC20Dispatcher { contract_address: currency };
@@ -129,14 +130,14 @@ pub mod VerifiableComponent {
                 self: self, currency: erc20_dispatcher, account: owner, amount: price,
             );
             if (!has_enough_balance) {
-                return (false, errors::VERIFIABLE_INVALID_BALANCE);
+                return (false, errors::SALE_INVALID_BALANCE);
             }
             // [Check] ERC20 approval
             let spender_is_allowed = ERC20Impl::spender_is_allowed(
                 self: self, currency: erc20_dispatcher, owner: owner, amount: price,
             );
             if (!spender_is_allowed) {
-                return (false, errors::VERIFIABLE_NOT_APPROVED);
+                return (false, errors::SALE_NOT_ALLOWED);
             }
             (true, 0)
         }
@@ -166,7 +167,7 @@ pub mod VerifiableComponent {
                     .safe_transfer_from(from: owner, to: recipient, token_id: token_id, data: data);
             } else {
                 // [Panic] Unsupported collection
-                assert(false, errors::VERIFIABLE_INVALID_COLLECTION);
+                assert(false, errors::SALE_INVALID_COLLECTION);
             }
         }
 
@@ -293,7 +294,7 @@ pub mod VerifiableComponent {
                     token_id: token_id,
                     value: value,
                 );
-            assert(!is_valid, errors::VERIFIABLE_NOT_INVALID);
+            assert(!is_valid, errors::SALE_NOT_INVALID);
         }
 
         #[inline]
@@ -323,7 +324,7 @@ pub mod VerifiableComponent {
                 .get_buy_validity(
                     owner: owner, expiration: expiration, currency: currency, price: price,
                 );
-            assert(!is_valid, errors::VERIFIABLE_NOT_INVALID);
+            assert(!is_valid, errors::SALE_NOT_INVALID);
         }
     }
 
