@@ -181,6 +181,7 @@ export function useMarketplaceActions() {
 						orderId,
 						collection,
 						tokenId,
+						tokenId,
 						quantity,
 						royalties,
 					),
@@ -221,6 +222,7 @@ export function useMarketplaceActions() {
 					buildExecuteCalldata(
 						orderId,
 						collection,
+						tokenId,
 						tokenId,
 						quantity,
 						royalties,
