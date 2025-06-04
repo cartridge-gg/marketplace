@@ -197,7 +197,7 @@ pub mod VerifiableComponent {
         ) -> (ContractAddress, u256) {
             let src5_dispatcher = ISRC5Dispatcher { contract_address: collection };
             if src5_dispatcher.supports_interface(IERC2981_ID) {
-                // [Interaction] ERC2981 royalty
+                // [Interaction] ERC2981 royalties
                 let collection_dispatcher = IERC2981Dispatcher { contract_address: collection };
                 return collection_dispatcher.royalty_info(token_id, sale_price);
             };

@@ -46,6 +46,7 @@ pub mod SellableComponent {
             price: u128,
             currency: ContractAddress,
             expiration: u64,
+            royalties: bool,
         ) {
             // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
@@ -68,11 +69,13 @@ pub mod SellableComponent {
             // [Effect] Create order
             let order_id = book.get_id();
             let time = starknet::get_block_timestamp();
+            // [Info] Royalties defined by the seller
             let order = OrderTrait::new(
                 id: order_id,
                 category: Category::Sell,
                 collection: collection.into(),
                 token_id: token_id,
+                royalties: royalties,
                 quantity: quantity,
                 price: price,
                 currency: currency.into(),
@@ -169,7 +172,6 @@ pub mod SellableComponent {
             token_id: u256,
             category: u8,
             quantity: u128,
-            royalties: bool,
         ) {
             // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
@@ -216,7 +218,7 @@ pub mod SellableComponent {
 
             // [Interaction] Process transfers
             let (orderbook_receiver, orderbook_fee) = book.fee(price);
-            let (creator_receiver, creator_fee) = if royalties {
+            let (creator_receiver, creator_fee) = if order.royalties {
                 verifiable.royalties(collection, token_id, price)
             } else {
                 (starknet::get_contract_address(), 0)

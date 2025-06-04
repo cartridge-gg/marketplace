@@ -11,6 +11,7 @@ pub mod errors {
     pub const ORDER_ALREADY_EXISTS: felt252 = 'Order: already exists';
     pub const ORDER_NOT_EXIST: felt252 = 'Order: does not exist';
     pub const ORDER_NOT_BUY: felt252 = 'Order: not a buy order';
+    pub const ORDER_NOT_BUY_ANY: felt252 = 'Order: not a buy any order';
     pub const ORDER_NOT_SELL: felt252 = 'Order: not a sell order';
     pub const ORDER_CANNOT_CANCEL: felt252 = 'Order: cannot be canceled';
     pub const ORDER_CANNOT_DELETE: felt252 = 'Order: cannot be deleted';
@@ -30,6 +31,7 @@ pub impl OrderImpl of OrderTrait {
         category: Category,
         collection: felt252,
         token_id: u256,
+        royalties: bool,
         quantity: u128,
         price: u128,
         currency: felt252,
@@ -46,6 +48,7 @@ pub impl OrderImpl of OrderTrait {
         Order {
             id: id,
             category: category.into(),
+            royalties: royalties,
             status: Status::Placed.into(),
             collection: collection,
             token_id: token_id,
@@ -60,6 +63,11 @@ pub impl OrderImpl of OrderTrait {
     #[inline]
     fn is_buy_order(self: @Order) -> bool {
         *self.category == Category::Buy.into()
+    }
+
+    #[inline]
+    fn is_buy_any(self: @Order) -> bool {
+        *self.category == Category::BuyAny.into()
     }
 
     #[inline]
@@ -117,6 +125,11 @@ pub impl OrderAssert of AssertTrait {
     #[inline]
     fn assert_buy_order(self: @Order) {
         assert(self.is_buy_order(), errors::ORDER_NOT_BUY);
+    }
+
+    #[inline]
+    fn assert_buy_any(self: @Order) {
+        assert(self.is_buy_any(), errors::ORDER_NOT_BUY_ANY);
     }
 
     #[inline]
@@ -178,6 +191,7 @@ pub mod tests {
     pub const ORDER_ID: u32 = 1;
     pub const COLLECTION: felt252 = 'COLLECTION';
     pub const TOKEN_ID: u256 = 42;
+    pub const ROYALTIES: bool = true;
     pub const QUANTITY: u128 = 100;
     pub const PRICE: u128 = 1234;
     pub const CURRENCY: felt252 = 'CURRENCY';
@@ -192,6 +206,7 @@ pub mod tests {
             CATEGORY,
             COLLECTION,
             TOKEN_ID,
+            ROYALTIES,
             QUANTITY,
             PRICE,
             CURRENCY,

@@ -3,7 +3,6 @@ pub mod setup {
 
     use starknet::{ContractAddress, SyscallResultTrait};
     use starknet::syscalls::deploy_syscall;
-    use starknet::testing::set_contract_address;
 
     // Dojo imports
 
@@ -81,6 +80,7 @@ pub mod setup {
                 TestResource::Model(models::m_Access::TEST_CLASS_HASH),
                 TestResource::Model(models::m_Book::TEST_CLASS_HASH),
                 TestResource::Model(models::m_Order::TEST_CLASS_HASH),
+                TestResource::Model(models::m_MetadataAttribute::TEST_CLASS_HASH),
                 TestResource::Event(events::e_Listing::TEST_CLASS_HASH),
                 TestResource::Event(events::e_Sale::TEST_CLASS_HASH),
                 TestResource::Event(events::e_Offer::TEST_CLASS_HASH),
@@ -146,7 +146,6 @@ pub mod setup {
     #[inline]
     pub fn spawn() -> (WorldStorage, Contracts, Context) {
         // [Setup] World
-        set_contract_address(OWNER());
         let namespace_def = setup_namespace();
         let world = spawn_test_world([namespace_def].span());
         world.sync_perms_and_inits(setup_contracts());
@@ -169,4 +168,10 @@ pub mod setup {
         // [Return]
         (world, systems, context)
     }
+}
+
+#[test]
+fn test_setup() {
+    // [Setup] World
+    setup::spawn();
 }

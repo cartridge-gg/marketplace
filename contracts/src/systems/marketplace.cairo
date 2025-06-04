@@ -29,6 +29,7 @@ pub trait IMarketplace<TContractState> {
         price: u128,
         currency: starknet::ContractAddress,
         expiration: u64,
+        royalties: bool,
     );
     fn offer(
         ref self: TContractState,
@@ -45,7 +46,7 @@ pub trait IMarketplace<TContractState> {
         collection: starknet::ContractAddress,
         token_id: u256,
     );
-    fn delete(
+    fn remove(
         ref self: TContractState,
         order_id: u32,
         collection: starknet::ContractAddress,
@@ -211,9 +212,14 @@ pub mod Marketplace {
             price: u128,
             currency: ContractAddress,
             expiration: u64,
+            royalties: bool,
         ) {
             let world = self.world_storage();
-            self.sellable.create(world, collection, token_id, quantity, price, currency, expiration)
+            self
+                .sellable
+                .create(
+                    world, collection, token_id, quantity, price, currency, expiration, royalties,
+                )
         }
 
         fn offer(
@@ -239,7 +245,7 @@ pub mod Marketplace {
             self.buyable.cancel(world, order_id, collection, token_id)
         }
 
-        fn delete(
+        fn remove(
             ref self: ContractState, order_id: u32, collection: ContractAddress, token_id: u256,
         ) {
             let world = self.world_storage();
@@ -260,9 +266,7 @@ pub mod Marketplace {
         ) {
             let world = self.world_storage();
             if self.sellable.is_sell_order(world, order_id, collection, token_id) {
-                return self
-                    .sellable
-                    .execute(world, order_id, collection, token_id, category, quantity, royalties);
+                return self.sellable.execute(world, order_id, collection, token_id, quantity);
             }
             self
                 .buyable

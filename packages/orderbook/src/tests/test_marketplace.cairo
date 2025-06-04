@@ -37,6 +37,7 @@ fn test_marketplace_list_erc721() {
             price: PRICE,
             currency: contracts.erc20.contract_address,
             expiration: EXPIRATION,
+            royalties: true,
         );
     // [Assert] Order is created
     let store = StoreTrait::new(world);

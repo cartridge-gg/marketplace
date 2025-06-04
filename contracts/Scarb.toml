@@ -2,7 +2,7 @@
 cairo-version = "2.10.1"
 edition = "2024_07"
 name = "marketplace"
-version = "0.0.3"
+version = "0.0.4"
 
 [cairo]
 sierra-replace-ids = true
@@ -25,6 +25,7 @@ build-external-contracts = [
     "orderbook::models::index::m_Access",
     "orderbook::models::index::m_Book",
     "orderbook::models::index::m_Order",
+    "orderbook::models::index::m_MetadataAttribute",
     "orderbook::events::index::e_Listing",
     "orderbook::events::index::e_Offer",
     "orderbook::events::index::e_Sale",

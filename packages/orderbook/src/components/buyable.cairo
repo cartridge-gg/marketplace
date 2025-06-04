@@ -66,11 +66,13 @@ pub mod BuyableComponent {
             // [Effect] Create order
             let order_id = book.get_id();
             let time = starknet::get_block_timestamp();
+            // [Info] Royalties set to false since it is overridden by the seller
             let order = OrderTrait::new(
                 id: order_id,
                 category: Category::Buy,
                 collection: collection.into(),
                 token_id: token_id,
+                royalties: false,
                 quantity: quantity,
                 price: price,
                 currency: currency.into(),
