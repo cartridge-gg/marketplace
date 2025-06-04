@@ -7,7 +7,8 @@ import { BackButton } from "../../../components/ui/back-button";
 import { TokenActionsPanel } from "../../../components/ui/token-action-panel";
 import { useAccount } from "@starknet-react/core";
 import { TokenOrdersPanel } from "../../../components/ui/order/list";
-import { useTokenOrders } from "../../../queries";
+import { useIsTokenListed, useTokenOrders } from "../../../queries";
+import type { OrderModel } from "@cartridge/marketplace-sdk";
 
 // Define metadata interface based on the expected structure
 interface TokenMetadata {
@@ -32,8 +33,11 @@ function RouteComponent() {
 	const { token, isOwner } = useToken(collectionAddress, tokenId, address);
 
 	const { data: orders } = useTokenOrders(collectionAddress, tokenId);
+	const {
+		data: { isListed, listing },
+	} = useIsTokenListed(collectionAddress, tokenId);
 
-	const { execute } = useMarketplaceActions();
+	const { executeListing } = useMarketplaceActions();
 
 	const tokenMetadata = useMemo<TokenMetadata>(() => {
 		if (!token || !token.metadata) return {};
@@ -52,7 +56,7 @@ function RouteComponent() {
 	const tokenName = useMemo(() => {
 		if (!token) return "Loading...";
 		const prefix = tokenMetadata.name ?? token.name;
-		const suffix = Number.parseInt(token.token_id, 16);
+		const suffix = Number.parseInt(token.token_id);
 		return `${prefix} #${suffix}`;
 	}, [token, tokenMetadata]);
 
@@ -62,13 +66,13 @@ function RouteComponent() {
 	}, [token, tokenMetadata]);
 
 	const handleAcceptOffer = useCallback(
-		async (order: any) => {
+		async (order: OrderModel) => {
 			if (!account) {
 				console.error("Log into controller first");
 				return;
 			}
 
-			await execute(
+			await executeListing(
 				account,
 				order.id,
 				collectionAddress,
@@ -77,7 +81,7 @@ function RouteComponent() {
 				true,
 			);
 		},
-		[account, collectionAddress, tokenId, execute],
+		[account, collectionAddress, tokenId, executeListing],
 	);
 
 	if (!token) {
@@ -104,6 +108,8 @@ function RouteComponent() {
 							collectionAddress={collectionAddress}
 							tokenId={tokenId}
 							isOwner={isOwner}
+							isListed={isListed}
+							listing={listing}
 						/>
 						<TokenOrdersPanel
 							orders={orders || []}

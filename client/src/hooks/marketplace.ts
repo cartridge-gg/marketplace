@@ -50,13 +50,13 @@ export function useMarketplaceActions() {
 	const {
 		cancel,
 		remove,
-		execute,
 		grantRole,
 		pause,
 		resume,
 		revokeRole,
 		setFee,
 		buildListCalldata,
+		buildExecuteCalldata,
 		getValidity,
 	} = ctx.provider.marketplace;
 	// Overidding offer action with approve to currency contract first
@@ -139,6 +139,91 @@ export function useMarketplaceActions() {
 						price,
 						currency,
 						expiration,
+						true, // royalties
+					),
+				],
+				"MARKETPLACE",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	// Overidding list action with set_approval_for_all to marketplace contract first
+	const executeOffer = async (
+		snAccount: Account | AccountInterface,
+		orderId: BigNumberish,
+		collection: string,
+		tokenId: BigNumberish,
+		quantity: BigNumberish,
+		royalties: boolean,
+		currency: string,
+		price: BigNumberish,
+	) => {
+		try {
+			return await ctx.provider.execute(
+				snAccount,
+				[
+					{
+						contractAddress: currency,
+						entrypoint: "approve",
+						calldata: CallData.compile({
+							spender: getContractByName(
+								config.manifest,
+								NAMESPACE,
+								"Marketplace",
+							).address,
+							amount: cairo.uint256(price),
+						}),
+					},
+					buildExecuteCalldata(
+						orderId,
+						collection,
+						tokenId,
+						quantity,
+						royalties,
+					),
+				],
+				"MARKETPLACE",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	// Overidding list action with set_approval_for_all to marketplace contract first
+	const executeListing = async (
+		snAccount: Account | AccountInterface,
+		orderId: BigNumberish,
+		collection: string,
+		tokenId: BigNumberish,
+		quantity: BigNumberish,
+		royalties: boolean,
+	) => {
+		try {
+			return await ctx.provider.execute(
+				snAccount,
+				[
+					{
+						contractAddress: collection,
+						entrypoint: "approve",
+						calldata: CallData.compile({
+							operator: getContractByName(
+								config.manifest,
+								NAMESPACE,
+								"Marketplace",
+							).address,
+							approved: true,
+						}),
+					},
+					buildExecuteCalldata(
+						orderId,
+						collection,
+						tokenId,
+						quantity,
+						royalties,
 					),
 				],
 				"MARKETPLACE",
@@ -152,7 +237,8 @@ export function useMarketplaceActions() {
 	return {
 		cancel,
 		remove,
-		execute,
+		executeListing,
+		executeOffer,
 		grantRole,
 		list,
 		offer,

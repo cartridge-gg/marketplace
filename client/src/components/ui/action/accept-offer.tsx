@@ -11,7 +11,8 @@ type AcceptOfferProps = {
 	account: AccountInterface;
 };
 function AcceptOffer({ isOwner, order, account }: AcceptOfferProps) {
-	const { execute } = useMarketplaceActions();
+	console.log(order);
+	const { executeListing } = useMarketplaceActions();
 	const handleAcceptOffer = useCallback(async () => {
 		if (!account) {
 			console.error("Log into controller first");
@@ -19,7 +20,7 @@ function AcceptOffer({ isOwner, order, account }: AcceptOfferProps) {
 		}
 
 		try {
-			await execute(
+			await executeListing(
 				account,
 				order.id,
 				order.collection,
@@ -30,7 +31,7 @@ function AcceptOffer({ isOwner, order, account }: AcceptOfferProps) {
 		} catch (error) {
 			console.error("Failed to accept offer", error);
 		}
-	}, [order, account, execute]);
+	}, [order, account, executeListing]);
 
 	if (!isOwner) return null;
 

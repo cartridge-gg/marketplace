@@ -3,3 +3,9 @@ export enum OrderCategory {
 	Buy = 1,
 	Sell = 2,
 }
+export enum OrderStatus {
+	None = 0,
+	Placed = 1,
+	Canceled = 2,
+	Executed = 3,
+}

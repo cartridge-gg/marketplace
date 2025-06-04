@@ -8,6 +8,7 @@ import {
 	SDKOrder,
 	SchemaType,
 	setupWorld,
+	OrderModel,
 } from "@cartridge/marketplace-sdk";
 
 /**
@@ -83,5 +84,9 @@ export function useIsTokenListed(collectionAddress: string, tokenId: string) {
 			};
 		},
 		enabled: !!collectionAddress && !!tokenId,
+		initialData: { isListed: false, listing: null } as {
+			isListed: boolean;
+			listing: OrderModel | null;
+		},
 	});
 }

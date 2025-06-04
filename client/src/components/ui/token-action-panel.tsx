@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { ListTokenAction } from "./action/list-token";
 import { MakeOfferAction } from "./action/make-offer";
+import { BuyAction } from "./action/buy";
 import type { Token } from "@dojoengine/torii-wasm/types";
+import type { OrderModel } from "@cartridge/marketplace-sdk";
 
 interface TokenActionsPanelProps {
 	token: Token;
 	collectionAddress: string;
 	tokenId: string;
 	isOwner: boolean;
+	isListed: boolean;
+	listing: OrderModel | null;
 }
 
 type ActiveForm = "list" | "offer" | null;
@@ -17,6 +21,8 @@ export function TokenActionsPanel({
 	collectionAddress,
 	tokenId,
 	isOwner,
+	isListed,
+	listing,
 }: TokenActionsPanelProps) {
 	const [activeForm, setActiveForm] = useState<ActiveForm>(null);
 
@@ -42,6 +48,7 @@ export function TokenActionsPanel({
 					onShowForm={() => setActiveForm("offer")}
 					onHideForm={() => setActiveForm(null)}
 				/>
+				<BuyAction isListed={isListed} listing={listing} />
 			</div>
 		</div>
 	);

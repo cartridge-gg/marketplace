@@ -4,7 +4,7 @@ import {
 	MemberClause,
 	ToriiQueryBuilder,
 } from "@dojoengine/sdk";
-import { ModelsMapping, OrderCategory } from "../bindings";
+import { ModelsMapping, OrderCategory, OrderStatus } from "../bindings";
 import { addAddressPadding } from "starknet";
 
 function getOrderBaseClause(
@@ -19,6 +19,12 @@ function getOrderBaseClause(
 			"FixedLen",
 		),
 		MemberClause(ModelsMapping.Order, "category", "Eq", category.toString()),
+		MemberClause(
+			ModelsMapping.Order,
+			"status",
+			"Neq",
+			OrderStatus.Executed.toString(),
+		),
 	]);
 }
 
