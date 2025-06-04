@@ -32,11 +32,28 @@ export interface BookValue {
 	fee_receiver: BigNumberish;
 }
 
+// Type definition for `orderbook::models::index::MetadataAttribute` struct
+export interface MetadataAttribute {
+	identity: BigNumberish;
+	collection: BigNumberish;
+	token_id: BigNumberish;
+	index: BigNumberish;
+	trait_type: string;
+	value: string;
+}
+
+// Type definition for `orderbook::models::index::MetadataAttributeValue` struct
+export interface MetadataAttributeValue {
+	trait_type: string;
+	value: string;
+}
+
 // Type definition for `orderbook::models::index::Order` struct
 export interface Order {
 	id: BigNumberish;
 	collection: BigNumberish;
 	token_id: BigNumberish;
+	royalties: boolean;
 	category: BigNumberish;
 	status: BigNumberish;
 	expiration: BigNumberish;
@@ -48,6 +65,7 @@ export interface Order {
 
 // Type definition for `orderbook::models::index::OrderValue` struct
 export interface OrderValue {
+	royalties: boolean;
 	category: BigNumberish;
 	status: BigNumberish;
 	expiration: BigNumberish;
@@ -106,6 +124,8 @@ export interface SchemaType extends ISchemaType {
 		AccessValue: AccessValue;
 		Book: Book;
 		BookValue: BookValue;
+		MetadataAttribute: MetadataAttribute;
+		MetadataAttributeValue: MetadataAttributeValue;
 		Order: Order;
 		OrderValue: OrderValue;
 		Listing: Listing;
@@ -140,10 +160,23 @@ export const schema: SchemaType = {
 			fee_num: 0,
 			fee_receiver: 0,
 		},
+		MetadataAttribute: {
+			identity: 0,
+			collection: 0,
+			token_id: 0,
+			index: 0,
+			trait_type: "",
+			value: "",
+		},
+		MetadataAttributeValue: {
+			trait_type: "",
+			value: "",
+		},
 		Order: {
 			id: 0,
 			collection: 0,
 			token_id: 0,
+			royalties: false,
 			category: 0,
 			status: 0,
 			expiration: 0,
@@ -153,6 +186,7 @@ export const schema: SchemaType = {
 			owner: 0,
 		},
 		OrderValue: {
+			royalties: false,
 			category: 0,
 			status: 0,
 			expiration: 0,
@@ -167,6 +201,7 @@ export const schema: SchemaType = {
 				id: 0,
 				collection: 0,
 				token_id: 0,
+				royalties: false,
 				category: 0,
 				status: 0,
 				expiration: 0,
@@ -182,6 +217,7 @@ export const schema: SchemaType = {
 				id: 0,
 				collection: 0,
 				token_id: 0,
+				royalties: false,
 				category: 0,
 				status: 0,
 				expiration: 0,
@@ -198,6 +234,7 @@ export const schema: SchemaType = {
 				id: 0,
 				collection: 0,
 				token_id: 0,
+				royalties: false,
 				category: 0,
 				status: 0,
 				expiration: 0,
@@ -213,6 +250,7 @@ export const schema: SchemaType = {
 				id: 0,
 				collection: 0,
 				token_id: 0,
+				royalties: false,
 				category: 0,
 				status: 0,
 				expiration: 0,
@@ -229,6 +267,7 @@ export const schema: SchemaType = {
 				id: 0,
 				collection: 0,
 				token_id: 0,
+				royalties: false,
 				category: 0,
 				status: 0,
 				expiration: 0,
@@ -246,6 +285,7 @@ export const schema: SchemaType = {
 				id: 0,
 				collection: 0,
 				token_id: 0,
+				royalties: false,
 				category: 0,
 				status: 0,
 				expiration: 0,
@@ -261,16 +301,18 @@ export const schema: SchemaType = {
 	},
 };
 export enum ModelsMapping {
-	Access = "MARKETPLACE-Access",
-	AccessValue = "MARKETPLACE-AccessValue",
-	Book = "MARKETPLACE-Book",
-	BookValue = "MARKETPLACE-BookValue",
-	Order = "MARKETPLACE-Order",
-	OrderValue = "MARKETPLACE-OrderValue",
-	Listing = "MARKETPLACE-Listing",
-	ListingValue = "MARKETPLACE-ListingValue",
-	Offer = "MARKETPLACE-Offer",
-	OfferValue = "MARKETPLACE-OfferValue",
-	Sale = "MARKETPLACE-Sale",
-	SaleValue = "MARKETPLACE-SaleValue",
+	Access = "orderbook-Access",
+	AccessValue = "orderbook-AccessValue",
+	Book = "orderbook-Book",
+	BookValue = "orderbook-BookValue",
+	MetadataAttribute = "orderbook-MetadataAttribute",
+	MetadataAttributeValue = "orderbook-MetadataAttributeValue",
+	Order = "orderbook-Order",
+	OrderValue = "orderbook-OrderValue",
+	Listing = "orderbook-Listing",
+	ListingValue = "orderbook-ListingValue",
+	Offer = "orderbook-Offer",
+	OfferValue = "orderbook-OfferValue",
+	Sale = "orderbook-Sale",
+	SaleValue = "orderbook-SaleValue",
 }
