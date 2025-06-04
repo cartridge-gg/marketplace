@@ -28,6 +28,9 @@ version = "0.0.4"
 dependencies = [
  "dojo",
  "dojo_cairo_test",
+ "openzeppelin_account",
+ "openzeppelin_introspection",
+ "openzeppelin_token",
  "orderbook",
 ]
 
@@ -81,7 +84,6 @@ version = "0.0.4"
 dependencies = [
  "dojo",
  "dojo_cairo_test",
- "openzeppelin_account",
  "openzeppelin_introspection",
  "openzeppelin_token",
 ]

@@ -11,13 +11,15 @@ sierra-replace-ids = true
 dev = "sozo clean && sozo build --typescript && sozo migrate plan && sozo migrate apply"
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.1" }
+openzeppelin_introspection.workspace = true
+openzeppelin_token.workspace = true
+dojo.workspace = true
 orderbook = { path = ".." }
-starknet = "2.10.1"
 
 [dev-dependencies]
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.1" }
-cairo_test = "2.10.1"
+openzeppelin_account.workspace = true
+dojo_cairo_test.workspace = true
+cairo_test.workspace = true
 
 [[target.starknet-contract]]
 build-external-contracts = [

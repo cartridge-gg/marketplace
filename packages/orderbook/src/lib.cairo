@@ -27,17 +27,3 @@ pub mod components {
     pub mod sellable;
     pub mod verifiable;
 }
-
-#[cfg(test)]
-mod tests {
-    pub mod setup;
-    pub mod test_marketplace;
-
-    pub mod mocks {
-        pub mod account;
-        pub mod erc20;
-        pub mod erc721;
-        pub mod erc1155;
-        pub mod marketplace;
-    }
-}
