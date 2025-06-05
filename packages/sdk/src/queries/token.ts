@@ -2,28 +2,48 @@ import {
 	AndComposeClause,
 	KeysClause,
 	MemberClause,
+	OrComposeClause,
 	ToriiQueryBuilder,
 } from "@dojoengine/sdk";
 import { ModelsMapping, OrderCategory, OrderStatus } from "../bindings";
-import { addAddressPadding } from "starknet";
+import { addAddressPadding, type BigNumberish } from "starknet";
 
+export function subscribeToTokenUpdatesClause(
+	collectionAddress: string,
+	tokenId: BigNumberish | undefined,
+) {
+	return KeysClause(
+		[ModelsMapping.Order],
+		[
+			undefined,
+			addAddressPadding(collectionAddress),
+			tokenId?.toString(),
+			undefined,
+		],
+	).build();
+}
 function getOrderBaseClause(
 	collectionAddress: string,
-	tokenId: string | undefined,
+	tokenId: BigNumberish | undefined,
 	category: OrderCategory,
 ) {
 	return AndComposeClause([
 		KeysClause(
 			[ModelsMapping.Order],
-			[undefined, addAddressPadding(collectionAddress), tokenId, undefined],
+			[
+				undefined,
+				addAddressPadding(collectionAddress),
+				tokenId?.toString(),
+				undefined,
+			],
 			"FixedLen",
 		),
 		MemberClause(ModelsMapping.Order, "category", "Eq", category.toString()),
 		MemberClause(
 			ModelsMapping.Order,
 			"status",
-			"Neq",
-			OrderStatus.Executed.toString(),
+			"Eq",
+			OrderStatus.Placed.toString(),
 		),
 	]);
 }
@@ -48,7 +68,7 @@ export function getTokenOrders(collectionAddress: string, tokenId: string) {
 		.withClause(
 			getOrderBaseClause(collectionAddress, tokenId, OrderCategory.Buy).build(),
 		)
-		.addOrderBy(ModelsMapping.Order, "expiration", "Asc")
+		.addOrderBy(ModelsMapping.Order, "expiration", "Desc")
 		.withEntityModels([ModelsMapping.Order])
 		.includeHashedKeys();
 }

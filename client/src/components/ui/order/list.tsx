@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { currencyToDecimal, getCurrencyByAddress } from "../../../currency.ts";
 import { constants } from "starknet";
 import { AcceptOfferAction } from "../action/accept-offer.tsx";
+import { CancelOrderAction } from "../action/cancel-order.tsx";
 import { DeleteOrderAction } from "../action/delete-order.tsx";
 import { useOrderValidity } from "../../../hooks/marketplace";
 import type { OrderModel } from "@cartridge/marketplace-sdk";
@@ -63,7 +64,10 @@ export function OrderItem({ order, isOwner }: OrderItemProps) {
 					</p>
 				</div>
 				{isValid ? (
-					<AcceptOfferAction order={order} isOwner={isOwner} />
+					<div className="flex gap-2">
+						<AcceptOfferAction order={order} isOwner={isOwner} />
+						<CancelOrderAction order={order} />
+					</div>
 				) : (
 					<DeleteOrderAction order={order} />
 				)}

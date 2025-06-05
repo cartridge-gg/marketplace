@@ -32,7 +32,7 @@ function Price({ listing }: PriceProps) {
 }
 
 function Buy({ isListed, listing, account }: BuyProps) {
-	const { executeOffer } = useMarketplaceActions();
+	const { executeListing } = useMarketplaceActions();
 	const handleBuy = useCallback(async () => {
 		if (!account) {
 			console.error("Log into controller first");
@@ -45,20 +45,18 @@ function Buy({ isListed, listing, account }: BuyProps) {
 		}
 
 		try {
-			await executeOffer(
+			await executeListing(
 				account,
 				listing.id,
 				listing.collection,
 				listing.tokenId,
 				listing.quantity,
 				true,
-				listing.currency,
-				listing.price,
 			);
 		} catch (error) {
 			console.error("Failed to buy token", error);
 		}
-	}, [listing, account, executeOffer]);
+	}, [listing, account, executeListing]);
 
 	if (!isListed || listing === null) {
 		return null;

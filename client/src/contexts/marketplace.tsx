@@ -117,9 +117,9 @@ export const MarketplaceProvider = ({ children }: { children: ReactNode }) => {
 			sale: true,
 		};
 		Marketplace.fetch(handleMarketplaceModels, options);
-		Marketplace.sub(handleMarketplaceModels, options);
+		// Marketplace.sub(handleMarketplaceModels, options);
 		return () => {
-			Marketplace.unsub();
+			// Marketplace.unsub();
 		};
 	}, [initialized, handleMarketplaceModels]);
 
