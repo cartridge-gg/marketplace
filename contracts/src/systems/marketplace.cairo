@@ -7,6 +7,7 @@ pub trait IAdministration<TContractState> {
     fn pause(ref self: TContractState);
     fn resume(ref self: TContractState);
     fn set_fee(ref self: TContractState, fee_num: u32, fee_receiver: starknet::ContractAddress);
+    fn set_royalties(ref self: TContractState, enabled: bool);
 }
 
 #[starknet::interface]
@@ -146,11 +147,12 @@ pub mod Marketplace {
 
     fn dojo_init(
         ref self: ContractState,
+        royalties: bool,
         fee_num: u32,
         fee_receiver: ContractAddress,
         owner: ContractAddress,
     ) {
-        self.manageable.initialize(self.world_storage(), fee_num, fee_receiver, owner);
+        self.manageable.initialize(self.world_storage(), royalties, fee_num, fee_receiver, owner);
     }
 
     // Implementations
@@ -180,6 +182,11 @@ pub mod Marketplace {
         fn set_fee(ref self: ContractState, fee_num: u32, fee_receiver: ContractAddress) {
             let world = self.world_storage();
             self.manageable.set_fee(world, fee_num, fee_receiver);
+        }
+
+        fn set_royalties(ref self: ContractState, enabled: bool) {
+            let world = self.world_storage();
+            self.manageable.set_royalties(world, enabled);
         }
     }
 

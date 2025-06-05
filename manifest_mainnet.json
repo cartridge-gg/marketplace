@@ -1,8 +1,8 @@
 {
   "world": {
     "class_hash": "0x4c60dc46a8ca8bb47675b7b914053cef769afbf0e340523187336b72bd71d1f",
-    "address": "0x721a3b839f2f1011da15799710e74eae77d9ff0292cfd13b3e6f1357bccccf2",
-    "seed": "Marketplace-0.0.4",
+    "address": "0x46d17ca0b6856d4f1cc635b753b296d57b0a8382c492a9f55686ee6b314ba0e",
+    "seed": "Marketplace-0.0.5",
     "name": "Cartridge Marketplace",
     "entrypoints": [
       "uuid",
@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x3a186ba14cd5c0e47adb22bba3e9b3285a399c4437739e7c61b6ef677b13e0d",
-      "class_hash": "0x11f7977bac418e75478fc004669593637be03bb66762b11dae2494c1999f91e",
+      "address": "0x1f0817826ab9ebe94953239aab59f2a4aa57e510f17690a2a49cd104e2f3a6f",
+      "class_hash": "0x5b2cacba5040aec2f80e5b18a8de2c0840d1a90f0f93ec8ed3dacce936312d0",
       "abi": [
         {
           "type": "impl",
@@ -1382,9 +1382,27 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "function",
           "name": "dojo_init",
           "inputs": [
+            {
+              "name": "royalties",
+              "type": "core::bool"
+            },
             {
               "name": "fee_num",
               "type": "core::integer::u32"
@@ -1467,6 +1485,18 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_royalties",
+              "inputs": [
+                {
+                  "name": "enabled",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -1486,20 +1516,6 @@
             {
               "name": "high",
               "type": "core::integer::u128"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
             }
           ]
         },
@@ -1901,6 +1917,7 @@
         }
       ],
       "init_calldata": [
+        "0x1",
         "0x1F4",
         "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b",
         "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b"
@@ -1914,6 +1931,7 @@
         "pause",
         "resume",
         "set_fee",
+        "set_royalties",
         "list",
         "offer",
         "intent",
@@ -1934,7 +1952,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x7d509062796c252ee2323affb274acc2aec44961ce9368fdb1ce16987bddf39",
+      "class_hash": "0x36d03ff052496ab208ce93af883c2cca8b2ca1d899d983f71c97a9f2e6af00a",
       "tag": "MARKETPLACE-Book",
       "selector": "0x6b71d0dbe436e76d464874d7990a0d38ccbaa4f75bbd8f5e44338a166653d9c"
     },

@@ -207,7 +207,7 @@ pub mod BuyableComponent {
             // [Interaction] Process sale
             let (orderbook_receiver, orderbook_fee) = book.fee(price);
             // [Info] Royalties are toggled by the seller (executor of the order)
-            let (creator_receiver, creator_fee) = if royalties {
+            let (creator_receiver, creator_fee) = if royalties || book.royalties {
                 verifiable.royalties(collection, token_id, price)
             } else {
                 (starknet::get_contract_address(), 0)

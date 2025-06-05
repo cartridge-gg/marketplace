@@ -16,7 +16,7 @@ pub mod errors {
 #[generate_trait]
 pub impl BookImpl of BookTrait {
     #[inline]
-    fn new(id: u32, fee_num: u32, fee_receiver: felt252) -> Book {
+    fn new(id: u32, royalties: bool, fee_num: u32, fee_receiver: felt252) -> Book {
         // [Check] Inputs
         BookAssert::assert_valid_address(fee_receiver);
         BookAssert::assert_valid_fee(fee_num);
@@ -26,6 +26,7 @@ pub impl BookImpl of BookTrait {
             version: VERSION,
             paused: false,
             counter: 0,
+            royalties: royalties,
             fee_num: fee_num,
             fee_receiver: fee_receiver,
         }
@@ -70,6 +71,12 @@ pub impl BookImpl of BookTrait {
         self.fee_num = fee_num;
         self.fee_receiver = fee_receiver;
     }
+
+    #[inline]
+    fn set_royalties(ref self: Book, enabled: bool) {
+        // [Update] Book
+        self.royalties = enabled;
+    }
 }
 
 #[generate_trait]
@@ -109,12 +116,13 @@ mod tests {
 
     // Constants
 
+    const ROYALTIES: bool = true;
     const FEE_NUM: u32 = 100;
     const FEE_RECEIVER: felt252 = 'FEE_RECEIVER';
 
     #[test]
     fn test_book_new() {
-        let book = BookTrait::new(BOOK_ID, FEE_NUM, FEE_RECEIVER);
+        let book = BookTrait::new(BOOK_ID, ROYALTIES, FEE_NUM, FEE_RECEIVER);
         assert_eq!(book.id, BOOK_ID);
         assert_eq!(book.version, VERSION);
         assert_eq!(book.paused, false);

@@ -416,6 +416,32 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_Marketplace_setRoyalties_calldata = (
+		enabled: boolean,
+	): DojoCall => {
+		return {
+			contractName: "Marketplace",
+			entrypoint: "set_royalties",
+			calldata: [enabled],
+		};
+	};
+
+	const Marketplace_setRoyalties = async (
+		snAccount: Account | AccountInterface,
+		enabled: boolean,
+	) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_Marketplace_setRoyalties_calldata(enabled),
+				"MARKETPLACE",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	return {
 		Marketplace: {
 			cancel: Marketplace_cancel,
@@ -444,6 +470,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildRevokeRoleCalldata: build_Marketplace_revokeRole_calldata,
 			setFee: Marketplace_setFee,
 			buildSetFeeCalldata: build_Marketplace_setFee_calldata,
+			setRoyalties: Marketplace_setRoyalties,
+			buildSetRoyaltiesCalldata: build_Marketplace_setRoyalties_calldata,
 		},
 	};
 }

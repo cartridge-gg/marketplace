@@ -38,6 +38,7 @@ pub mod ManageableComponent {
         fn initialize(
             self: @ComponentState<TContractState>,
             world: WorldStorage,
+            royalties: bool,
             fee_num: u32,
             fee_receiver: ContractAddress,
             owner: ContractAddress,
@@ -48,7 +49,7 @@ pub mod ManageableComponent {
             store.set_access(@access);
             // [Effect] Initialize book
             let mut store = StoreTrait::new(world);
-            let book = BookTrait::new(BOOK_ID, fee_num, fee_receiver.into());
+            let book = BookTrait::new(BOOK_ID, royalties, fee_num, fee_receiver.into());
             store.set_book(@book);
         }
 
@@ -123,6 +124,20 @@ pub mod ManageableComponent {
             // [Effect] Set fee
             let mut book = store.book(BOOK_ID);
             book.set_fee(fee_num, fee_receiver.into());
+            // [Update] Book
+            store.set_book(@book);
+        }
+
+        fn set_royalties(
+            self: @ComponentState<TContractState>, world: WorldStorage, enabled: bool,
+        ) {
+            // [Check] Caller is allowed
+            let mut store = StoreTrait::new(world);
+            let caller_access = store.access(starknet::get_caller_address().into());
+            caller_access.assert_is_allowed(Role::Owner);
+            // [Effect] Set royalties
+            let mut book = store.book(BOOK_ID);
+            book.set_royalties(enabled);
             // [Update] Book
             store.set_book(@book);
         }
