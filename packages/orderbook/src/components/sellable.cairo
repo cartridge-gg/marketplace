@@ -46,6 +46,7 @@ pub mod SellableComponent {
             price: u128,
             currency: ContractAddress,
             expiration: u64,
+            royalties: bool,
         ) {
             // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
@@ -68,11 +69,13 @@ pub mod SellableComponent {
             // [Effect] Create order
             let order_id = book.get_id();
             let time = starknet::get_block_timestamp();
+            // [Info] Royalties defined by the seller
             let order = OrderTrait::new(
                 id: order_id,
                 category: Category::Sell,
                 collection: collection.into(),
                 token_id: token_id,
+                royalties: royalties,
                 quantity: quantity,
                 price: price,
                 currency: currency.into(),
@@ -166,7 +169,6 @@ pub mod SellableComponent {
             collection: ContractAddress,
             token_id: u256,
             quantity: u128,
-            royalties: bool,
         ) {
             // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
@@ -184,68 +186,42 @@ pub mod SellableComponent {
             let owner: ContractAddress = order.owner.try_into().unwrap();
             let collection: ContractAddress = order.collection.try_into().unwrap();
             let token_id: u256 = order.token_id;
-            let value: u256 = order.quantity.into();
+            let value: u256 = quantity.into();
             let verifiable = get_dep_component!(self, Verify);
-            verifiable
-                .assert_sell_validity(
-                    owner: owner,
-                    expiration: order.expiration,
-                    collection: collection,
-                    token_id: token_id,
-                    value: value,
-                );
-
-            // [Check] Execute requirements
             let spender = starknet::get_caller_address();
             let currency: ContractAddress = order.currency.try_into().unwrap();
-            let price: u256 = order.price.into();
-            verifiable
-                .assert_buy_validity(
-                    owner: spender, expiration: order.expiration, currency: currency, price: price,
-                );
+            // [Info] Price is a unit price in case or ERC1155 otherwise the asset price
+            let price: u256 = core::cmp::max(order.price.into(), order.price.into() * value);
 
             // [Effect] Execute order
             let time = starknet::get_block_timestamp();
             order.execute(quantity, time);
-
-            // [Effect] Update models
             store.set_order(@order);
 
-            // [Interaction] Process transfers
+            // [Interaction] Process sale
             let (orderbook_receiver, orderbook_fee) = book.fee(price);
-            let (creator_receiver, creator_fee) = if royalties {
+            // [Info] Royalties are toggled by the seller (owner of the order)
+            let (creator_receiver, creator_fee) = if order.royalties {
                 verifiable.royalties(collection, token_id, price)
             } else {
                 (starknet::get_contract_address(), 0)
             };
+            let mut fees = array![
+                (orderbook_receiver.try_into().unwrap(), orderbook_fee),
+                (creator_receiver, creator_fee),
+            ]
+                .span();
             verifiable
-                .pay(
+                .process(
                     spender: spender,
-                    recipient: orderbook_receiver.try_into().unwrap(),
-                    currency: currency,
-                    amount: orderbook_fee,
-                );
-            verifiable
-                .pay(
-                    spender: spender,
-                    recipient: creator_receiver,
-                    currency: currency,
-                    amount: creator_fee,
-                );
-            verifiable
-                .pay(
-                    spender: spender,
-                    recipient: owner,
-                    currency: currency,
-                    amount: price - orderbook_fee - creator_fee,
-                );
-            verifiable
-                .transfer(
                     owner: owner,
                     collection: collection,
                     token_id: token_id,
                     value: value,
-                    recipient: spender,
+                    currency: currency,
+                    price: price,
+                    expiration: order.expiration,
+                    ref fees: fees,
                 );
 
             // [Event] Sale

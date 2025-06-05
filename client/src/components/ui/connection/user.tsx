@@ -1,7 +1,8 @@
 import ControllerConnector from "@cartridge/connector/controller";
-import { Button, GearIcon, SignOutIcon } from "@cartridge/ui";
+import { Button, GearIcon, SignOutIcon, WalletIcon } from "@cartridge/ui";
 import { useAccount, useDisconnect } from "@starknet-react/core";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "@tanstack/react-router";
 // import { UserAvatar } from "../user/avatar";
 import { ControllerActions } from "../../modules/controller-actions";
 import { ControllerAction } from "../../modules/controller-action";
@@ -11,6 +12,7 @@ export function User() {
 	const { isConnected } = useAccount();
 	const { disconnect } = useDisconnect();
 	const [name, setName] = useState<string>("");
+	const router = useRouter();
 
 	const handleClick = useCallback(() => {
 		if (!name && !address) return;
@@ -50,6 +52,14 @@ export function User() {
 		// navigate("/");
 	}, [disconnect]);
 
+	const handleWalletClick = useCallback(() => {
+		if (!address) return;
+		router.navigate({
+			to: "/wallet/$address",
+			params: { address: address.toLowerCase() },
+		});
+	}, [address, router]);
+
 	if (!isConnected || !account || !name) return null;
 
 	const glowStyle = {
@@ -70,6 +80,11 @@ export function User() {
 				<p className="text-sm font-semibold normal-case">{name}</p>
 			</Button>
 			<ControllerActions>
+				<ControllerAction
+					label="Wallet"
+					Icon={<WalletIcon size="sm" variant="solid" />}
+					onClick={handleWalletClick}
+				/>
 				<ControllerAction
 					label="Settings"
 					Icon={<GearIcon size="sm" />}

@@ -85,6 +85,7 @@ function Collection({ collection }: { collection: Token }) {
 				params={{
 					collectionAddress: getChecksumAddress(collection.contract_address),
 				}}
+				search={{ cursor: undefined }}
 				className="block h-full"
 			>
 				<div className="relative">

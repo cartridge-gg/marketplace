@@ -1,6 +1,6 @@
 //! Models
 
-#[derive(Clone, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct Access {
     #[key]
@@ -29,6 +29,7 @@ pub struct Order {
     pub collection: felt252,
     #[key]
     pub token_id: u256,
+    pub royalties: bool,
     pub category: u8,
     pub status: u8,
     pub expiration: u64,
@@ -36,4 +37,19 @@ pub struct Order {
     pub price: u128,
     pub currency: felt252,
     pub owner: felt252,
+}
+
+#[derive(Clone, Drop, Serde)]
+#[dojo::model]
+pub struct MetadataAttribute {
+    #[key]
+    pub identity: felt252,
+    #[key]
+    pub collection: felt252,
+    #[key]
+    pub token_id: u256,
+    #[key]
+    pub index: u32,
+    pub trait_type: ByteArray,
+    pub value: ByteArray,
 }

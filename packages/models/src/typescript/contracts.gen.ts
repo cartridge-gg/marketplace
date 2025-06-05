@@ -46,19 +46,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_execute_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish, quantity: BigNumberish, royalties: boolean): DojoCall => {
+	const build_Marketplace_execute_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish, category: BigNumberish, quantity: BigNumberish, royalties: boolean): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "execute",
-			calldata: [orderId, collection, tokenId, quantity, royalties],
+			calldata: [orderId, collection, tokenId, category, quantity, royalties],
 		};
 	};
 
-	const Marketplace_execute = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish, quantity: BigNumberish, royalties: boolean) => {
+	const Marketplace_execute = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish, category: BigNumberish, quantity: BigNumberish, royalties: boolean) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_Marketplace_execute_calldata(orderId, collection, tokenId, quantity, royalties),
+				build_Marketplace_execute_calldata(orderId, collection, tokenId, category, quantity, royalties),
 				"MARKETPLACE",
 			);
 		} catch (error) {

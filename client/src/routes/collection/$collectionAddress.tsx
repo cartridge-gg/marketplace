@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMemo, useCallback } from "react";
 import { useCollection } from "../../hooks";
 import { getChecksumAddress } from "starknet";
-import { CollectibleAsset } from "@cartridge/ui";
+import { CollectibleAsset, Button } from "@cartridge/ui";
 import type { Token } from "@dojoengine/torii-wasm";
 
 // Define metadata interface based on the expected structure
@@ -19,13 +19,50 @@ interface TokenMetadata {
 
 export const Route = createFileRoute("/collection/$collectionAddress")({
 	component: RouteComponent,
+	validateSearch: (search: Record<string, unknown>) => {
+		return {
+			cursor: search?.cursor as string | undefined,
+		};
+	},
 });
 
 function RouteComponent() {
 	const { collectionAddress } = Route.useParams();
-	const { collection } = useCollection(collectionAddress);
+	const { cursor } = Route.useSearch();
+	const navigate = useNavigate({ from: Route.fullPath });
+	const {
+		collection,
+		getPrevPage,
+		getNextPage,
+		hasPrev,
+		hasNext,
+		isLoading,
+		currentPage,
+		nextCursor,
+		prevCursor,
+	} = useCollection(collectionAddress, 50, cursor);
 
-	if (collection.length === 0) {
+	const handlePrevPage = useCallback(() => {
+		if (hasPrev) {
+			navigate({
+				search: prevCursor ? { cursor: prevCursor } : { cursor: undefined },
+				replace: false,
+			});
+			getPrevPage();
+		}
+	}, [navigate, getPrevPage, hasPrev, prevCursor]);
+
+	const handleNextPage = useCallback(() => {
+		if (hasNext && nextCursor) {
+			navigate({
+				search: { cursor: nextCursor },
+				replace: false,
+			});
+			getNextPage();
+		}
+	}, [navigate, getNextPage, hasNext, nextCursor]);
+
+	if (collection.length === 0 && isLoading) {
 		return (
 			<div className="flex items-center justify-center h-screen bg-background-100">
 				<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
@@ -61,7 +98,16 @@ function RouteComponent() {
 						</span>
 					</Link>
 				</div>
-				<CollectionGrid collection={collection} name={collectionName} />
+				<CollectionGrid
+					collection={collection}
+					name={collectionName}
+					getPrevPage={handlePrevPage}
+					getNextPage={handleNextPage}
+					hasPrev={hasPrev}
+					hasNext={hasNext}
+					isLoading={isLoading}
+					currentPage={currentPage}
+				/>
 			</div>
 		</div>
 	);
@@ -70,17 +116,81 @@ function RouteComponent() {
 interface CollectionGridProps {
 	collection: Token[];
 	name: string;
+	getPrevPage: () => void;
+	getNextPage: () => void;
+	hasPrev: boolean;
+	hasNext: boolean;
+	isLoading: boolean;
+	currentPage: number;
 }
 
-function CollectionGrid({ collection, name }: CollectionGridProps) {
+function CollectionGrid({
+	collection,
+	name,
+	getPrevPage,
+	getNextPage,
+	hasPrev,
+	hasNext,
+	isLoading,
+	currentPage,
+}: CollectionGridProps) {
 	return (
 		<>
-			<h1 className="text-3xl font-bold mb-8 text-primary-500">{name}</h1>
-			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-				{collection.map((t) => (
-					<Token token={t} key={t.token_id} />
-				))}
+			<div className="flex justify-between items-center mb-8">
+				<h1 className="text-3xl font-bold text-primary-500">{name}</h1>
+				<div className="flex items-center gap-4">
+					<span className="text-sm text-gray-500">Page {currentPage}</span>
+					<div className="flex gap-2">
+						<Button
+							onClick={getPrevPage}
+							disabled={!hasPrev || isLoading}
+							variant="secondary"
+						>
+							Previous
+						</Button>
+						<Button
+							onClick={getNextPage}
+							disabled={!hasNext || isLoading}
+							variant="secondary"
+						>
+							Next
+						</Button>
+					</div>
+				</div>
 			</div>
+			{isLoading ? (
+				<div className="flex items-center justify-center h-64">
+					<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+				</div>
+			) : (
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+					{collection.map((t) => (
+						<Token token={t} key={t.token_id} />
+					))}
+				</div>
+			)}
+			{/* Pagination controls at the bottom as well */}
+			{collection.length > 0 && (
+				<div className="flex justify-center gap-2 mt-8">
+					<Button
+						onClick={getPrevPage}
+						disabled={!hasPrev || isLoading}
+						variant="secondary"
+					>
+						Previous
+					</Button>
+					<span className="flex items-center px-4 text-gray-500">
+						Page {currentPage}
+					</span>
+					<Button
+						onClick={getNextPage}
+						disabled={!hasNext || isLoading}
+						variant="secondary"
+					>
+						Next
+					</Button>
+				</div>
+			)}
 		</>
 	);
 }

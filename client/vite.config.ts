@@ -19,6 +19,10 @@ export default defineConfig({
 			"@": "/src",
 		},
 	},
+	optimizeDeps: {
+		include: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
+		exclude: ["@dojoengine/sdk"],
+	},
 	plugins: [
 		tailwindcss(),
 		TanStackRouterVite({ target: "react", autoCodeSplitting: true }),

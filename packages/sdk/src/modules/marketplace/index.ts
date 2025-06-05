@@ -23,6 +23,7 @@ export * from "./policies";
 export {
 	AccessModel,
 	BookModel,
+	Order as SDKOrder,
 	OrderModel,
 	ListingEvent,
 	OfferEvent,
@@ -158,7 +159,7 @@ export const Marketplace = {
 			Error
 		>) => {
 			if (error) {
-				console.error("Error subscribing to entities:", error);
+				console.error("Error subscribing to marketplace entities:", error);
 				return;
 			}
 			if (!data || data.length === 0 || BigInt(data[0].entityId) === 0n) return;
@@ -196,7 +197,7 @@ export const Marketplace = {
 			Error
 		>) => {
 			if (error) {
-				console.error("Error subscribing to entities:", error);
+				console.error("Error subscribing to marketplace events:", error);
 				return;
 			}
 			if (!data || data.length === 0 || BigInt(data[0].entityId) === 0n) return;

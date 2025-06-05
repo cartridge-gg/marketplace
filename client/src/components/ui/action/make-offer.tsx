@@ -3,9 +3,9 @@ import { TokenDetailsActionProps } from ".";
 import { useMarketplaceActions } from "../../../hooks";
 import { useCallback } from "react";
 import { useAccount } from "@starknet-react/core";
-
-const STRK_ADDRESS =
-	"0x04718f5a0Fc34cC1AF16A1cdee98fFB20C31f5cD61D6Ab07201858f4287c938D";
+import { getCurrencyAddress, amountToCurrencyBigInt } from "../../../currency";
+import { constants } from "starknet";
+import { ActionForm, ActionFormData } from "../action-form";
 
 /**
  * Adds a specified number of days to a given date
@@ -22,32 +22,73 @@ function addDays(date: Date | string, days: number): number {
 	return result.getTime();
 }
 
+interface MakeOfferActionProps extends TokenDetailsActionProps {
+	showForm: boolean;
+	onShowForm: () => void;
+	onHideForm: () => void;
+}
+
 export function MakeOfferAction({
 	collectionAddress,
 	tokenId,
-}: TokenDetailsActionProps) {
+	showForm,
+	onShowForm,
+	onHideForm,
+}: MakeOfferActionProps) {
 	const { offer } = useMarketplaceActions();
 	const { account } = useAccount();
 
-	const handleMakeOffer = useCallback(async () => {
-		// Logic to accept the offer
-		if (!account) {
-			console.error("Not connected");
-			return;
-		}
-		await offer(
-			account,
-			collectionAddress,
-			tokenId,
-			1,
-			10000000000000000000n,
-			STRK_ADDRESS,
-			addDays(new Date(), 1),
+	const handleSubmit = useCallback(
+		async (formData: ActionFormData) => {
+			if (!account) {
+				console.error("Not connected");
+				return;
+			}
+
+			const currencyAddress = getCurrencyAddress(
+				formData.currency,
+				constants.StarknetChainId.SN_MAIN,
+			);
+			if (!currencyAddress) {
+				console.error(`${formData.currency} currency not found`);
+				return;
+			}
+
+			const priceInWei = amountToCurrencyBigInt(
+				Number.parseFloat(formData.price),
+				formData.currency,
+			);
+
+			await offer(
+				account,
+				collectionAddress,
+				tokenId,
+				Number.parseInt(formData.quantity),
+				priceInWei,
+				currencyAddress,
+				addDays(new Date(), Number.parseInt(formData.expirationDays)),
+			);
+
+			onHideForm();
+		},
+		[offer, account, collectionAddress, tokenId, onHideForm],
+	);
+
+	if (showForm) {
+		return (
+			<ActionForm
+				title="Make an Offer"
+				submitLabel="Submit Offer"
+				defaultValues={{ expirationDays: "1" }}
+				maxExpirationDays={30}
+				onSubmit={handleSubmit}
+				onCancel={onHideForm}
+			/>
 		);
-	}, [offer, account, collectionAddress, tokenId]);
+	}
 
 	return (
-		<Button variant="secondary" onClick={handleMakeOffer}>
+		<Button variant="secondary" onClick={onShowForm}>
 			Make Offer
 		</Button>
 	);

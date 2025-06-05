@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useArcade } from "./arcade";
 import type { Token, TokenBalance, ToriiClient } from "@dojoengine/torii-wasm";
+import { getChecksumAddress } from "starknet";
 
 // Common function to parse token metadata
 function parseTokenMetadata(token: Token): Token {
@@ -39,7 +40,7 @@ async function fetchFromAllClients<T>(
 
 // Common function to filter balances with positive amounts
 function filterPositiveBalances(balances: TokenBalance[]): TokenBalance[] {
-	return balances.filter((balance) => parseInt(balance.balance, 16) > 0);
+	return balances.filter((balance) => Number.parseInt(balance.balance, 16) > 0);
 }
 
 // Common function to get unique contract addresses from balances
@@ -225,7 +226,8 @@ export function useToken(
 		if (token === null && balances.length === 0) return false;
 		const balance = balances.find(
 			(b) =>
-				b.account_address === accountAddress &&
+				getChecksumAddress(b.account_address) ===
+					getChecksumAddress(accountAddress) &&
 				Number.parseInt(b.balance, 16) > 0,
 		);
 

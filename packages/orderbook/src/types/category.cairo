@@ -3,6 +3,7 @@ pub enum Category {
     None,
     Buy,
     Sell,
+    BuyAny,
 }
 
 // Implementations
@@ -14,6 +15,7 @@ pub impl IntoCategoryU8 of core::traits::Into<Category, u8> {
             Category::None => 0,
             Category::Buy => 1,
             Category::Sell => 2,
+            Category::BuyAny => 3,
         }
     }
 }
@@ -25,6 +27,7 @@ pub impl IntoU8Category of core::traits::Into<u8, Category> {
             0 => Category::None,
             1 => Category::Buy,
             2 => Category::Sell,
+            3 => Category::BuyAny,
             _ => Category::None,
         }
     }

@@ -24,10 +24,13 @@ source = "git+https://github.com/dojoengine/dojo?tag=v1.5.1#986c3b0c6d647b23847c
 
 [[package]]
 name = "marketplace"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "dojo",
  "dojo_cairo_test",
+ "openzeppelin_account",
+ "openzeppelin_introspection",
+ "openzeppelin_token",
  "orderbook",
 ]
 
@@ -77,11 +80,10 @@ checksum = "sha256:fd348b31c4a4407add33adc3c2b8f26dca71dbd7431faaf726168f37a91db
 
 [[package]]
 name = "orderbook"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "dojo",
  "dojo_cairo_test",
- "openzeppelin_account",
  "openzeppelin_introspection",
  "openzeppelin_token",
 ]

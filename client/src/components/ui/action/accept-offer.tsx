@@ -1,25 +1,46 @@
 import { Button } from "@cartridge/ui";
-import { TokenDetailsActionProps } from ".";
+import type { OrderModel } from "@cartridge/marketplace-sdk";
+import { WithAccount } from "@dojoengine/sdk/react";
+import { useCallback } from "react";
+import type { AccountInterface } from "starknet";
+import { useMarketplaceActions } from "../../../hooks/marketplace";
 
-export function AcceptOfferAction({
-	token,
-	collectionAddress,
-	tokenId,
-	isOwner,
-}: TokenDetailsActionProps) {
-	const handleAcceptOffer = () => {
-		// Logic to accept the offer
-		console.log(token);
-		console.log(
-			`Accepting offer for token ${tokenId} from collection ${collectionAddress}`,
-		);
-	};
+type AcceptOfferProps = {
+	isOwner: boolean;
+	order: OrderModel;
+	account: AccountInterface;
+};
+function AcceptOffer({ isOwner, order, account }: AcceptOfferProps) {
+	const { executeOffer } = useMarketplaceActions();
+	const handleAcceptOffer = useCallback(async () => {
+		if (!account) {
+			console.error("Log into controller first");
+			return;
+		}
+
+		try {
+			await executeOffer(
+				account,
+				order.id,
+				order.collection,
+				order.tokenId,
+				order.quantity,
+				true,
+				order.currency,
+				order.price,
+			);
+		} catch (error) {
+			console.error("Failed to accept offer", error);
+		}
+	}, [order, account, executeOffer]);
 
 	if (!isOwner) return null;
 
 	return (
-		<Button variant="secondary" onClick={handleAcceptOffer}>
+		<Button variant="primary" onClick={handleAcceptOffer}>
 			Accept Offer
 		</Button>
 	);
 }
+
+export const AcceptOfferAction = WithAccount(AcceptOffer);

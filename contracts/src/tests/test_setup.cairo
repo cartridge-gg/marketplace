@@ -7,5 +7,5 @@ use marketplace::tests::setup::setup::spawn;
 #[test]
 fn test_setup() {
     // [Setup]
-    let (_, _, _) = spawn();
+    spawn();
 }

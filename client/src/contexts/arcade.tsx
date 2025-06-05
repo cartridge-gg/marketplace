@@ -133,9 +133,9 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 			edition: true,
 		};
 		Registry.fetch(handleRegistryModels, options);
-		Registry.sub(handleRegistryModels, options);
+		// Registry.sub(handleRegistryModels, options);
 		return () => {
-			Registry.unsub();
+			// Registry.unsub();
 		};
 	}, [initialized, handleRegistryModels]);
 
