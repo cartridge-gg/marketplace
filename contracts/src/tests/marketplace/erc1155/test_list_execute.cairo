@@ -91,7 +91,7 @@ fn test_list() {
 }
 
 #[test]
-#[should_panic(expected: ('Order: cannot execute', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('Order: cannot be executed', 'ENTRYPOINT_FAILED'))]
 fn test_list_revert_cannot_execute() {
     // [Setup] World
     let (world, contracts, context) = spawn();
