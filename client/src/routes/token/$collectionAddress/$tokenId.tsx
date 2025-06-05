@@ -79,6 +79,8 @@ function RouteComponent() {
 				tokenId,
 				order.quantity,
 				true,
+				order.currency,
+				order.price,
 			);
 		},
 		[account, collectionAddress, tokenId, executeListing],
