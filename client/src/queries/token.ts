@@ -2,7 +2,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDojoSDK } from "@dojoengine/sdk/react";
 import {
 	subscribeToTokenUpdatesClause,
-	getTokenQuery,
 	getTokenOrders,
 	getListedTokensForCollection,
 	isTokenListed,
@@ -10,34 +9,19 @@ import {
 	type SchemaType,
 	type setupWorld,
 	type OrderModel,
-	ModelsMapping,
 } from "@cartridge/marketplace-sdk";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { Subscription } from "@dojoengine/torii-wasm/types";
-import {
-	KeysClause,
-	StandardizedQueryResult,
-	SubscriptionCallbackArgs,
-} from "@dojoengine/sdk";
-import { addAddressPadding } from "starknet";
+import type { Clause } from "@dojoengine/torii-wasm/types";
 import { useInitialized } from "../hooks";
 
 /**
- * Hook to fetch all buy orders for a specific token
+ * Hook to manage subscription lifecycle for entity updates
  */
-export function useTokenOrders(collectionAddress: string, tokenId: string) {
+function useEntitySubscription(subscriptionClause: Clause, queryKey: any[]) {
 	const { sdk } = useDojoSDK<typeof setupWorld, SchemaType>();
 	const subscriptionRef = useRef<Subscription>(null);
-	const [initialized, _setInitialized] = useInitialized();
-
-	const q = useMemo(
-		() => getTokenOrders(collectionAddress, tokenId),
-		[collectionAddress, tokenId],
-	);
-	const queryKey = useMemo(
-		() => ["tokenOrders", { collectionAddress, tokenId }],
-		[collectionAddress, tokenId],
-	);
+	const [initialized] = useInitialized();
 	const queryClient = useQueryClient();
 
 	useEffect(() => {
@@ -50,7 +34,7 @@ export function useTokenOrders(collectionAddress: string, tokenId: string) {
 		};
 
 		subscriptionRef.current = sdk.client.onEntityUpdated(
-			subscribeToTokenUpdatesClause(collectionAddress, tokenId),
+			subscriptionClause,
 			wrappedCallback,
 		);
 
@@ -60,7 +44,28 @@ export function useTokenOrders(collectionAddress: string, tokenId: string) {
 				subscriptionRef.current = null;
 			}
 		};
-	}, [initialized, q, sdk, queryClient, queryKey, collectionAddress, tokenId]);
+	}, [initialized, sdk, queryClient, queryKey, subscriptionClause]);
+}
+
+/**
+ * Hook to fetch all buy orders for a specific token
+ */
+export function useTokenOrders(collectionAddress: string, tokenId: string) {
+	const { sdk } = useDojoSDK<typeof setupWorld, SchemaType>();
+	const q = useMemo(
+		() => getTokenOrders(collectionAddress, tokenId),
+		[collectionAddress, tokenId],
+	);
+	const queryKey = useMemo(
+		() => ["tokenOrders", { collectionAddress, tokenId }],
+		[collectionAddress, tokenId],
+	);
+	const subscriptionClause = useMemo(
+		() => subscribeToTokenUpdatesClause(collectionAddress, tokenId),
+		[collectionAddress, tokenId],
+	);
+
+	useEntitySubscription(subscriptionClause, queryKey);
 
 	return useQuery({
 		queryKey,
@@ -77,8 +82,6 @@ export function useTokenOrders(collectionAddress: string, tokenId: string) {
  */
 export function useListedTokensForCollection(collectionAddress: string) {
 	const { sdk } = useDojoSDK<typeof setupWorld, SchemaType>();
-	const subscriptionRef = useRef<Subscription>(null);
-	const [initialized, _setInitialized] = useInitialized();
 
 	const q = useMemo(
 		() => getListedTokensForCollection(collectionAddress),
@@ -88,29 +91,12 @@ export function useListedTokensForCollection(collectionAddress: string) {
 		() => ["listedTokens", collectionAddress],
 		[collectionAddress],
 	);
-	const queryClient = useQueryClient();
+	const subscriptionClause = useMemo(
+		() => subscribeToTokenUpdatesClause(collectionAddress, undefined),
+		[collectionAddress],
+	);
 
-	useEffect(() => {
-		if (!initialized && subscriptionRef.current === null) return;
-
-		const wrappedCallback = () => {
-			queryClient.invalidateQueries({
-				queryKey,
-			});
-		};
-
-		subscriptionRef.current = sdk.client.onEntityUpdated(
-			subscribeToTokenUpdatesClause(collectionAddress, undefined),
-			wrappedCallback,
-		);
-
-		return () => {
-			if (subscriptionRef.current !== null) {
-				subscriptionRef.current.free();
-				subscriptionRef.current = null;
-			}
-		};
-	}, [initialized, q, sdk, queryClient, queryKey, collectionAddress]);
+	useEntitySubscription(subscriptionClause, queryKey);
 
 	return useQuery({
 		queryKey,
@@ -127,8 +113,6 @@ export function useListedTokensForCollection(collectionAddress: string) {
  */
 export function useIsTokenListed(collectionAddress: string, tokenId: string) {
 	const { sdk } = useDojoSDK<typeof setupWorld, SchemaType>();
-	const subscriptionRef = useRef<Subscription>(null);
-	const [initialized, _setInitialized] = useInitialized();
 
 	const q = useMemo(
 		() => isTokenListed(collectionAddress, tokenId),
@@ -138,29 +122,12 @@ export function useIsTokenListed(collectionAddress: string, tokenId: string) {
 		() => ["isTokenListed", collectionAddress, tokenId],
 		[collectionAddress, tokenId],
 	);
-	const queryClient = useQueryClient();
+	const subscriptionClause = useMemo(
+		() => subscribeToTokenUpdatesClause(collectionAddress, tokenId),
+		[collectionAddress, tokenId],
+	);
 
-	useEffect(() => {
-		if (!initialized && subscriptionRef.current === null) return;
-
-		const wrappedCallback = () => {
-			queryClient.invalidateQueries({
-				queryKey,
-			});
-		};
-
-		subscriptionRef.current = sdk.client.onEntityUpdated(
-			subscribeToTokenUpdatesClause(collectionAddress, tokenId),
-			wrappedCallback,
-		);
-
-		return () => {
-			if (subscriptionRef.current !== null) {
-				subscriptionRef.current.free();
-				subscriptionRef.current = null;
-			}
-		};
-	}, [initialized, q, sdk, queryClient, queryKey, collectionAddress, tokenId]);
+	useEntitySubscription(subscriptionClause, queryKey);
 
 	return useQuery({
 		queryKey,

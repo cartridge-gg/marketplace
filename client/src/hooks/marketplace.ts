@@ -202,21 +202,23 @@ export function useMarketplaceActions() {
 		tokenId: BigNumberish,
 		quantity: BigNumberish,
 		royalties: boolean,
+		currency: string,
+		price: BigNumberish,
 	) => {
 		try {
 			return await ctx.provider.execute(
 				snAccount,
 				[
 					{
-						contractAddress: collection,
+						contractAddress: currency,
 						entrypoint: "approve",
 						calldata: CallData.compile({
-							operator: getContractByName(
+							spender: getContractByName(
 								config.manifest,
 								NAMESPACE,
 								"Marketplace",
 							).address,
-							approved: true,
+							amount: cairo.uint256(price),
 						}),
 					},
 					buildExecuteCalldata(

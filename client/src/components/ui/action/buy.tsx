@@ -52,6 +52,8 @@ function Buy({ isListed, listing, account }: BuyProps) {
 				listing.tokenId,
 				listing.quantity,
 				true,
+				listing.currency,
+				listing.price,
 			);
 		} catch (error) {
 			console.error("Failed to buy token", error);
