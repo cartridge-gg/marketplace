@@ -5,3 +5,4 @@ export * from "./bindings";
 export * from "./modules";
 export * from "./classes";
 export * from "./queries";
+export * from "./hooks";

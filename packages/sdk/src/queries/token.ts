@@ -2,7 +2,6 @@ import {
 	AndComposeClause,
 	KeysClause,
 	MemberClause,
-	OrComposeClause,
 	ToriiQueryBuilder,
 } from "@dojoengine/sdk";
 import { ModelsMapping, OrderCategory, OrderStatus } from "../bindings";
