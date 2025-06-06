@@ -39,13 +39,13 @@ jobs:
       - name: Prepare NPM Package
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: |
-          npm pkg set name=@cartridge/marketplace
-          npm pkg set version=${{ github.event.client_payload.version }}
-          npm pkg set files='["*.js", "*.wasm", "*.d.ts"]'
-          npm pkg set main=marketplace.js
-          npm pkg set types=marketplace.d.ts
-          npm pkg set repository=https://github.com/cartridge-gg/marketplace
-          npm pkg set license=MIT
+          pnpm pkg set name=@cartridge/marketplace
+          pnpm pkg set version=${{ github.event.client_payload.version }}
+          pnpm pkg set files='["*.js", "*.wasm", "*.d.ts"]'
+          pnpm pkg set main=marketplace.js
+          pnpm pkg set types=marketplace.d.ts
+          pnpm pkg set repository=https://github.com/cartridge-gg/marketplace
+          pnpm pkg set license=MIT
 
       - name: Publish to NPM
         if: ${{ !github.event.client_payload.dry_run }}
