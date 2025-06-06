@@ -50,7 +50,7 @@ jobs:
       - name: Publish to NPM
         if: ${{ !github.event.client_payload.dry_run }}
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: pnpm publish --access public --tag ${{ github.event.client_payload.tag }}
+        run: pnpm publish --no-git-checks --access public --tag ${{ github.event.client_payload.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
