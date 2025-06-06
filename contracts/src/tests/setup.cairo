@@ -97,7 +97,7 @@ pub mod setup {
         [
             ContractDefTrait::new(@"MARKETPLACE", @"Marketplace")
                 .with_writer_of([dojo::utils::bytearray_hash(@"MARKETPLACE")].span())
-                .with_init_calldata(array![0x1F4, OWNER().into(), RECEIVER().into()].span()),
+                .with_init_calldata(array![0x1, 0x1F4, OWNER().into(), RECEIVER().into()].span()),
         ]
             .span()
     }

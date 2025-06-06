@@ -1,5 +1,5 @@
 rpc = "https://api.cartridge.gg/x/starknet/mainnet"
-world_address = "0x0721a3b839f2f1011da15799710e74eae77d9ff0292cfd13b3e6f1357bccccf2"
+world_address = "0x046d17ca0b6856d4f1cc635b753b296d57b0a8382c492a9f55686ee6b314ba0e"
 
 [indexing]
 events_chunk_size = 1024

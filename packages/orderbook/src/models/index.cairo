@@ -15,6 +15,7 @@ pub struct Book {
     pub id: u32,
     pub version: u8,
     pub paused: bool,
+    pub royalties: bool,
     pub counter: u32,
     pub fee_num: u32,
     pub fee_receiver: felt252,

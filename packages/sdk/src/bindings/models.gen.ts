@@ -18,6 +18,7 @@ export interface Book {
 	id: BigNumberish;
 	version: BigNumberish;
 	paused: boolean;
+	royalties: boolean;
 	counter: BigNumberish;
 	fee_num: BigNumberish;
 	fee_receiver: BigNumberish;
@@ -27,6 +28,7 @@ export interface Book {
 export interface BookValue {
 	version: BigNumberish;
 	paused: boolean;
+	royalties: boolean;
 	counter: BigNumberish;
 	fee_num: BigNumberish;
 	fee_receiver: BigNumberish;
@@ -149,6 +151,7 @@ export const schema: SchemaType = {
 			id: 0,
 			version: 0,
 			paused: false,
+			royalties: false,
 			counter: 0,
 			fee_num: 0,
 			fee_receiver: 0,
@@ -156,6 +159,7 @@ export const schema: SchemaType = {
 		BookValue: {
 			version: 0,
 			paused: false,
+			royalties: false,
 			counter: 0,
 			fee_num: 0,
 			fee_receiver: 0,
