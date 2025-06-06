@@ -27,8 +27,8 @@ default = "MARKETPLACE"
 [env]
 rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
 account_address = "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b"
-# world_address = "0x0721a3b839f2f1011da15799710e74eae77d9ff0292cfd13b3e6f1357bccccf2"
-# world_block = 1460131
+world_address = "0x046d17ca0b6856d4f1cc635b753b296d57b0a8382c492a9f55686ee6b314ba0e"
+world_block = 1464035
 ipfs_config.url = "https://ipfs.infura.io:5001"
 ipfs_config.username = "2EBrzr7ZASQZKH32sl2xWauXPSA"
 ipfs_config.password = "12290b883db9138a8ae3363b6739d220"
