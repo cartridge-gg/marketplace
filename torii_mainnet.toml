@@ -7,7 +7,7 @@ blocks_chunk_size = 1024
 pending = true
 polling_interval = 500
 max_concurrent_tasks = 100
-world_block = 1460131
+world_block = 1464035
 contracts = []
 
 [sql]
