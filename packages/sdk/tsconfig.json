@@ -15,7 +15,7 @@
     "esModuleInterop": true,
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.json", "../../contracts/manifest_*.json"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.json", "../../manifest_*.json"],
   "skipLibCheck": true,
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
