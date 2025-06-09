@@ -56,6 +56,7 @@ export function useMarketplaceActions() {
 		revokeRole,
 		setFee,
 		buildListCalldata,
+		buildOfferCalldata,
 		buildExecuteCalldata,
 		getValidity,
 	} = ctx.provider.marketplace;
@@ -70,40 +71,48 @@ export function useMarketplaceActions() {
 		expiration: BigNumberish,
 	) => {
 		try {
-			return await ctx.provider.execute(
-				snAccount,
-				[
-					{
-						contractAddress: currency,
-						entrypoint: "approve",
-						calldata: CallData.compile({
-							spender: getContractByName(
-								config.manifest,
-								NAMESPACE,
-								"Marketplace",
-							).address,
-							amount: cairo.uint256(price),
-						}),
-					},
-					{
-						contractName: "Marketplace",
-						entrypoint: "offer",
-						calldata: [
-							collection,
-							tokenId,
-							quantity,
-							price,
-							currency,
-							expiration,
-						],
-					},
-				],
-				"MARKETPLACE",
+			const calls = buildOfferCalls(
+				collection,
+				tokenId,
+				quantity,
+				price,
+				currency,
+				expiration,
 			);
+			return await ctx.provider.execute(snAccount, calls, "MARKETPLACE");
 		} catch (error) {
 			console.error(error);
 			throw error;
 		}
+	};
+
+	const buildOfferCalls = (
+		collection: string,
+		tokenId: BigNumberish,
+		quantity: BigNumberish,
+		price: BigNumberish,
+		currency: string,
+		expiration: BigNumberish,
+	) => {
+		return [
+			{
+				contractAddress: currency,
+				entrypoint: "approve",
+				calldata: CallData.compile({
+					spender: getContractByName(config.manifest, NAMESPACE, "Marketplace")
+						.address,
+					amount: cairo.uint256(price),
+				}),
+			},
+			buildOfferCalldata(
+				collection,
+				tokenId,
+				quantity,
+				price,
+				currency,
+				expiration,
+			),
+		];
 	};
 
 	// Overidding list action with set_approval_for_all to marketplace contract first
@@ -117,37 +126,49 @@ export function useMarketplaceActions() {
 		expiration: BigNumberish,
 	) => {
 		try {
-			return await ctx.provider.execute(
-				snAccount,
-				[
-					{
-						contractAddress: collection,
-						entrypoint: "set_approval_for_all",
-						calldata: CallData.compile({
-							operator: getContractByName(
-								config.manifest,
-								NAMESPACE,
-								"Marketplace",
-							).address,
-							approved: true,
-						}),
-					},
-					buildListCalldata(
-						collection,
-						tokenId,
-						quantity,
-						price,
-						currency,
-						expiration,
-						true, // royalties
-					),
-				],
-				"MARKETPLACE",
+			const calls = buildListCalls(
+				collection,
+				tokenId,
+				quantity,
+				price,
+				currency,
+				expiration,
 			);
+			return await ctx.provider.execute(snAccount, calls, "MARKETPLACE");
 		} catch (error) {
 			console.error(error);
 			throw error;
 		}
+	};
+
+	const buildListCalls = (
+		collection: string,
+		tokenId: BigNumberish,
+		quantity: BigNumberish,
+		price: BigNumberish,
+		currency: string,
+		expiration: BigNumberish,
+	) => {
+		return [
+			{
+				contractAddress: collection,
+				entrypoint: "set_approval_for_all",
+				calldata: CallData.compile({
+					operator: getContractByName(config.manifest, NAMESPACE, "Marketplace")
+						.address,
+					approved: true,
+				}),
+			},
+			buildListCalldata(
+				collection,
+				tokenId,
+				quantity,
+				price,
+				currency,
+				expiration,
+				true, // royalties
+			),
+		];
 	};
 
 	// Overidding list action with set_approval_for_all to marketplace contract first
@@ -162,36 +183,50 @@ export function useMarketplaceActions() {
 		price: BigNumberish,
 	) => {
 		try {
-			return await ctx.provider.execute(
-				snAccount,
-				[
-					{
-						contractAddress: currency,
-						entrypoint: "approve",
-						calldata: CallData.compile({
-							spender: getContractByName(
-								config.manifest,
-								NAMESPACE,
-								"Marketplace",
-							).address,
-							amount: cairo.uint256(price),
-						}),
-					},
-					buildExecuteCalldata(
-						orderId,
-						collection,
-						tokenId,
-						tokenId,
-						quantity,
-						royalties,
-					),
-				],
-				"MARKETPLACE",
+			const calls = buildExecuteOfferCalls(
+				orderId,
+				collection,
+				tokenId,
+				quantity,
+				royalties,
+				currency,
+				price,
 			);
+			return await ctx.provider.execute(snAccount, calls, "MARKETPLACE");
 		} catch (error) {
 			console.error(error);
 			throw error;
 		}
+	};
+
+	const buildExecuteOfferCalls = (
+		orderId: BigNumberish,
+		collection: string,
+		tokenId: BigNumberish,
+		quantity: BigNumberish,
+		royalties: boolean,
+		currency: string,
+		price: BigNumberish,
+	) => {
+		return [
+			{
+				contractAddress: currency,
+				entrypoint: "approve",
+				calldata: CallData.compile({
+					spender: getContractByName(config.manifest, NAMESPACE, "Marketplace")
+						.address,
+					amount: cairo.uint256(price),
+				}),
+			},
+			buildExecuteCalldata(
+				orderId,
+				collection,
+				tokenId,
+				tokenId,
+				quantity,
+				royalties,
+			),
+		];
 	};
 
 	// Overidding list action with set_approval_for_all to marketplace contract first
@@ -206,36 +241,50 @@ export function useMarketplaceActions() {
 		price: BigNumberish,
 	) => {
 		try {
-			return await ctx.provider.execute(
-				snAccount,
-				[
-					{
-						contractAddress: currency,
-						entrypoint: "approve",
-						calldata: CallData.compile({
-							spender: getContractByName(
-								config.manifest,
-								NAMESPACE,
-								"Marketplace",
-							).address,
-							amount: cairo.uint256(price),
-						}),
-					},
-					buildExecuteCalldata(
-						orderId,
-						collection,
-						tokenId,
-						tokenId,
-						quantity,
-						royalties,
-					),
-				],
-				"MARKETPLACE",
+			const calls = buildExecuteListingCalls(
+				orderId,
+				collection,
+				tokenId,
+				quantity,
+				royalties,
+				currency,
+				price,
 			);
+			return await ctx.provider.execute(snAccount, calls, "MARKETPLACE");
 		} catch (error) {
 			console.error(error);
 			throw error;
 		}
+	};
+
+	const buildExecuteListingCalls = (
+		orderId: BigNumberish,
+		collection: string,
+		tokenId: BigNumberish,
+		quantity: BigNumberish,
+		royalties: boolean,
+		currency: string,
+		price: BigNumberish,
+	) => {
+		return [
+			{
+				contractAddress: currency,
+				entrypoint: "approve",
+				calldata: CallData.compile({
+					spender: getContractByName(config.manifest, NAMESPACE, "Marketplace")
+						.address,
+					amount: cairo.uint256(price),
+				}),
+			},
+			buildExecuteCalldata(
+				orderId,
+				collection,
+				tokenId,
+				tokenId,
+				quantity,
+				royalties,
+			),
+		];
 	};
 
 	return {
@@ -251,6 +300,10 @@ export function useMarketplaceActions() {
 		revokeRole,
 		setFee,
 		getValidity,
+		buildOfferCalls,
+		buildListCalls,
+		buildExecuteOfferCalls,
+		buildExecuteListingCalls,
 	};
 }
 
