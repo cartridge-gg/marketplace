@@ -1,0 +1,30 @@
+{
+  "name": "@cartridge/metadata-processor",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+  "start": "bun src/index.ts",
+    "build": "tsc -b",
+    "type:check": "tsc -b",
+    "test:env": "tsx -e \"import('./src/env.js').then(m => console.log('✅ Environment loaded successfully'))\""
+  },
+  "dependencies": {
+    "@cartridge/arcade": "0.0.0",
+    "@cartridge/marketplace-sdk": "workspace:*",
+    "@dojoengine/core": "catalog:",
+    "@dojoengine/sdk": "catalog:",
+    "@dojoengine/torii-wasm": "catalog:",
+    "dotenv": "^16.4.7",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0",
+    "starknet": "catalog:",
+    "zod": "^3.25.56"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.4",
+    "typescript": "catalog:"
+  }
+}
