@@ -65,35 +65,29 @@ export function createTokenFetcherState(
  * Fetches all editions from the registry
  */
 export async function fetchEditions(state: TokenFetcherState): Promise<void> {
-	return new Promise((resolve, reject) => {
-		function handleRegistryModels(models: RegistryModel[]): void {
-			try {
-				// Filter and process edition models
-				const editions = filterEditionModels(models, state.ignoreProjects);
+	function handleRegistryModels(models: RegistryModel[]): void {
+		try {
+			// Filter and process edition models
+			const editions = filterEditionModels(models, state.ignoreProjects);
 
-				// Store valid editions
-				editions.forEach((edition) => {
-					if (edition.config) {
-						state.editions.set(edition.config.project, edition);
-					}
-				});
+			// Store valid editions
+			for (const edition of editions) {
+				if (!edition.config) {
+					continue;
+				}
 
-				resolve();
-			} catch (error) {
-				reject(error);
+				const cfg = JSON.parse(edition.config.toString() as string);
+				state.editions.set(cfg.project, edition);
 			}
-		}
+		} catch (error) {}
+	}
 
-		fetchRegistryModels(
-			state.registryState,
-			{
-				access: false,
-				game: true,
-				edition: true,
-			},
-			handleRegistryModels,
-		).catch(reject);
+	const res = await fetchRegistryModels(state.registryState, {
+		access: false,
+		game: true,
+		edition: true,
 	});
+	handleRegistryModels(res);
 }
 
 /**
@@ -103,22 +97,19 @@ export async function createToriiClients(
 	state: TokenFetcherState,
 ): Promise<void> {
 	async function createClientForEdition(edition: EditionModel): Promise<void> {
+		const cfg = JSON.parse(edition.config.toString());
+		const project = cfg.project;
 		try {
-			const url = `https://api.cartridge.gg/x/${edition.config.project}/torii`;
+			const url = `https://api.cartridge.gg/x/${project}/torii`;
 			const client = await new ToriiClient({
 				toriiUrl: url,
 				relayUrl: "",
 				worldAddress: env.MARKETPLACE_ADDRESS,
 			});
-			state.toriiClients.set(edition.config.project, client);
-			state.logger.info(
-				`Created Torii client for project: ${edition.config.project}`,
-			);
+			state.toriiClients.set(project, client);
+			state.logger.info(`Created Torii client for project: ${project}`);
 		} catch (error) {
-			state.logger.error(
-				error,
-				`Failed to create Torii client for ${edition.config.project}`,
-			);
+			state.logger.error(error, `Failed to create Torii client for ${project}`);
 		}
 	}
 

@@ -235,4 +235,3 @@ async function main() {
 
 // Run the worker
 main().catch(console.error);
-
