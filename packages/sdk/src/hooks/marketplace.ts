@@ -1,14 +1,14 @@
 import { useContext, useState, useEffect } from "react";
 import { MarketplaceContext } from "../contexts/marketplace";
 import type { Account, AccountInterface, BigNumberish } from "starknet";
-import { CallData } from "starknet";
-import { useDojoSDK } from "@dojoengine/sdk/react";
+import { CallData, constants } from "starknet";
 import { getContractByName } from "@dojoengine/core";
 import { NAMESPACE } from "../constants";
 import type { OrderModel } from "../modules/marketplace";
 import { cairo } from "starknet";
+import { useConfig } from ".";
 
-function useMarketplace() {
+export function useMarketplace() {
 	const ctx = useContext(MarketplaceContext);
 	if (ctx === null) {
 		throw new Error(
@@ -44,7 +44,7 @@ export function useOrderValidity(order: OrderModel) {
 }
 
 export function useMarketplaceActions() {
-	const { config } = useDojoSDK();
+	const config = useConfig(constants.StarknetChainId.SN_MAIN);
 	const ctx = useMarketplace();
 
 	const {
