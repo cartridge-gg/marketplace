@@ -1,8 +1,8 @@
-import type {
-	AccessModel,
-	EditionModel,
-	GameModel,
-	RegistryModel,
+import {
+	type AccessModel,
+	type EditionModel,
+	type GameModel,
+	type RegistryModel,
 } from "@cartridge/arcade";
 import {
 	type SchemaType as ISchemaType,
@@ -15,18 +15,26 @@ import {
 import { type constants, shortString } from "starknet";
 import { type Logger, createLogger } from "../utils/logger.ts";
 
+// TODO: use imports from Arcade, when rewriting with torii-wasm is done
+export const NAMESPACE = "ARCADE";
+export enum ModelsMapping {
+	Access = "Access",
+	Game = "Game",
+	Edition = "Edition",
+}
+
 /**
  * Arcade schema type definition
  */
 export interface ArcadeSchemaType extends ISchemaType {
 	ARCADE: {
-		AccessModel: {
+		Access: {
 			[field: string]: any;
 		};
-		GameModel: {
+		Game: {
 			[field: string]: any;
 		};
-		EditionModel: {
+		Edition: {
 			[field: string]: any;
 		};
 	};
@@ -125,18 +133,18 @@ export function buildRegistryQuery(
 	const modelNames: string[] = [];
 
 	if (options.access) {
-		modelNames.push("AccessModel");
+		modelNames.push(ModelsMapping.Access);
 	}
 	if (options.game) {
-		modelNames.push("GameModel");
+		modelNames.push(ModelsMapping.Game);
 	}
 	if (options.edition) {
-		modelNames.push("EditionModel");
+		modelNames.push(ModelsMapping.Edition);
 	}
 
 	// Build a query that fetches all entities for these models
 	const modelKeys = modelNames.map(
-		(model) => `ARCADE-${model}` as `${string}-${string}`,
+		(model) => `${NAMESPACE}-${model}` as `${string}-${string}`,
 	);
 	const clause = KeysClause(modelKeys, [undefined], "VariableLen").build();
 
@@ -160,19 +168,16 @@ export function parseRegistryModels(
 		const arcadeModels = entity.models.ARCADE;
 
 		try {
-			// Check for each model type in the ARCADE namespace
-			if (arcadeModels.EditionModel) {
-				// Parse as EditionModel - the arcade package should handle the parsing
-				// when we pass the raw data to it
-				models.push(arcadeModels.EditionModel as EditionModel);
+			if (arcadeModels.Edition) {
+				models.push(arcadeModels.Edition as EditionModel);
 			}
 
-			if (arcadeModels.GameModel) {
-				models.push(arcadeModels.GameModel as GameModel);
+			if (arcadeModels.Game) {
+				models.push(arcadeModels.Game as GameModel);
 			}
 
-			if (arcadeModels.AccessModel) {
-				models.push(arcadeModels.AccessModel as AccessModel);
+			if (arcadeModels.Access) {
+				models.push(arcadeModels.Access as AccessModel);
 			}
 		} catch (error) {
 			console.error(
@@ -191,8 +196,7 @@ export function parseRegistryModels(
 export async function fetchRegistryModels(
 	state: RegistryState,
 	options: FetchOptions,
-	callback: (models: RegistryModel[]) => void,
-): Promise<void> {
+): Promise<RegistryModel[]> {
 	if (!state.sdk) {
 		throw new Error("Registry SDK not initialized. Call initRegistry first.");
 	}
@@ -202,19 +206,14 @@ export async function fetchRegistryModels(
 
 		state.logger.info("Fetching registry models...");
 
-		// Fetch entities using the SDK
 		const result = await state.sdk.getEntities({ query });
-
-		// Get items from the result
 		const items = result.getItems();
-
-		// Parse the entities into models
 		const models = parseRegistryModels(items);
 
 		state.logger.info(`Fetched ${models.length} registry models`);
 
 		// Call the callback with the parsed models
-		callback(models);
+		return models;
 	} catch (error) {
 		state.logger.error(error, "Failed to fetch registry models");
 		throw error;
@@ -225,7 +224,7 @@ export async function fetchRegistryModels(
  * Helper to check if a model is an EditionModel
  */
 export function isEditionModel(model: any): model is EditionModel {
-	return model && "config" in model && "exists" in model;
+	return model && "config" in model && "world_address" in model;
 }
 
 /**
@@ -237,10 +236,5 @@ export function filterEditionModels(
 ): EditionModel[] {
 	return models
 		.filter(isEditionModel)
-		.filter(
-			(edition) =>
-				edition.exists() &&
-				edition.config &&
-				!ignoreProjects.includes(edition.config.project),
-		);
+		.filter((edition) => !ignoreProjects.includes(edition.config.project));
 }
