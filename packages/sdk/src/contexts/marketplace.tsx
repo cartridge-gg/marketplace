@@ -57,7 +57,7 @@ export function hydrateModel<T extends MarketplaceModel>(
 /**
  * Interface defining the shape of the Marketplace context.
  */
-interface MarketplaceContextType {
+export type MarketplaceContextType = {
 	/** The Marketplace client instance */
 	chainId: string;
 	provider: ExternalProvider;
@@ -67,7 +67,7 @@ interface MarketplaceContextType {
 	listings: ListingEvent[];
 	offers: OfferEvent[];
 	sales: SaleEvent[];
-}
+};
 
 /**
  * React context for sharing Marketplace-related data throughout the application.
