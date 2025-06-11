@@ -12,8 +12,11 @@ import {
 	ToriiQueryBuilder,
 	init as initSDK,
 } from "@dojoengine/sdk/node";
+import { ToriiClient } from "@dojoengine/torii-wasm/node";
 import { type constants, shortString } from "starknet";
 import { type Logger, createLogger } from "../utils/logger.ts";
+import { TokenFetcherState } from "./token-fetcher.ts";
+import { env } from "../env.ts";
 
 // TODO: use imports from Arcade, when rewriting with torii-wasm is done
 export const NAMESPACE = "ARCADE";
@@ -41,16 +44,16 @@ export interface ArcadeSchemaType extends ISchemaType {
 }
 
 /**
- * Registry service state
+ * Arcade registry service state
  */
-export type RegistryState = {
+export type ArcadeRegistryState = {
 	sdk: SDK<ArcadeSchemaType> | null;
 	logger: Logger;
 	chainId: constants.StarknetChainId;
 };
 
 /**
- * Registry fetch options
+ * Arcade registry fetch options
  */
 export type FetchOptions = {
 	access?: boolean;
@@ -75,14 +78,14 @@ const TORII_CONFIG = {
 } as const;
 
 /**
- * Creates registry state
+ * Creates arcade registry state
  */
-export function createRegistryState(
+export function createArcadeRegistryState(
 	chainId: constants.StarknetChainId,
-): RegistryState {
+): ArcadeRegistryState {
 	return {
 		sdk: null,
-		logger: createLogger("Registry"),
+		logger: createLogger("ArcadeRegistry"),
 		chainId,
 	};
 }
@@ -96,13 +99,13 @@ export function getToriiConfig(chainId: constants.StarknetChainId) {
 }
 
 /**
- * Initializes the registry SDK
+ * Initializes the arcade registry SDK
  */
-export async function initRegistry(state: RegistryState): Promise<void> {
+export async function initArcadeRegistry(state: ArcadeRegistryState): Promise<void> {
 	try {
 		const config = getToriiConfig(state.chainId);
 
-		state.logger.info("Initializing Registry SDK...");
+		state.logger.info("Initializing Arcade Registry SDK...");
 
 		state.sdk = await initSDK({
 			client: {
@@ -117,17 +120,75 @@ export async function initRegistry(state: RegistryState): Promise<void> {
 			},
 		});
 
-		state.logger.info("Registry SDK initialized successfully");
+		state.logger.info("Arcade Registry SDK initialized successfully");
 	} catch (error) {
-		state.logger.error(error, "Failed to initialize Registry SDK");
+		state.logger.error(error, "Failed to initialize Arcade Registry SDK");
 		throw error;
 	}
 }
 
 /**
- * Builds query for fetching registry models
+ * Fetches all editions from the arcade registry
  */
-export function buildRegistryQuery(
+export async function fetchEditions(state: TokenFetcherState): Promise<void> {
+	function handleArcadeRegistryModels(models: RegistryModel[]): void {
+		try {
+			// Filter and process edition models
+			const editions = filterEditionModels(models, state.ignoreProjects);
+
+			// Store valid editions
+			for (const edition of editions) {
+				if (!edition.config) {
+					continue;
+				}
+
+				const cfg = JSON.parse(edition.config.toString() as string);
+				state.editions.set(cfg.project, edition);
+			}
+		} catch (error) {}
+	}
+
+	const res = await fetchArcadeRegistryModels(state.registryState, {
+		access: false,
+		game: true,
+		edition: true,
+	});
+	handleArcadeRegistryModels(res);
+}
+
+/**
+ * Creates Torii clients for all editions
+ */
+export async function createToriiClients(
+	state: TokenFetcherState,
+): Promise<void> {
+	async function createClientForEdition(edition: EditionModel): Promise<void> {
+		const cfg = JSON.parse(edition.config.toString());
+		const project = cfg.project;
+		try {
+			const url = `https://api.cartridge.gg/x/${project}/torii`;
+			const client = await new ToriiClient({
+				toriiUrl: url,
+				relayUrl: "",
+				worldAddress: env.MARKETPLACE_ADDRESS,
+			});
+			state.toriiClients.set(project, client);
+			state.logger.info(`Created Torii client for project: ${project}`);
+		} catch (error) {
+			state.logger.error(error, `Failed to create Torii client for ${project}`);
+		}
+	}
+
+	const clientPromises = Array.from(state.editions.values()).map(
+		createClientForEdition,
+	);
+	await Promise.all(clientPromises);
+}
+
+/**
+ * Builds query for fetching arcade registry models
+ */
+export function buildArcadeRegistryQuery(
 	options: FetchOptions,
 ): ToriiQueryBuilder<ArcadeSchemaType> {
 	const modelNames: string[] = [];
@@ -155,9 +216,9 @@ export function buildRegistryQuery(
 }
 
 /**
- * Parses entity data into registry models
+ * Parses entity data into arcade registry models
  */
-export function parseRegistryModels(
+export function parseArcadeRegistryModels(
 	entities: ParsedEntity<ArcadeSchemaType>[],
 ): RegistryModel[] {
 	const models: RegistryModel[] = [];
@@ -191,31 +252,31 @@ export function parseRegistryModels(
 }
 
 /**
- * Fetches registry models
+ * Fetches arcade registry models
  */
-export async function fetchRegistryModels(
-	state: RegistryState,
+export async function fetchArcadeRegistryModels(
+	state: ArcadeRegistryState,
 	options: FetchOptions,
 ): Promise<RegistryModel[]> {
 	if (!state.sdk) {
-		throw new Error("Registry SDK not initialized. Call initRegistry first.");
+		throw new Error("Arcade Registry SDK not initialized. Call initArcadeRegistry first.");
 	}
 
 	try {
-		const query = buildRegistryQuery(options);
+		const query = buildArcadeRegistryQuery(options);
 
-		state.logger.info("Fetching registry models...");
+		state.logger.info("Fetching arcade registry models...");
 
 		const result = await state.sdk.getEntities({ query });
 		const items = result.getItems();
-		const models = parseRegistryModels(items);
+		const models = parseArcadeRegistryModels(items);
 
-		state.logger.info(`Fetched ${models.length} registry models`);
+		state.logger.info(`Fetched ${models.length} arcade registry models`);
 
 		// Call the callback with the parsed models
 		return models;
 	} catch (error) {
-		state.logger.error(error, "Failed to fetch registry models");
+		state.logger.error(error, "Failed to fetch arcade registry models");
 		throw error;
 	}
 }
