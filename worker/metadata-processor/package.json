@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "bun --watch src/index.ts",
-  "start": "bun src/index.ts",
-    "build": "tsc -b",
-    "type:check": "tsc -b",
-    "test:env": "tsx -e \"import('./src/env.js').then(m => console.log('✅ Environment loaded successfully'))\""
+    "start": "bun src/index.ts",
+    "build": "tsc --noEmit",
+    "type:check": "tsc --noEmit",
+    "test:env": "bun -e \"import('./src/env.ts').then(m => console.log('✅ Environment loaded successfully'))\""
   },
   "dependencies": {
     "@cartridge/arcade": "0.0.0",
