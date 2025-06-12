@@ -60,6 +60,12 @@ const envSchema = z.object({
 		.min(1)
 		.describe("Address of the marketplace contract"),
 
+	MARKETPLACE_TORII_URL: z
+		.string()
+		.url()
+		.default("https://api.cartridge.gg/x/marketplace-mainnet/torii")
+		.describe("Marketplace Torii"),
+
 	// Arcade contract address
 	ARCADE_ADDRESS: z.string().min(1).describe("Address of the arcade contract"),
 
