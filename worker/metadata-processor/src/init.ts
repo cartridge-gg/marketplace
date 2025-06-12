@@ -1,4 +1,4 @@
-import { Account, RpcProvider } from "starknet";
+import { Account, RpcProvider, shortString } from "starknet";
 import { env, chainId } from "./env.ts";
 import {
 	type TokenFetcherState,
@@ -14,6 +14,9 @@ import {
 	createTokenSubscriptionState,
 } from "./services/token-subscription.ts";
 import { createLogger, type Logger } from "./utils/logger.ts";
+import { init } from "@dojoengine/sdk/node";
+import { SigningKey } from "@dojoengine/torii-wasm/node";
+import type { SchemaType } from "@cartridge/marketplace-sdk";
 
 /**
  * Worker state type
@@ -42,6 +45,21 @@ export async function createWorkerState(): Promise<WorkerState> {
 		env.ACCOUNT_PRIVATE_KEY,
 	);
 
+	const marketplaceClient = await init<SchemaType>({
+		client: {
+			toriiUrl: env.MARKETPLACE_TORII_URL,
+			worldAddress: env.MARKETPLACE_ADDRESS,
+		},
+		domain: {
+			name: "Marketplace",
+			version: "1.0",
+			chainId: shortString.encodeShortString(env.CHAIN_ID),
+			revision: "1",
+		},
+		identity: env.ACCOUNT_ADDRESS,
+		signer: new SigningKey(env.ACCOUNT_PRIVATE_KEY),
+	});
+
 	// Initialize token fetcher
 	const tokenFetcherState = await initializeTokenFetcher({ provider, chainId });
 
@@ -50,6 +68,7 @@ export async function createWorkerState(): Promise<WorkerState> {
 		provider,
 		account,
 		marketplaceAddress: env.MARKETPLACE_ADDRESS,
+		client: marketplaceClient,
 		batchSize: env.BATCH_SIZE,
 	});
 
