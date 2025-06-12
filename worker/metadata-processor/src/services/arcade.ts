@@ -171,7 +171,6 @@ export async function createToriiClients(
 			const url = `https://api.cartridge.gg/x/${project}/torii`;
 			const client = await new ToriiClient({
 				toriiUrl: url,
-				relayUrl: "",
 				worldAddress: env.MARKETPLACE_ADDRESS,
 			});
 			state.toriiClients.set(project, client);
