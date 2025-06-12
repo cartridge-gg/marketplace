@@ -1,6 +1,7 @@
 import { env } from "./env.ts";
 import {
 	fetchAllTokens,
+	fetchAllTokenBatches,
 } from "./services/token-fetcher.ts";
 import {
 	processTokens,
@@ -13,12 +14,51 @@ import {
 import type { WorkerState } from "./init.ts";
 
 /**
- * Processes all tokens from all Torii instances
+ * Processes all tokens from all Torii instances using batches
  */
 export async function processAllTokensFromFetcher(
 	state: WorkerState,
 ): Promise<void> {
-	state.logger.info("Starting token processing...");
+	const batchSize = env.TOKEN_FETCH_BATCH_SIZE;
+	state.logger.info(`Starting batch token processing (batch size: ${batchSize})...`);
+
+	let totalProcessed = 0;
+	let batchCount = 0;
+
+	try {
+		for await (const { projectId, tokens } of fetchAllTokenBatches(state.tokenFetcherState, batchSize)) {
+			batchCount++;
+			const startTime = Date.now();
+			
+			state.logger.info(
+				`Processing batch ${batchCount} from project ${projectId} with ${tokens.length} tokens...`,
+			);
+			
+			await processTokens(state.metadataProcessorState, tokens);
+			totalProcessed += tokens.length;
+			
+			const processingTime = Date.now() - startTime;
+			state.logger.info(
+				`Batch ${batchCount} processed in ${processingTime}ms (${Math.round(tokens.length / (processingTime / 1000))} tokens/sec)`,
+			);
+		}
+
+		state.logger.info(
+			`Processing complete. Processed ${totalProcessed} tokens in ${batchCount} batches`,
+		);
+	} catch (error) {
+		state.logger.error(error, "Error during batch token processing");
+		// Don't throw - we want the worker to continue even if processing fails
+	}
+}
+
+/**
+ * Processes all tokens from all Torii instances (legacy mode - loads all into memory)
+ */
+export async function processAllTokensLegacy(
+	state: WorkerState,
+): Promise<void> {
+	state.logger.info("Starting token processing (legacy mode)...");
 
 	try {
 		const tokens = await fetchAllTokens(state.tokenFetcherState);

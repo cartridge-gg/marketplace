@@ -64,16 +64,9 @@ export function parseTokenFromUpdate(
 		// This needs to be implemented based on the actual update structure
 		// Extract collection address, token ID, and owner from the update
 
-		// Placeholder implementation
-		if (update.entity && update.entity.models) {
-			// Parse the token data from the entity models
-			return {
-				collection: "", // Extract from update
-				tokenId: "", // Extract from update
-				owner: "", // Extract from update
-				projectId,
-			};
-		}
+		// TODO: Implement proper parsing once we understand the update structure
+		// The Token type from ToriiToken has: contract_address, token_id, name, symbol, decimals, metadata
+		// For now, return null until we can properly parse the update
 
 		return null;
 	} catch (error) {

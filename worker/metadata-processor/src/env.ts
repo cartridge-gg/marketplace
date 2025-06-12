@@ -76,6 +76,12 @@ const envSchema = z.object({
 		.pipe(z.number().positive())
 		.default("10")
 		.describe("Number of tokens to process in parallel"),
+	TOKEN_FETCH_BATCH_SIZE: z
+		.string()
+		.transform((val) => Number.parseInt(val, 10))
+		.pipe(z.number().positive())
+		.default("5000")
+		.describe("Number of tokens to fetch per batch from Torii"),
 	RETRY_ATTEMPTS: z
 		.string()
 		.transform((val) => Number.parseInt(val, 10))
