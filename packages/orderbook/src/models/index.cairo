@@ -44,7 +44,7 @@ pub struct Order {
 #[dojo::model]
 pub struct MetadataAttribute {
     #[key]
-    pub identity: felt252,
+    pub identity: starknet::ContractAddress,
     #[key]
     pub collection: felt252,
     #[key]
