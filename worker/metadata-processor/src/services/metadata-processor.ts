@@ -62,11 +62,11 @@ export type MetadataProcessorOptions = {
 const MetadataAttributedataTyped = [
 	{
 		name: "identity",
-		type: "felt",
+		type: "ContractAddress",
 	},
 	{
 		name: "collection",
-		type: "felt",
+		type: "ContractAddress",
 	},
 	{
 		name: "token_id",
@@ -101,17 +101,6 @@ export function createMetadataProcessorState(
 		batchSize: options.batchSize || 10,
 		client: options.client,
 	};
-}
-
-/**
- * Creates batches from an array
- */
-export function createBatches<T>(items: T[], batchSize: number): T[][] {
-	const batches: T[][] = [];
-	for (let i = 0; i < items.length; i += batchSize) {
-		batches.push(items.slice(i, i + batchSize));
-	}
-	return batches;
 }
 
 /**
@@ -169,11 +158,11 @@ export function createAttributeMessage(
 	traitType: string,
 	value: string,
 ): MetadataMessage {
-	const u256 = cairo.uint256(token.token_id);
+	const tokenIdU256 = cairo.uint256(token.token_id);
 	return {
 		identity: env.ACCOUNT_ADDRESS,
 		collection: token.contract_address,
-		token_id: { low: u256.low, high: u256.high },
+		token_id: { low: tokenIdU256.low, high: tokenIdU256.high },
 		index: index,
 		trait_type: traitType,
 		value: value,
@@ -299,10 +288,8 @@ export async function processTokens(
 ): Promise<void> {
 	state.logger.info(`Processing metadata for ${tokens.length} tokens...`);
 
-	const batches = createBatches(tokens, state.batchSize);
-
-	for (const batch of batches) {
-		await processBatch(state, batch);
+	for (const token of tokens) {
+		await processToken(state, token);
 	}
 
 	state.logger.info(

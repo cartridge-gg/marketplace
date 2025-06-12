@@ -84,72 +84,98 @@ export async function initializeTokenFetcher(
 }
 
 /**
- * Fetches tokens from a specific project
+ * Generator that yields token batches from a specific project
  */
-export async function fetchTokensFromProject(
+export async function* fetchTokenBatchesFromProject(
 	state: TokenFetcherState,
 	projectId: string,
 	client: ToriiClient,
-): Promise<Token[]> {
+	batchSize: number = 5000,
+): AsyncGenerator<Token[], void, unknown> {
+	state.logger.info(`Starting token fetch for project: ${projectId}`);
+	
 	try {
-		return await fetchPaginatedTokens(client, state.logger, [], undefined);
+		yield* fetchPaginatedTokens(client, state.logger, batchSize);
 	} catch (error) {
 		state.logger.error(error, `Error querying tokens from ${projectId}`);
-		return [];
-	}
-}
-
-async function fetchPaginatedTokens(
-	client: ToriiClient,
-	logger: Logger,
-	init: ToriiToken[],
-	cursor: string | undefined,
-): Promise<Token[]> {
-	try {
-		const tokens = await client.getTokens([], [], 5000, cursor);
-		if (tokens.next_cursor) {
-			return fetchPaginatedTokens(
-				client,
-				logger,
-				[...init, ...tokens.items.filter((t) => !!t.metadata)],
-				tokens.next_cursor,
-			);
-		}
-		return [...init, ...tokens.items.filter((t) => !!t.metadata)];
-	} catch (e) {
-		logger.warn("failed fetching tokens", e);
 	}
 }
 
 /**
- * Fetches all tokens from all Torii instances
+ * Generator function that yields tokens in batches
+ */
+async function* fetchPaginatedTokens(
+	client: ToriiClient,
+	logger: Logger,
+	batchSize: number = 5000,
+): AsyncGenerator<Token[], void, unknown> {
+	let cursor: string | undefined = undefined;
+	
+	do {
+		try {
+			const response = await client.getTokens([], [], batchSize, cursor);
+			const tokensWithMetadata = response.items.filter((t) => !!t.metadata);
+			
+			if (tokensWithMetadata.length > 0) {
+				yield tokensWithMetadata;
+			}
+			
+			cursor = response.next_cursor;
+		} catch (e) {
+			logger.warn("Failed fetching tokens batch", e);
+			break;
+		}
+	} while (cursor);
+}
+
+/**
+ * Generator that yields token batches from all Torii instances
+ */
+export async function* fetchAllTokenBatches(
+	state: TokenFetcherState,
+	batchSize: number = 5000,
+): AsyncGenerator<{ projectId: string; tokens: Token[] }, void, unknown> {
+	state.logger.info("Starting batch token fetch from all Torii instances...");
+	
+	const eligibleClients = Array.from(state.toriiClients.entries())
+		.filter(([projectId, _client]) => !state.ignoreProjects.includes(projectId));
+	
+	for (const [projectId, client] of eligibleClients) {
+		let batchCount = 0;
+		let tokenCount = 0;
+		
+		for await (const batch of fetchTokenBatchesFromProject(state, projectId, client, batchSize)) {
+			batchCount++;
+			tokenCount += batch.length;
+			yield { projectId, tokens: batch };
+			
+			state.logger.info(
+				`Project ${projectId}: Yielded batch ${batchCount} with ${batch.length} tokens (total: ${tokenCount})`,
+			);
+		}
+		
+		if (tokenCount > 0) {
+			state.logger.info(
+				`Completed fetching from project ${projectId}: ${tokenCount} tokens in ${batchCount} batches`,
+			);
+		}
+	}
+}
+
+/**
+ * Fetches all tokens from all Torii instances (backward compatibility)
+ * Note: This loads all tokens into memory. Consider using fetchAllTokenBatches for better memory efficiency.
  */
 export async function fetchAllTokens(
 	state: TokenFetcherState,
 ): Promise<Token[]> {
-	state.logger.info("Fetching tokens from all Torii instances...");
+	state.logger.info("Fetching all tokens (legacy mode)...");
 	const allTokens: Token[] = [];
-
-	async function fetchFromProject([projectId, client]: [
-		string,
-		ToriiClient,
-	]): Promise<void> {
-		try {
-			const tokens = await fetchTokensFromProject(state, projectId, client);
-			allTokens.push(...tokens);
-			state.logger.info(
-				`Fetched ${tokens.length} tokens from project: ${projectId}`,
-			);
-		} catch (error) {
-			state.logger.error(error, `Failed to fetch tokens from ${projectId}`);
-		}
+	
+	for await (const { tokens } of fetchAllTokenBatches(state)) {
+		allTokens.push(...tokens);
 	}
-
-	const fetchPromises = Array.from(state.toriiClients.entries())
-		.filter(([projectId, _client]) => !state.ignoreProjects.includes(projectId))
-		.map(fetchFromProject);
-	await Promise.all(fetchPromises);
-
+	
 	state.logger.info(`Total tokens fetched: ${allTokens.length}`);
 	return allTokens;
 }
