@@ -4,24 +4,20 @@ import {
 	createArcadeRegistryState,
 	createToriiClients,
 	fetchEditions,
-	fetchArcadeRegistryModels,
-	filterEditionModels,
 	initArcadeRegistry,
 	type ArcadeRegistryState,
 } from "./arcade.ts";
-import { ToriiClient } from "@dojoengine/torii-wasm/node";
+import type {
+	ToriiClient,
+	Token as ToriiToken,
+} from "@dojoengine/torii-wasm/node";
 import { env } from "../env.ts";
-import type { RegistryModel, EditionModel } from "@cartridge/arcade";
+import type { EditionModel } from "@cartridge/arcade";
 
 /**
  * Token type definition
  */
-export type Token = {
-	collection: string;
-	tokenId: string;
-	owner: string;
-	projectId: string;
-};
+export type Token = ToriiToken;
 
 /**
  * Token fetcher state type
@@ -55,9 +51,9 @@ export function createTokenFetcherState(
 		logger: createLogger("TokenFetcher"),
 		editions: new Map(),
 		toriiClients: new Map(),
-		ignoreProjects: options.ignoreProjects || [
-			"populariumdemo-game",
-			"dragark-mainnet-v11-3",
+		ignoreProjects: [
+			...(options.ignoreProjects || []),
+			...["populariumdemo-game", "dragark-mainnet-v11-3"],
 		],
 		registryState: createArcadeRegistryState(options.chainId),
 	};
@@ -95,26 +91,33 @@ export async function fetchTokensFromProject(
 	projectId: string,
 	client: ToriiClient,
 ): Promise<Token[]> {
-	// TODO: Implement the actual query based on the project's token model structure
-	// This is a placeholder implementation - you'll need to adjust based on actual token models
-
 	try {
-		// Query for ERC721/ERC1155 tokens
-		// This will depend on how tokens are modeled in each project
-		// For now, return empty array as we need to know the specific model structure
-		state.logger.warn(
-			`Token fetching not yet implemented for project: ${projectId}`,
-		);
-
-		// In a real implementation, you would:
-		// 1. Build a query for the specific token models used in the project
-		// 2. Execute the query using client.getEntities()
-		// 3. Parse the results to extract token data
-
-		return [];
+		return await fetchPaginatedTokens(client, state.logger, [], undefined);
 	} catch (error) {
 		state.logger.error(error, `Error querying tokens from ${projectId}`);
 		return [];
+	}
+}
+
+async function fetchPaginatedTokens(
+	client: ToriiClient,
+	logger: Logger,
+	init: ToriiToken[],
+	cursor: string | undefined,
+): Promise<Token[]> {
+	try {
+		const tokens = await client.getTokens([], [], 5000, cursor);
+		if (tokens.next_cursor) {
+			return fetchPaginatedTokens(
+				client,
+				logger,
+				[...init, ...tokens.items.filter((t) => !!t.metadata)],
+				tokens.next_cursor,
+			);
+		}
+		return [...init, ...tokens.items.filter((t) => !!t.metadata)];
+	} catch (e) {
+		logger.warn("failed fetching tokens", e);
 	}
 }
 
@@ -142,9 +145,9 @@ export async function fetchAllTokens(
 		}
 	}
 
-	const fetchPromises = Array.from(state.toriiClients.entries()).map(
-		fetchFromProject,
-	);
+	const fetchPromises = Array.from(state.toriiClients.entries())
+		.filter(([projectId, _client]) => !state.ignoreProjects.includes(projectId))
+		.map(fetchFromProject);
 	await Promise.all(fetchPromises);
 
 	state.logger.info(`Total tokens fetched: ${allTokens.length}`);
