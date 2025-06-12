@@ -9,7 +9,6 @@ export const initSDK = async (chainId: constants.StarknetChainId) => {
 	return init<SchemaType>({
 		client: {
 			toriiUrl: config.toriiUrl,
-			relayUrl: config.relayUrl,
 			worldAddress: config.manifest.world.address,
 		},
 		domain: {

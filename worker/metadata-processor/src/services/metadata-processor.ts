@@ -1,6 +1,9 @@
+import type { SDK } from "@dojoengine/sdk/node";
+import { env } from "../env.ts";
 import { createLogger, type Logger } from "../utils/logger.ts";
-import { type Token } from "./token-fetcher.ts";
-import { CallData, hash, Account, RpcProvider } from "starknet";
+import type { Token } from "./token-fetcher.ts";
+import { BigNumberish, cairo, type Account, type RpcProvider } from "starknet";
+import { type SchemaType } from "@cartridge/marketplace-sdk";
 
 /**
  * Metadata attribute type
@@ -26,7 +29,7 @@ export type TokenMetadata = {
 export type MetadataMessage = {
 	identity: string;
 	collection: string;
-	token_id: string;
+	token_id: { low: BigNumberish; high: BigNumberish };
 	index: number;
 	trait_type: string;
 	value: string;
@@ -42,6 +45,7 @@ export type MetadataProcessorState = {
 	processedTokens: Set<string>;
 	logger: Logger;
 	batchSize: number;
+	client: SDK<SchemaType>;
 };
 
 /**
@@ -51,8 +55,36 @@ export type MetadataProcessorOptions = {
 	provider: RpcProvider;
 	account: Account;
 	marketplaceAddress: string;
+	client: SDK<SchemaType>;
 	batchSize?: number;
 };
+
+const MetadataAttributedataTyped = [
+	{
+		name: "identity",
+		type: "felt",
+	},
+	{
+		name: "collection",
+		type: "felt",
+	},
+	{
+		name: "token_id",
+		type: "u256",
+	},
+	{
+		name: "index",
+		type: "u128",
+	},
+	{
+		name: "trait_type",
+		type: "string",
+	},
+	{
+		name: "value",
+		type: "string",
+	},
+];
 
 /**
  * Creates metadata processor state
@@ -67,6 +99,7 @@ export function createMetadataProcessorState(
 		processedTokens: new Set(),
 		logger: createLogger("MetadataProcessor"),
 		batchSize: options.batchSize || 10,
+		client: options.client,
 	};
 }
 
@@ -85,7 +118,7 @@ export function createBatches<T>(items: T[], batchSize: number): T[][] {
  * Gets a unique token key
  */
 export function getTokenKey(token: Token): string {
-	return `${token.collection}-${token.tokenId}`;
+	return `${token.contract_address}-${token.token_id}`;
 }
 
 /**
@@ -109,39 +142,6 @@ export function markTokenAsProcessed(
 }
 
 /**
- * Gets token URI from contract
- */
-export async function getTokenURI(
-	state: MetadataProcessorState,
-	token: Token,
-): Promise<string | null> {
-	try {
-		// Call the token contract to get the URI
-		// This needs to be adapted based on the actual token contract interface
-		// For ERC721/ERC1155, this would typically be tokenURI(tokenId)
-
-		// Example placeholder - replace with actual contract call
-		const result = await state.provider.callContract({
-			contractAddress: token.collection,
-			entrypoint: "tokenURI",
-			calldata: CallData.compile({
-				tokenId: token.tokenId,
-			}),
-		});
-
-		// Parse the result to get the URI string
-		// This will depend on how the URI is returned by the contract
-		return ""; // Placeholder
-	} catch (error) {
-		state.logger.error(
-			error,
-			`Failed to get token URI for ${token.collection}-${token.tokenId}`,
-		);
-		return null;
-	}
-}
-
-/**
  * Fetches token metadata from URI
  */
 export async function fetchTokenMetadata(
@@ -149,25 +149,12 @@ export async function fetchTokenMetadata(
 	token: Token,
 ): Promise<TokenMetadata | null> {
 	try {
-		// First, get the token URI from the contract
-		const tokenURI = await getTokenURI(state, token);
-
-		if (!tokenURI) {
-			return null;
-		}
-
-		// Fetch metadata from URI
-		const response = await fetch(tokenURI);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch metadata: ${response.statusText}`);
-		}
-
-		const metadata = (await response.json()) as TokenMetadata;
+		const metadata = JSON.parse(token.metadata);
 		return metadata;
 	} catch (error) {
 		state.logger.error(
 			error,
-			`Failed to fetch metadata for ${token.collection}-${token.tokenId}`,
+			`Failed to fetch metadata for ${token.contract_address}-${token.token_id}`,
 		);
 		return null;
 	}
@@ -182,10 +169,11 @@ export function createAttributeMessage(
 	traitType: string,
 	value: string,
 ): MetadataMessage {
+	const u256 = cairo.uint256(token.token_id);
 	return {
-		identity: hash.getSelectorFromName("metadata_attribute"),
-		collection: token.collection,
-		token_id: token.tokenId,
+		identity: env.ACCOUNT_ADDRESS,
+		collection: token.contract_address,
+		token_id: { low: u256.low, high: u256.high },
 		index: index,
 		trait_type: traitType,
 		value: value,
@@ -201,34 +189,24 @@ export function createMetadataMessages(
 ): MetadataMessage[] {
 	const messages: MetadataMessage[] = [];
 
-	// Create messages for basic metadata
-	if (metadata.name) {
-		messages.push(createAttributeMessage(token, 0, "name", metadata.name));
-	}
+	// Iterate over all metadata keys
+	Object.keys(metadata).forEach((key, index) => {
+		const value = metadata[key as keyof TokenMetadata];
 
-	if (metadata.description) {
-		messages.push(
-			createAttributeMessage(token, 1, "description", metadata.description),
-		);
-	}
-
-	if (metadata.image) {
-		messages.push(createAttributeMessage(token, 2, "image", metadata.image));
-	}
-
-	// Create messages for attributes
-	if (metadata.attributes && metadata.attributes.length > 0) {
-		metadata.attributes.forEach((attr, index) => {
-			messages.push(
-				createAttributeMessage(
-					token,
-					index + 3, // Start after basic metadata
-					attr.trait_type,
-					attr.value,
-				),
-			);
-		});
-	}
+		if (key === "attributes" && Array.isArray(value)) {
+			// Handle attributes array specially
+			value.forEach((attr, attrIndex) => {
+				messages.push(
+					createAttributeMessage(
+						token,
+						index + attrIndex + Object.keys(metadata).length,
+						attr.trait_type,
+						attr.value,
+					),
+				);
+			});
+		}
+	});
 
 	return messages;
 }
@@ -236,31 +214,22 @@ export function createMetadataMessages(
 /**
  * Sends metadata messages to the orderbook
  */
-export async function sendMetadataMessages(
+export async function publishOffchainMetadataMessages(
 	state: MetadataProcessorState,
 	messages: MetadataMessage[],
 ): Promise<void> {
 	try {
-		// Prepare the multicall to send all messages at once
-		function createCall(message: MetadataMessage) {
-			return {
-				contractAddress: state.marketplaceAddress,
-				entrypoint: "set_metadata_attribute", // Adjust based on actual contract interface
-				calldata: CallData.compile(message),
-			};
+		const sdk = state.client;
+		for (const message of messages) {
+			const data = sdk.generateTypedData(
+				"MARKETPLACE-MetadataAttribute",
+				message,
+				MetadataAttributedataTyped,
+			);
+			await sdk.sendMessage(data);
 		}
 
-		const calls = messages.map(createCall);
-
-		// Execute the transaction
-		const tx = await state.account.execute(calls);
-
-		state.logger.info(
-			`Sent ${messages.length} metadata messages. Transaction: ${tx.transaction_hash}`,
-		);
-
-		// Wait for transaction confirmation
-		await state.provider.waitForTransaction(tx.transaction_hash);
+		state.logger.info(`Sent ${messages.length} metadata messages.`);
 	} catch (error) {
 		state.logger.error(error, "Failed to send metadata messages");
 		throw error;
@@ -294,9 +263,9 @@ export async function processToken(
 		// Create metadata messages
 		const messages = createMetadataMessages(token, metadata);
 
-		// Send messages to the orderbook
+		// Publish offchain messages
 		if (messages.length > 0) {
-			await sendMetadataMessages(state, messages);
+			await publishOffchainMetadataMessages(state, messages);
 		}
 
 		// Mark as processed
@@ -347,4 +316,3 @@ export async function processTokens(
 export function getProcessedCount(state: MetadataProcessorState): number {
 	return state.processedTokens.size;
 }
-

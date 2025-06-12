@@ -1,8 +1,8 @@
-import {
-	type AccessModel,
-	type EditionModel,
-	type GameModel,
-	type RegistryModel,
+import type {
+	AccessModel,
+	EditionModel,
+	GameModel,
+	RegistryModel,
 } from "@cartridge/arcade";
 import {
 	type SchemaType as ISchemaType,
@@ -15,7 +15,7 @@ import {
 import { ToriiClient } from "@dojoengine/torii-wasm/node";
 import { type constants, shortString } from "starknet";
 import { type Logger, createLogger } from "../utils/logger.ts";
-import { TokenFetcherState } from "./token-fetcher.ts";
+import type { TokenFetcherState } from "./token-fetcher.ts";
 import { env } from "../env.ts";
 
 // TODO: use imports from Arcade, when rewriting with torii-wasm is done
@@ -101,7 +101,9 @@ export function getToriiConfig(chainId: constants.StarknetChainId) {
 /**
  * Initializes the arcade registry SDK
  */
-export async function initArcadeRegistry(state: ArcadeRegistryState): Promise<void> {
+export async function initArcadeRegistry(
+	state: ArcadeRegistryState,
+): Promise<void> {
 	try {
 		const config = getToriiConfig(state.chainId);
 
@@ -259,7 +261,9 @@ export async function fetchArcadeRegistryModels(
 	options: FetchOptions,
 ): Promise<RegistryModel[]> {
 	if (!state.sdk) {
-		throw new Error("Arcade Registry SDK not initialized. Call initArcadeRegistry first.");
+		throw new Error(
+			"Arcade Registry SDK not initialized. Call initArcadeRegistry first.",
+		);
 	}
 
 	try {
