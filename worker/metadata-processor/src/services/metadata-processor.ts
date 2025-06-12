@@ -1,4 +1,4 @@
-import type { SDK } from "@dojoengine/sdk/node";
+import { KeysClause, ToriiQueryBuilder, type SDK } from "@dojoengine/sdk/node";
 import { env } from "../env.ts";
 import { createLogger, type Logger } from "../utils/logger.ts";
 import type { Token } from "./token-fetcher.ts";
@@ -30,7 +30,7 @@ export type MetadataMessage = {
 	identity: string;
 	collection: string;
 	token_id: { low: BigNumberish; high: BigNumberish };
-	index: number;
+	index: BigNumberish;
 	trait_type: string;
 	value: string;
 };
@@ -66,7 +66,7 @@ const MetadataAttributedataTyped = [
 	},
 	{
 		name: "collection",
-		type: "ContractAddress",
+		type: "felt",
 	},
 	{
 		name: "token_id",
@@ -113,11 +113,21 @@ export function getTokenKey(token: Token): string {
 /**
  * Checks if a token has been processed
  */
-export function isTokenProcessed(
+export async function isTokenProcessed(
 	state: MetadataProcessorState,
 	token: Token,
-): boolean {
-	return state.processedTokens.has(getTokenKey(token));
+): Promise<boolean> {
+	const query = new ToriiQueryBuilder()
+		.withClause(
+			KeysClause(
+				["MARKETPLACE-MetadataAttribute"],
+				[env.ACCOUNT_ADDRESS, token.contract_address, token.token_id],
+			).build(),
+		)
+		.withEntityModels(["MARKETPLACE-MetadataAttribute"]);
+	const res = await state.client.getEntities({ query });
+
+	return res.getItems().length > 0;
 }
 
 /**
@@ -215,10 +225,14 @@ export async function publishOffchainMetadataMessages(
 				message,
 				MetadataAttributedataTyped,
 			);
-			await sdk.sendMessage(data);
+
+			const res = await sdk.sendMessage(data, state.account);
+			if (res.isErr()) {
+				throw res.error;
+			}
 		}
 
-		state.logger.info(`Sent ${messages.length} metadata messages.`);
+		// state.logger.info(`Sent ${messages.length} metadata messages.`);
 	} catch (error) {
 		state.logger.error(error, "Failed to send metadata messages");
 		throw error;
@@ -233,17 +247,16 @@ export async function processToken(
 	token: Token,
 ): Promise<void> {
 	const tokenKey = getTokenKey(token);
+	// Fetch token metadata
+	const metadata = await fetchTokenMetadata(state, token);
 
 	// Skip if already processed
-	if (isTokenProcessed(state, token)) {
+	if (await isTokenProcessed(state, token)) {
 		state.logger.debug(`Token ${tokenKey} already processed, skipping...`);
 		return;
 	}
 
 	try {
-		// Fetch token metadata
-		const metadata = await fetchTokenMetadata(state, token);
-
 		if (!metadata) {
 			state.logger.warn(`No metadata found for token ${tokenKey}`);
 			return;
@@ -262,21 +275,6 @@ export async function processToken(
 	} catch (error) {
 		state.logger.error(error, `Failed to process token ${tokenKey}`);
 	}
-}
-
-/**
- * Processes a batch of tokens
- */
-export async function processBatch(
-	state: MetadataProcessorState,
-	tokens: Token[],
-): Promise<void> {
-	async function processTokenWrapper(token: Token): Promise<void> {
-		return processToken(state, token);
-	}
-
-	const promises = tokens.map(processTokenWrapper);
-	await Promise.all(promises);
 }
 
 /**
