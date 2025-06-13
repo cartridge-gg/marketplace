@@ -1,6 +1,6 @@
 import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
-import { BigNumberish } from 'starknet';
+import { BigNumberish } from "starknet";
 
 // Type definition for `orderbook::models::index::Access` struct
 export interface Access {
@@ -18,6 +18,7 @@ export interface Book {
 	id: BigNumberish;
 	version: BigNumberish;
 	paused: boolean;
+	royalties: boolean;
 	counter: BigNumberish;
 	fee_num: BigNumberish;
 	fee_receiver: BigNumberish;
@@ -27,9 +28,26 @@ export interface Book {
 export interface BookValue {
 	version: BigNumberish;
 	paused: boolean;
+	royalties: boolean;
 	counter: BigNumberish;
 	fee_num: BigNumberish;
 	fee_receiver: BigNumberish;
+}
+
+// Type definition for `orderbook::models::index::MetadataAttribute` struct
+export interface MetadataAttribute {
+	identity: string;
+	collection: BigNumberish;
+	token_id: BigNumberish;
+	index: BigNumberish;
+	trait_type: string;
+	value: string;
+}
+
+// Type definition for `orderbook::models::index::MetadataAttributeValue` struct
+export interface MetadataAttributeValue {
+	trait_type: string;
+	value: string;
 }
 
 // Type definition for `orderbook::models::index::Order` struct
@@ -37,6 +55,7 @@ export interface Order {
 	id: BigNumberish;
 	collection: BigNumberish;
 	token_id: BigNumberish;
+	royalties: boolean;
 	category: BigNumberish;
 	status: BigNumberish;
 	expiration: BigNumberish;
@@ -48,6 +67,7 @@ export interface Order {
 
 // Type definition for `orderbook::models::index::OrderValue` struct
 export interface OrderValue {
+	royalties: boolean;
 	category: BigNumberish;
 	status: BigNumberish;
 	expiration: BigNumberish;
@@ -102,19 +122,21 @@ export interface SaleValue {
 
 export interface SchemaType extends ISchemaType {
 	orderbook: {
-		Access: Access,
-		AccessValue: AccessValue,
-		Book: Book,
-		BookValue: BookValue,
-		Order: Order,
-		OrderValue: OrderValue,
-		Listing: Listing,
-		ListingValue: ListingValue,
-		Offer: Offer,
-		OfferValue: OfferValue,
-		Sale: Sale,
-		SaleValue: SaleValue,
-	},
+		Access: Access;
+		AccessValue: AccessValue;
+		Book: Book;
+		BookValue: BookValue;
+		MetadataAttribute: MetadataAttribute;
+		MetadataAttributeValue: MetadataAttributeValue;
+		Order: Order;
+		OrderValue: OrderValue;
+		Listing: Listing;
+		ListingValue: ListingValue;
+		Offer: Offer;
+		OfferValue: OfferValue;
+		Sale: Sale;
+		SaleValue: SaleValue;
+	};
 }
 export const schema: SchemaType = {
 	orderbook: {
@@ -129,6 +151,7 @@ export const schema: SchemaType = {
 			id: 0,
 			version: 0,
 			paused: false,
+			royalties: false,
 			counter: 0,
 			fee_num: 0,
 			fee_receiver: 0,
@@ -136,14 +159,28 @@ export const schema: SchemaType = {
 		BookValue: {
 			version: 0,
 			paused: false,
+			royalties: false,
 			counter: 0,
 			fee_num: 0,
 			fee_receiver: 0,
 		},
+		MetadataAttribute: {
+			identity: "",
+			collection: 0,
+			token_id: 0,
+			index: 0,
+			trait_type: "",
+			value: "",
+		},
+		MetadataAttributeValue: {
+			trait_type: "",
+			value: "",
+		},
 		Order: {
 			id: 0,
 			collection: 0,
-		token_id: 0,
+			token_id: 0,
+			royalties: false,
 			category: 0,
 			status: 0,
 			expiration: 0,
@@ -153,6 +190,7 @@ export const schema: SchemaType = {
 			owner: 0,
 		},
 		OrderValue: {
+			royalties: false,
 			category: 0,
 			status: 0,
 			expiration: 0,
@@ -163,31 +201,103 @@ export const schema: SchemaType = {
 		},
 		Listing: {
 			order_id: 0,
-		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			order: {
+				id: 0,
+				collection: 0,
+				token_id: 0,
+				royalties: false,
+				category: 0,
+				status: 0,
+				expiration: 0,
+				quantity: 0,
+				price: 0,
+				currency: 0,
+				owner: 0,
+			},
 			time: 0,
 		},
 		ListingValue: {
-		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			order: {
+				id: 0,
+				collection: 0,
+				token_id: 0,
+				royalties: false,
+				category: 0,
+				status: 0,
+				expiration: 0,
+				quantity: 0,
+				price: 0,
+				currency: 0,
+				owner: 0,
+			},
 			time: 0,
 		},
 		Offer: {
 			order_id: 0,
-		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			order: {
+				id: 0,
+				collection: 0,
+				token_id: 0,
+				royalties: false,
+				category: 0,
+				status: 0,
+				expiration: 0,
+				quantity: 0,
+				price: 0,
+				currency: 0,
+				owner: 0,
+			},
 			time: 0,
 		},
 		OfferValue: {
-		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			order: {
+				id: 0,
+				collection: 0,
+				token_id: 0,
+				royalties: false,
+				category: 0,
+				status: 0,
+				expiration: 0,
+				quantity: 0,
+				price: 0,
+				currency: 0,
+				owner: 0,
+			},
 			time: 0,
 		},
 		Sale: {
 			order_id: 0,
-		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			order: {
+				id: 0,
+				collection: 0,
+				token_id: 0,
+				royalties: false,
+				category: 0,
+				status: 0,
+				expiration: 0,
+				quantity: 0,
+				price: 0,
+				currency: 0,
+				owner: 0,
+			},
 			from: 0,
 			to: 0,
 			time: 0,
 		},
 		SaleValue: {
-		order: { id: 0, collection: 0, token_id: 0, category: 0, status: 0, expiration: 0, quantity: 0, price: 0, currency: 0, owner: 0, },
+			order: {
+				id: 0,
+				collection: 0,
+				token_id: 0,
+				royalties: false,
+				category: 0,
+				status: 0,
+				expiration: 0,
+				quantity: 0,
+				price: 0,
+				currency: 0,
+				owner: 0,
+			},
 			from: 0,
 			to: 0,
 			time: 0,
@@ -195,16 +305,19 @@ export const schema: SchemaType = {
 	},
 };
 export enum ModelsMapping {
-	Access = 'MARKETPLACE-Access',
-	AccessValue = 'MARKETPLACE-AccessValue',
-	Book = 'MARKETPLACE-Book',
-	BookValue = 'MARKETPLACE-BookValue',
-	Order = 'MARKETPLACE-Order',
-	OrderValue = 'MARKETPLACE-OrderValue',
-	Listing = 'MARKETPLACE-Listing',
-	ListingValue = 'MARKETPLACE-ListingValue',
-	Offer = 'MARKETPLACE-Offer',
-	OfferValue = 'MARKETPLACE-OfferValue',
-	Sale = 'MARKETPLACE-Sale',
-	SaleValue = 'MARKETPLACE-SaleValue',
+	Access = "MARKETPLACE-Access",
+	AccessValue = "MARKETPLACE-AccessValue",
+	Book = "MARKETPLACE-Book",
+	BookValue = "MARKETPLACE-BookValue",
+	MetadataAttribute = "MARKETPLACE-MetadataAttribute",
+	MetadataAttributeValue = "MARKETPLACE-MetadataAttributeValue",
+	Order = "MARKETPLACE-Order",
+	OrderValue = "MARKETPLACE-OrderValue",
+	Listing = "MARKETPLACE-Listing",
+	ListingValue = "MARKETPLACE-ListingValue",
+	Offer = "MARKETPLACE-Offer",
+	OfferValue = "MARKETPLACE-OfferValue",
+	Sale = "MARKETPLACE-Sale",
+	SaleValue = "MARKETPLACE-SaleValue",
 }
+
