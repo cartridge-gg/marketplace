@@ -106,8 +106,8 @@ export function createMetadataProcessorState(
 /**
  * Gets a unique token key
  */
-export function getTokenKey(token: Token): string {
-	return `${token.contract_address}-${token.token_id}`;
+export function getTokenKey(token: Token): string[] {
+	return [env.ACCOUNT_ADDRESS, token.contract_address, token.token_id];
 }
 
 /**
@@ -119,25 +119,12 @@ export async function isTokenProcessed(
 ): Promise<boolean> {
 	const query = new ToriiQueryBuilder()
 		.withClause(
-			KeysClause(
-				["MARKETPLACE-MetadataAttribute"],
-				[env.ACCOUNT_ADDRESS, token.contract_address, token.token_id],
-			).build(),
+			KeysClause(["MARKETPLACE-MetadataAttribute"], getTokenKey(token)).build(),
 		)
 		.withEntityModels(["MARKETPLACE-MetadataAttribute"]);
 	const res = await state.client.getEntities({ query });
 
 	return res.getItems().length > 0;
-}
-
-/**
- * Marks a token as processed
- */
-export function markTokenAsProcessed(
-	state: MetadataProcessorState,
-	token: Token,
-): void {
-	state.processedTokens.add(getTokenKey(token));
 }
 
 /**
@@ -199,7 +186,8 @@ export function createMetadataMessages(
 					createAttributeMessage(
 						token,
 						index + attrIndex + Object.keys(metadata).length,
-						attr.trait_type,
+						// @ts-ignore
+						attr.trait_type ?? attr.trait,
 						attr.value,
 					),
 				);
@@ -269,11 +257,9 @@ export async function processToken(
 		if (messages.length > 0) {
 			await publishOffchainMetadataMessages(state, messages);
 		}
-
-		// Mark as processed
-		markTokenAsProcessed(state, token);
 	} catch (error) {
 		state.logger.error(error, `Failed to process token ${tokenKey}`);
+		console.log(token);
 	}
 }
 
@@ -298,6 +284,19 @@ export async function processTokens(
 /**
  * Gets the count of processed tokens
  */
-export function getProcessedCount(state: MetadataProcessorState): number {
-	return state.processedTokens.size;
+export async function getProcessedCount(
+	state: MetadataProcessorState,
+): Promise<number> {
+	const query = new ToriiQueryBuilder()
+		.withClause(
+			KeysClause(
+				["MARKETPLACE-MetadataAttribute"],
+				[undefined, undefined, undefined, undefined],
+				"FixedLen",
+			).build(),
+		)
+		.withEntityModels(["MARKETPLACE-MetadataAttribute"]);
+	const res = await state.client.getEntities({ query });
+
+	return res.getItems().length;
 }
