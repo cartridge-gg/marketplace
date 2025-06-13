@@ -25,40 +25,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_delete_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish): DojoCall => {
-		return {
-			contractName: "Marketplace",
-			entrypoint: "delete",
-			calldata: [orderId, collection, tokenId],
-		};
-	};
-
-	const Marketplace_delete = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_Marketplace_delete_calldata(orderId, collection, tokenId),
-				"MARKETPLACE",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_Marketplace_execute_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish, category: BigNumberish, quantity: BigNumberish, royalties: boolean): DojoCall => {
+	const build_Marketplace_execute_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish, assetId: BigNumberish, quantity: BigNumberish, royalties: boolean): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "execute",
-			calldata: [orderId, collection, tokenId, category, quantity, royalties],
+			calldata: [orderId, collection, tokenId, assetId, quantity, royalties],
 		};
 	};
 
-	const Marketplace_execute = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish, category: BigNumberish, quantity: BigNumberish, royalties: boolean) => {
+	const Marketplace_execute = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish, assetId: BigNumberish, quantity: BigNumberish, royalties: boolean) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_Marketplace_execute_calldata(orderId, collection, tokenId, category, quantity, royalties),
+				build_Marketplace_execute_calldata(orderId, collection, tokenId, assetId, quantity, royalties),
 				"MARKETPLACE",
 			);
 		} catch (error) {
@@ -122,19 +101,40 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_list_calldata = (collection: string, tokenId: BigNumberish, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish): DojoCall => {
+	const build_Marketplace_intent_calldata = (collection: string, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish): DojoCall => {
 		return {
 			contractName: "Marketplace",
-			entrypoint: "list",
-			calldata: [collection, tokenId, quantity, price, currency, expiration],
+			entrypoint: "intent",
+			calldata: [collection, quantity, price, currency, expiration],
 		};
 	};
 
-	const Marketplace_list = async (snAccount: Account | AccountInterface, collection: string, tokenId: BigNumberish, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish) => {
+	const Marketplace_intent = async (snAccount: Account | AccountInterface, collection: string, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_Marketplace_list_calldata(collection, tokenId, quantity, price, currency, expiration),
+				build_Marketplace_intent_calldata(collection, quantity, price, currency, expiration),
+				"MARKETPLACE",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_Marketplace_list_calldata = (collection: string, tokenId: BigNumberish, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish, royalties: boolean): DojoCall => {
+		return {
+			contractName: "Marketplace",
+			entrypoint: "list",
+			calldata: [collection, tokenId, quantity, price, currency, expiration, royalties],
+		};
+	};
+
+	const Marketplace_list = async (snAccount: Account | AccountInterface, collection: string, tokenId: BigNumberish, quantity: BigNumberish, price: BigNumberish, currency: string, expiration: BigNumberish, royalties: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_Marketplace_list_calldata(collection, tokenId, quantity, price, currency, expiration, royalties),
 				"MARKETPLACE",
 			);
 		} catch (error) {
@@ -177,6 +177,27 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_Marketplace_pause_calldata(),
+				"MARKETPLACE",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_Marketplace_remove_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "Marketplace",
+			entrypoint: "remove",
+			calldata: [orderId, collection, tokenId],
+		};
+	};
+
+	const Marketplace_remove = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_Marketplace_remove_calldata(orderId, collection, tokenId),
 				"MARKETPLACE",
 			);
 		} catch (error) {
@@ -248,14 +269,33 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_Marketplace_setRoyalties_calldata = (enabled: boolean): DojoCall => {
+		return {
+			contractName: "Marketplace",
+			entrypoint: "set_royalties",
+			calldata: [enabled],
+		};
+	};
+
+	const Marketplace_setRoyalties = async (snAccount: Account | AccountInterface, enabled: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_Marketplace_setRoyalties_calldata(enabled),
+				"MARKETPLACE",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 
 
 	return {
 		Marketplace: {
 			cancel: Marketplace_cancel,
 			buildCancelCalldata: build_Marketplace_cancel_calldata,
-			delete: Marketplace_delete,
-			buildDeleteCalldata: build_Marketplace_delete_calldata,
 			execute: Marketplace_execute,
 			buildExecuteCalldata: build_Marketplace_execute_calldata,
 			getValidities: Marketplace_getValidities,
@@ -264,18 +304,24 @@ export function setupWorld(provider: DojoProvider) {
 			buildGetValidityCalldata: build_Marketplace_getValidity_calldata,
 			grantRole: Marketplace_grantRole,
 			buildGrantRoleCalldata: build_Marketplace_grantRole_calldata,
+			intent: Marketplace_intent,
+			buildIntentCalldata: build_Marketplace_intent_calldata,
 			list: Marketplace_list,
 			buildListCalldata: build_Marketplace_list_calldata,
 			offer: Marketplace_offer,
 			buildOfferCalldata: build_Marketplace_offer_calldata,
 			pause: Marketplace_pause,
 			buildPauseCalldata: build_Marketplace_pause_calldata,
+			remove: Marketplace_remove,
+			buildRemoveCalldata: build_Marketplace_remove_calldata,
 			resume: Marketplace_resume,
 			buildResumeCalldata: build_Marketplace_resume_calldata,
 			revokeRole: Marketplace_revokeRole,
 			buildRevokeRoleCalldata: build_Marketplace_revokeRole_calldata,
 			setFee: Marketplace_setFee,
 			buildSetFeeCalldata: build_Marketplace_setFee_calldata,
+			setRoyalties: Marketplace_setRoyalties,
+			buildSetRoyaltiesCalldata: build_Marketplace_setRoyalties_calldata,
 		},
 	};
 }
