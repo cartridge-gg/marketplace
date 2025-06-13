@@ -24,10 +24,7 @@
 	"packageManager": "pnpm@10.10.0",
 	"dependencies": {
 		"@cartridge/presets": "github:cartridge-gg/presets#2cc76cc",
-		"@cartridge/ui": "github:cartridge-gg/ui#3fa3547",
-		"@dojoengine/core": "link:../../dojo.js/packages/core",
-		"@dojoengine/sdk": "link:../../dojo.js/packages/sdk",
-		"core": "link:../dojo.js/packages/core"
+		"@cartridge/ui": "github:cartridge-gg/ui#3fa3547"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",

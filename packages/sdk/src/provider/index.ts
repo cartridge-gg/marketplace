@@ -48,7 +48,6 @@ export class MarketplaceProvider extends DojoProvider {
 	getToriiClient(toriiUrl: string): torii.ToriiClient {
 		const toriiClient = new torii.ToriiClient({
 			toriiUrl: toriiUrl,
-			relayUrl: "",
 			worldAddress: this.manifest.world.address,
 		});
 		return toriiClient;
