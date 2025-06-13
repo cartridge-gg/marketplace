@@ -3,9 +3,7 @@ import { createLogger, type Logger } from "../utils/logger.ts";
 import { type Token } from "./token-fetcher.ts";
 import {
 	type MetadataProcessorState,
-	processTokens,
-	isTokenProcessed,
-	getTokenKey,
+	processToken,
 } from "./metadata-processor.ts";
 
 /**
@@ -54,85 +52,6 @@ export function createTokenSubscriptionState(
 }
 
 /**
- * Parses token information from an update event
- */
-export function parseTokenFromUpdate(
-	projectId: string,
-	update: any,
-): Token | null {
-	try {
-		// This needs to be implemented based on the actual update structure
-		// Extract collection address, token ID, and owner from the update
-
-		// TODO: Implement proper parsing once we understand the update structure
-		// The Token type from ToriiToken has: contract_address, token_id, name, symbol, decimals, metadata
-		// For now, return null until we can properly parse the update
-
-		return null;
-	} catch (error) {
-		// Log error (no logger available in this pure function)
-		return null;
-	}
-}
-
-/**
- * Handles token metadata update for existing tokens
- */
-export async function handleTokenMetadataUpdate(
-	state: TokenSubscriptionState,
-	token: Token,
-): Promise<void> {
-	// Check if metadata has actually changed
-	// This might involve comparing with cached metadata
-
-	// If metadata has changed, reprocess it
-	state.logger.info(
-		`Reprocessing metadata for updated token: ${getTokenKey(token)}`,
-	);
-	await processTokens(state.metadataProcessorState, [token]);
-}
-
-/**
- * Handles token update events
- */
-export function createTokenUpdateHandler(
-	state: TokenSubscriptionState,
-): TokenUpdateHandler {
-	return async function handleTokenUpdate(
-		projectId: string,
-		update: any,
-	): Promise<void> {
-		try {
-			// Parse the update to extract token information
-			const token = parseTokenFromUpdate(projectId, update);
-
-			if (!token) {
-				state.logger.debug("Update does not contain valid token data");
-				return;
-			}
-
-			// Check if this is a new token or an update to existing token
-			const isNewToken = !isTokenProcessed(state.metadataProcessorState, token);
-
-			if (isNewToken) {
-				state.logger.info(`New token detected: ${getTokenKey(token)}`);
-				// Process the new token's metadata
-				await processTokens(state.metadataProcessorState, [token]);
-			} else {
-				state.logger.info(`Token update detected: ${getTokenKey(token)}`);
-				// For updates, we might want to reprocess the metadata
-				await handleTokenMetadataUpdate(state, token);
-			}
-		} catch (error) {
-			state.logger.error(
-				error,
-				`Error handling token update from ${projectId}`,
-			);
-		}
-	};
-}
-
-/**
  * Subscribes to token updates for a specific project
  */
 export async function subscribeToProject(
@@ -148,13 +67,34 @@ export async function subscribeToProject(
 			`Token subscription not yet implemented for project: ${projectId}`,
 		);
 
-		// In a real implementation, you would:
-		// 1. Create a subscription clause for the token models
-		// 2. Subscribe using client.onEntityUpdated()
-		// 3. Handle updates in the callback
+		const sub = client.onTokenUpdated([], [], async (token: Token) => {
+			try {
+				// Ignore ack responses from Torii
+				if (
+					token.contract_address === "0x0" &&
+					token.token_id ===
+						"0x0000000000000000000000000000000000000000000000000000000000000000"
+				) {
+					return;
+				}
 
-		// Placeholder subscription entry
-		state.subscriptions.set(projectId, null);
+				state.logger.info(
+					"Received update for token : %s:%s",
+					token.contract_address,
+					token.token_id,
+				);
+				await processToken(state.metadataProcessorState, token);
+			} catch (err) {
+				state.logger.error(
+					"Failed to update metadata for token : ",
+					token.contract_address,
+					" ",
+					token.token_id,
+				);
+			}
+		});
+
+		state.subscriptions.set(projectId, sub);
 	} catch (error) {
 		state.logger.error(error, `Error subscribing to project ${projectId}`);
 		throw error;
@@ -168,8 +108,6 @@ export async function subscribeToAllTokens(
 	state: TokenSubscriptionState,
 ): Promise<void> {
 	state.logger.info("Setting up subscriptions for all Torii instances...");
-
-	const updateHandler = createTokenUpdateHandler(state);
 
 	async function subscribeToClient([projectId, client]: [
 		string,

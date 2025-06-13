@@ -20,23 +20,28 @@ export async function processAllTokensFromFetcher(
 	state: WorkerState,
 ): Promise<void> {
 	const batchSize = env.TOKEN_FETCH_BATCH_SIZE;
-	state.logger.info(`Starting batch token processing (batch size: ${batchSize})...`);
+	state.logger.info(
+		`Starting batch token processing (batch size: ${batchSize})...`,
+	);
 
 	let totalProcessed = 0;
 	let batchCount = 0;
 
 	try {
-		for await (const { projectId, tokens } of fetchAllTokenBatches(state.tokenFetcherState, batchSize)) {
+		for await (const { projectId, tokens } of fetchAllTokenBatches(
+			state.tokenFetcherState,
+			batchSize,
+		)) {
 			batchCount++;
 			const startTime = Date.now();
-			
+
 			state.logger.info(
 				`Processing batch ${batchCount} from project ${projectId} with ${tokens.length} tokens...`,
 			);
-			
+
 			await processTokens(state.metadataProcessorState, tokens);
 			totalProcessed += tokens.length;
-			
+
 			const processingTime = Date.now() - startTime;
 			state.logger.info(
 				`Batch ${batchCount} processed in ${processingTime}ms (${Math.round(tokens.length / (processingTime / 1000))} tokens/sec)`,
@@ -65,7 +70,7 @@ export async function processAllTokensLegacy(
 		await processTokens(state.metadataProcessorState, tokens);
 
 		state.logger.info(
-			`Processing complete. Processed ${getProcessedCount(state.metadataProcessorState)} tokens`,
+			`Processing complete. Processed ${await getProcessedCount(state.metadataProcessorState)} tokens`,
 		);
 	} catch (error) {
 		state.logger.error(error, "Error during token processing");
@@ -171,3 +176,4 @@ export function setupGracefulShutdown(state: WorkerState): void {
 	process.on("SIGINT", handleSigint);
 	process.on("SIGTERM", handleSigterm);
 }
+
