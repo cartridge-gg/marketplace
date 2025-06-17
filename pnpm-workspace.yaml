@@ -4,7 +4,7 @@ packages:
   - contracts
   - worker/*
 catalog:
-  "@cartridge/ui": github:cartridge-gg/ui#3fa3547
+  "@cartridge/ui": github:cartridge-gg/ui#460751b
   "@cartridge/controller": 0.7.13
   "@cartridge/connector": 0.7.13
   "@starknet-react/core": 3.7.4

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCollections, type Collection as CollectionType } from "../hooks";
-import { CollectibleAsset } from "@cartridge/ui";
+import { CollectibleCard } from "@cartridge/ui";
 import { Token } from "@dojoengine/torii-client";
 import { useMemo } from "react";
 import { getChecksumAddress } from "starknet";
@@ -89,12 +89,13 @@ function Collection({ collection }: { collection: Token }) {
 				className="block h-full"
 			>
 				<div className="relative">
-					<CollectibleAsset
+					<CollectibleCard
 						title=""
 						image={imageUrl}
 						// @ts-expect-error
 						count={collection.count}
 						className="w-full h-auto"
+						selectable={false}
 					/>
 					{/* @ts-expect-error */}
 					{collection.count && (

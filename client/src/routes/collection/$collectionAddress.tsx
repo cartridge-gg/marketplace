@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useCallback } from "react";
-import { useCollection } from "../../hooks";
+import { useMemo, useCallback, useState } from "react";
+import { useCollection, useCollectionMetadata } from "../../hooks";
 import { getChecksumAddress } from "starknet";
-import { CollectibleAsset, Button } from "@cartridge/ui";
+import { CollectibleCard, Button } from "@cartridge/ui";
 import type { Token } from "@dojoengine/torii-wasm";
+import type { TokenMetadataUI } from "@cartridge/marketplace-sdk";
+import { MetadataFilters } from "../../components/collection/metadata-filters";
 
 // Define metadata interface based on the expected structure
 interface TokenMetadata {
@@ -42,6 +44,12 @@ function RouteComponent() {
 		prevCursor,
 	} = useCollection(collectionAddress, 50, cursor);
 
+	const { data: collectionMetadata } = useCollectionMetadata(collectionAddress);
+
+	const [filteredTokenIds, setFilteredTokenIds] = useState<Set<string> | null>(
+		null,
+	);
+
 	const handlePrevPage = useCallback(() => {
 		if (hasPrev) {
 			navigate({
@@ -62,6 +70,27 @@ function RouteComponent() {
 		}
 	}, [navigate, getNextPage, hasNext, nextCursor]);
 
+	// Get collection name from the first token
+	const collectionName = collection[0]?.name || "Collection";
+
+	// Filter collection based on metadata filters
+	const displayedCollection = useMemo(() => {
+		if (!filteredTokenIds) return collection;
+		return collection.filter((token) => filteredTokenIds.has(token.token_id));
+	}, [collection, filteredTokenIds]);
+
+	const handleFilteredTokensChange = useCallback(
+		(filteredTokens: TokenMetadataUI[]) => {
+			if (filteredTokens.length === collectionMetadata?.tokens.length) {
+				setFilteredTokenIds(null);
+			} else {
+				const tokenIds = new Set(filteredTokens.map((token) => token.tokenId));
+				setFilteredTokenIds(tokenIds);
+			}
+		},
+		[collectionMetadata],
+	);
+
 	if (collection.length === 0 && isLoading) {
 		return (
 			<div className="flex items-center justify-center h-screen bg-background-100">
@@ -69,9 +98,6 @@ function RouteComponent() {
 			</div>
 		);
 	}
-
-	// Get collection name from the first token
-	const collectionName = collection[0]?.name || "Collection";
 
 	return (
 		<div className="bg-background-100 min-h-screen w-full overflow-y-auto pb-12">
@@ -98,16 +124,30 @@ function RouteComponent() {
 						</span>
 					</Link>
 				</div>
-				<CollectionGrid
-					collection={collection}
-					name={collectionName}
-					getPrevPage={handlePrevPage}
-					getNextPage={handleNextPage}
-					hasPrev={hasPrev}
-					hasNext={hasNext}
-					isLoading={isLoading}
-					currentPage={currentPage}
-				/>
+				<div className="flex flex-col lg:flex-row gap-8">
+					{collectionMetadata && collectionMetadata.tokens.length > 0 && (
+						<aside className="lg:w-80">
+							<MetadataFilters
+								tokens={collectionMetadata.tokens}
+								onFilteredTokensChange={handleFilteredTokensChange}
+							/>
+						</aside>
+					)}
+					<div className="flex-1">
+						<CollectionGrid
+							collection={displayedCollection}
+							name={collectionName}
+							getPrevPage={handlePrevPage}
+							getNextPage={handleNextPage}
+							hasPrev={hasPrev}
+							hasNext={hasNext}
+							isLoading={isLoading}
+							currentPage={currentPage}
+							isFiltered={!!filteredTokenIds}
+							totalCount={collection.length}
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
@@ -122,6 +162,8 @@ interface CollectionGridProps {
 	hasNext: boolean;
 	isLoading: boolean;
 	currentPage: number;
+	isFiltered?: boolean;
+	totalCount?: number;
 }
 
 function CollectionGrid({
@@ -133,11 +175,20 @@ function CollectionGrid({
 	hasNext,
 	isLoading,
 	currentPage,
+	isFiltered,
+	totalCount,
 }: CollectionGridProps) {
 	return (
 		<>
 			<div className="flex justify-between items-center mb-8">
-				<h1 className="text-3xl font-bold text-primary-500">{name}</h1>
+				<div>
+					<h1 className="text-3xl font-bold text-primary-500">{name}</h1>
+					{isFiltered && totalCount && (
+						<p className="text-sm text-gray-400 mt-1">
+							{collection.length} of {totalCount} tokens match your filters
+						</p>
+					)}
+				</div>
 				<div className="flex items-center gap-4">
 					<span className="text-sm text-gray-500">Page {currentPage}</span>
 					<div className="flex gap-2">
@@ -233,10 +284,12 @@ function Token({ token }: { token: Token }) {
 				className="block h-full"
 			>
 				<div>
-					<CollectibleAsset
+					<CollectibleCard
 						title=""
+						description=""
 						image={imageUrl}
 						className="w-full h-auto"
+						selectable={false}
 					/>
 				</div>
 				<div className="p-4">
