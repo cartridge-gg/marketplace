@@ -54,7 +54,7 @@ fn test_offer_cancel() {
 }
 
 #[test]
-#[should_panic(expected: ('Order: cannot be executed', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('Order: invalid status', 'ENTRYPOINT_FAILED'))]
 fn test_offer_cancel_execute_revert_cannot_be_executed() {
     // [Setup] World
     let (_world, contracts, context) = spawn();
