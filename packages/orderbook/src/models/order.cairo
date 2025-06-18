@@ -15,7 +15,9 @@ pub mod errors {
     pub const ORDER_NOT_SELL: felt252 = 'Order: not a sell order';
     pub const ORDER_CANNOT_CANCEL: felt252 = 'Order: cannot be canceled';
     pub const ORDER_CANNOT_DELETE: felt252 = 'Order: cannot be deleted';
-    pub const ORDER_CANNOT_EXECUTE: felt252 = 'Order: cannot be executed';
+    pub const ORDER_INVALID_QUANTITY: felt252 = 'Order: invalid quantity';
+    pub const ORDER_IS_EXPIRED: felt252 = 'Order: is expired';
+    pub const ORDER_INVALID_STATUS: felt252 = 'Order: invalid status';
     pub const ORDER_INVALID_COLLECTION: felt252 = 'Order: invalid collection';
     pub const ORDER_INVALID_PRICE: felt252 = 'Order: invalid price';
     pub const ORDER_INVALID_CURRENCY: felt252 = 'Order: invalid currency';
@@ -144,9 +146,9 @@ pub impl OrderAssert of AssertTrait {
 
     #[inline]
     fn assert_can_execute(self: @Order, quantity: u128, now: u64) {
-        assert(*self.quantity >= quantity, errors::ORDER_CANNOT_EXECUTE);
-        assert(*self.expiration >= now, errors::ORDER_CANNOT_EXECUTE);
-        assert(*self.status == Status::Placed.into(), errors::ORDER_CANNOT_EXECUTE);
+        assert(*self.quantity >= quantity, errors::ORDER_INVALID_QUANTITY);
+        assert(*self.expiration >= now, errors::ORDER_IS_EXPIRED);
+        assert(*self.status == Status::Placed.into(), errors::ORDER_INVALID_STATUS);
     }
 
     #[inline]
