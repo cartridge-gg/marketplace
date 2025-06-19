@@ -10,3 +10,29 @@ export enum OrderStatus {
 	Canceled = 2,
 	Executed = 3,
 }
+export const MetadataAttributeTypedData = [
+	{
+		name: "identity",
+		type: "felt",
+	},
+	{
+		name: "collection",
+		type: "felt",
+	},
+	{
+		name: "token_id",
+		type: "u256",
+	},
+	{
+		name: "index",
+		type: "u256",
+	},
+	{
+		name: "trait_type",
+		type: "bytearray",
+	},
+	{
+		name: "value",
+		type: "bytearray",
+	},
+];
