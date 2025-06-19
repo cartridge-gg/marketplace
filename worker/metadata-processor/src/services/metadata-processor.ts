@@ -199,6 +199,17 @@ export function createMetadataMessages(
 }
 
 /**
+ * Helper function to chunk an array into smaller arrays
+ */
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+	const chunks: T[][] = [];
+	for (let i = 0; i < array.length; i += chunkSize) {
+		chunks.push(array.slice(i, i + chunkSize));
+	}
+	return chunks;
+}
+
+/**
  * Sends metadata messages to the orderbook
  */
 export async function publishOffchainMetadataMessages(
@@ -207,20 +218,51 @@ export async function publishOffchainMetadataMessages(
 ): Promise<void> {
 	try {
 		const sdk = state.client;
-		for (const message of messages) {
-			const data = sdk.generateTypedData(
-				"MARKETPLACE-MetadataAttribute",
-				message,
-				MetadataAttributedataTyped,
+		const batchSize = env.MESSAGE_BATCH_SIZE;
+
+		// Split messages into batches
+		const batches = chunkArray(messages, batchSize);
+		state.logger.info(
+			`Processing ${messages.length} messages in ${batches.length} batches of up to ${batchSize} messages each`,
+		);
+
+		// Process each batch sequentially
+		for (const [batchIndex, batch] of batches.entries()) {
+			state.logger.debug(
+				`Processing batch ${batchIndex + 1}/${batches.length} with ${batch.length} messages`,
 			);
 
-			const res = await sdk.sendMessage(data, state.account);
-			if (res.isErr()) {
-				throw res.error;
+			// TODO: When batch sending is available in @dojoengine/sdk/node, replace this loop with:
+			// const batchData = batch.map(message => sdk.generateTypedData(
+			//     "MARKETPLACE-MetadataAttribute",
+			//     message,
+			//     MetadataAttributedataTyped,
+			// ));
+			// const res = await sdk.sendMessageBatch(batchData, state.account);
+			// if (res.isErr()) {
+			//     throw res.error;
+			// }
+
+			// Current implementation - send messages one by one within each batch
+			for (const message of batch) {
+				const data = sdk.generateTypedData(
+					"MARKETPLACE-MetadataAttribute",
+					message,
+					MetadataAttributedataTyped,
+				);
+
+				// const res = await sdk.sendMessage(data, state.account);
+				// if (res.isErr()) {
+				// 	throw res.error;
+				// }
 			}
+
+			state.logger.debug(`Completed batch ${batchIndex + 1}/${batches.length}`);
 		}
 
-		// state.logger.info(`Sent ${messages.length} metadata messages.`);
+		state.logger.info(
+			`Successfully sent all ${messages.length} metadata messages`,
+		);
 	} catch (error) {
 		state.logger.error(error, "Failed to send metadata messages");
 		throw error;

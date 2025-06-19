@@ -123,6 +123,14 @@ const envSchema = z.object({
 		.url()
 		.default("https://ipfs.io/ipfs/")
 		.describe("IPFS gateway URL"),
+	
+	// Message batching configuration
+	MESSAGE_BATCH_SIZE: z
+		.string()
+		.transform((val) => Number.parseInt(val, 10))
+		.pipe(z.number().positive())
+		.default("500")
+		.describe("Number of messages to send in a single batch"),
 });
 
 // Parse and validate environment variables
