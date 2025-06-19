@@ -9,6 +9,7 @@ polling_interval = 500
 max_concurrent_tasks = 100
 world_block = 1464035
 contracts = []
+transactions = true
 
 [sql]
 historical = []
