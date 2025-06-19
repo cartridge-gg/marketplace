@@ -54,3 +54,15 @@ pub struct MetadataAttribute {
     pub trait_type: ByteArray,
     pub value: ByteArray,
 }
+
+#[derive(Clone, Drop, Serde)]
+#[dojo::model]
+pub struct MetadataAttributeIntegrity {
+    #[key]
+    pub identity: starknet::ContractAddress,
+    #[key]
+    pub collection: felt252,
+    #[key]
+    pub token_id: u256,
+    pub state: felt252,
+}

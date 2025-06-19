@@ -1964,6 +1964,12 @@
     },
     {
       "members": [],
+      "class_hash": "0x1bb62212efc0a19acdda4a80f7b0ebe76d2154a3dc70fed8c3e8a88ae311e98",
+      "tag": "MARKETPLACE-MetadataAttributeIntegrity",
+      "selector": "0x7c2a5e62afd20c94744f664a80bed54d75fbac215d0582879e8852e3c9aa447"
+    },
+    {
+      "members": [],
       "class_hash": "0x47e98b3af5f7c709a133f3f10ff3953b4fdb63156817206057d32d1d029430e",
       "tag": "MARKETPLACE-Order",
       "selector": "0x61b4c97fb2ee0697bed87a3f5f7e932e5af76c77c88682b9ae67552f32eff69"
