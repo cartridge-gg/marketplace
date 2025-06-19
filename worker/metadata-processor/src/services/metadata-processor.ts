@@ -232,29 +232,16 @@ export async function publishOffchainMetadataMessages(
 				`Processing batch ${batchIndex + 1}/${batches.length} with ${batch.length} messages`,
 			);
 
-			// TODO: When batch sending is available in @dojoengine/sdk/node, replace this loop with:
-			// const batchData = batch.map(message => sdk.generateTypedData(
-			//     "MARKETPLACE-MetadataAttribute",
-			//     message,
-			//     MetadataAttributedataTyped,
-			// ));
-			// const res = await sdk.sendMessageBatch(batchData, state.account);
-			// if (res.isErr()) {
-			//     throw res.error;
-			// }
-
-			// Current implementation - send messages one by one within each batch
-			for (const message of batch) {
-				const data = sdk.generateTypedData(
+			const batchData = batch.map((message) =>
+				sdk.generateTypedData(
 					"MARKETPLACE-MetadataAttribute",
 					message,
 					MetadataAttributedataTyped,
-				);
-
-				// const res = await sdk.sendMessage(data, state.account);
-				// if (res.isErr()) {
-				// 	throw res.error;
-				// }
+				),
+			);
+			const res = await sdk.sendMessageBatch(batchData, state.account);
+			if (res.isErr()) {
+				throw res.error;
 			}
 
 			state.logger.debug(`Completed batch ${batchIndex + 1}/${batches.length}`);
