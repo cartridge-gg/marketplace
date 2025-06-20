@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  claude-review:
+  review:
     # Optional: Filter by PR author
     # if: |
     #   github.event.pull_request.user.login == 'external-contributor' ||
@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 2
 
       - name: Check if commit is from Claude
         id: check-author
@@ -50,10 +50,22 @@ jobs:
           direct_prompt: |
             Please review this TypeScript/React + Dojo smart contracts marketplace PR and provide inline feedback using the GitHub review system. Follow these steps:
 
-            1. **Start a review**: Use `mcp__github__create_pending_pull_request_review` to begin a pending review
-            2. **Get diff information**: Use `mcp__github__get_pull_request_diff` to understand the code changes and line numbers
-            3. **Add inline comments**: Use `mcp__github__add_pull_request_review_comment_to_pending_review` for each specific piece of feedback on particular lines, including code change suggestions where appropriate
-            4. **Submit the review**: Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" (not "REQUEST_CHANGES") to publish all comments as a non-blocking review
+            1. **Check for existing reviews**: First, use `mcp__github__get_pull_request_reviews` to check if you have any existing pending or submitted reviews on this PR
+            2. **Check existing comments**: Use `mcp__github__get_pull_request_comments` to see what comments have already been made to avoid redundancy
+            3. **Start a fresh review**: Use `mcp__github__create_pending_pull_request_review` to begin a new pending review
+            4. **Get diff information**: Use `mcp__github__get_pull_request_diff` to understand the code changes
+            5. **Add unique inline comments**: Only add comments for issues that haven't been addressed in existing reviews
+            6. **Add inline comments**: Use `mcp__github__add_pull_request_review_comment_to_pending_review` for each specific piece of feedback on particular lines, including code change suggestions where appropriate using multiline comments and the suggestion syntax:
+
+            ```suggestion
+              const ExampleComponent: React.FC<Props> = ({ asset }) => {
+                return <MarketplaceCard asset={asset} />;
+              };
+            ```
+
+            7. **Submit the review**: Use `mcp__github__submit_pending_pull_request_review` with event type "COMMENT" (not "REQUEST_CHANGES") to publish all comments as a non-blocking review
+
+            Only comment when something is off, wrong, or could be improved but don't be overly pedantic; if a given implementation is already good, do not comment on it.
 
             Focus your review on:
 
@@ -99,7 +111,9 @@ jobs:
             - API/contract interface documentation
             - User-facing feature documentation
 
-            Provide specific, actionable feedback with inline comments for line-specific issues and include an overall summary when submitting the review. **Important**: Submit as "COMMENT" type so the review doesn't block the PR.
+            Provide specific, actionable feedback with inline comments and suggestions for line-specific issues. Include an concise overall summary when submitting the review.
+
+            **Important**: Submit as "COMMENT" type so the review doesn't block the PR.
 
           # Add MCP GitHub tools for inline comments and project-specific testing
-          allowed_tools: "mcp__github__create_pending_pull_request_review,mcp__github__add_pull_request_review_comment_to_pending_review,mcp__github__submit_pending_pull_request_review,mcp__github__get_pull_request_diff,Bash,Read,Glob"
+          allowed_tools: "mcp__github__create_pending_pull_request_review,mcp__github__get_pull_request_comments,mcp__github__get_pull_request_reviews,mcp__github__add_pull_request_review_comment_to_pending_review,mcp__github__submit_pending_pull_request_review,mcp__github__get_pull_request_diff,Bash(pnpm install),Bash(pnpm run build),Bash(pnpm run test),Bash(pnpm run lint),Bash(pnpm run type:check),Bash(pnpm run build:scarb),Bash(pnpm --filter *),Bash(sozo build),Bash(sozo test)"
