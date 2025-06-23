@@ -1,9 +1,19 @@
-import { KeysClause, ToriiQueryBuilder, type SDK } from "@dojoengine/sdk/node";
+import {
+	KeysClause,
+	OrComposeClause,
+	ToriiQueryBuilder,
+	type SDK,
+} from "@dojoengine/sdk/node";
 import { env } from "../env.ts";
 import { createLogger, type Logger } from "../utils/logger.ts";
-import type { Token } from "./token-fetcher.ts";
-import { BigNumberish, cairo, type Account, type RpcProvider } from "starknet";
-import { type SchemaType } from "@cartridge/marketplace-sdk";
+import type { Token } from "../services/token-fetcher.ts";
+import {
+	cairo,
+	type BigNumberish,
+	type Account,
+	type RpcProvider,
+} from "starknet";
+import type { SchemaType } from "@cartridge/marketplace-sdk";
 
 /**
  * Metadata attribute type
@@ -119,7 +129,9 @@ export async function isTokenProcessed(
 ): Promise<boolean> {
 	const query = new ToriiQueryBuilder()
 		.withClause(
-			KeysClause(["MARKETPLACE-MetadataAttribute"], getTokenKey(token)).build(),
+			OrComposeClause([
+				KeysClause(["MARKETPLACE-MetadataAttribute"], getTokenKey(token)),
+			]).build(),
 		)
 		.withEntityModels(["MARKETPLACE-MetadataAttribute"]);
 	const res = await state.client.getEntities({ query });
@@ -212,7 +224,7 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 /**
  * Sends metadata messages to the orderbook
  */
-export async function publishOffchainMetadataMessages(
+export async function publishOffchainMetadataMessagesBatch(
 	state: MetadataProcessorState,
 	messages: MetadataMessage[],
 ): Promise<void> {
@@ -257,12 +269,12 @@ export async function publishOffchainMetadataMessages(
 }
 
 /**
- * Processes a single token
+ * Processes a single token and returns its messages
  */
-export async function processToken(
+export async function processTokenForMessages(
 	state: MetadataProcessorState,
 	token: Token,
-): Promise<void> {
+): Promise<MetadataMessage[]> {
 	const tokenKey = getTokenKey(token);
 	// Fetch token metadata
 	const metadata = await fetchTokenMetadata(state, token);
@@ -270,30 +282,42 @@ export async function processToken(
 	// Skip if already processed
 	if (await isTokenProcessed(state, token)) {
 		state.logger.debug(`Token ${tokenKey} already processed, skipping...`);
-		return;
+		return [];
 	}
 
 	try {
 		if (!metadata) {
 			state.logger.warn(`No metadata found for token ${tokenKey}`);
-			return;
+			return [];
 		}
 
 		// Create metadata messages
 		const messages = createMetadataMessages(token, metadata);
-
-		// Publish offchain messages
-		if (messages.length > 0) {
-			await publishOffchainMetadataMessages(state, messages);
-		}
+		return messages;
 	} catch (error) {
 		state.logger.error(error, `Failed to process token ${tokenKey}`);
 		console.log(token);
+		return [];
 	}
 }
 
 /**
- * Processes all tokens
+ * Processes a single token (for real-time updates)
+ */
+export async function processToken(
+	state: MetadataProcessorState,
+	token: Token,
+): Promise<void> {
+	const messages = await processTokenForMessages(state, token);
+
+	// Publish offchain messages
+	if (messages.length > 0) {
+		await publishOffchainMetadataMessagesBatch(state, messages);
+	}
+}
+
+/**
+ * Processes all tokens in a batch
  */
 export async function processTokens(
 	state: MetadataProcessorState,
@@ -301,13 +325,27 @@ export async function processTokens(
 ): Promise<void> {
 	state.logger.info(`Processing metadata for ${tokens.length} tokens...`);
 
+	// Collect all messages from all tokens
+	const allMessages: MetadataMessage[] = [];
+	let processedCount = 0;
+
 	for (const token of tokens) {
-		await processToken(state, token);
+		const messages = await processTokenForMessages(state, token);
+		if (messages.length > 0) {
+			allMessages.push(...messages);
+			processedCount++;
+		}
 	}
 
-	state.logger.info(
-		`Processed metadata for ${state.processedTokens.size} tokens`,
-	);
+	// Send all messages in a single batch
+	if (allMessages.length > 0) {
+		state.logger.info(
+			`Sending ${allMessages.length} messages from ${processedCount} tokens in batch`,
+		);
+		await publishOffchainMetadataMessagesBatch(state, allMessages);
+	}
+
+	state.logger.info(`Processed metadata for ${processedCount} tokens`);
 }
 
 /**

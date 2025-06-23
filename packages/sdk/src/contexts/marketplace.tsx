@@ -1,6 +1,6 @@
 import {
 	createContext,
-	ReactNode,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useEffect,
@@ -9,14 +9,14 @@ import {
 } from "react";
 import {
 	Marketplace,
-	MarketplaceModel,
+	type MarketplaceModel,
 	AccessModel,
 	BookModel,
 	OrderModel,
 	ListingEvent,
 	OfferEvent,
 	SaleEvent,
-	MarketplaceOptions,
+	type MarketplaceOptions,
 } from "../modules/marketplace";
 import { MarketplaceProvider as ExternalProvider } from "../provider";
 import { constants } from "starknet";

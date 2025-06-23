@@ -4,9 +4,9 @@ import {
 	fetchAllTokenBatches,
 } from "./services/token-fetcher.ts";
 import {
-	processTokens,
+	runTasksForTokenBatch,
 	getProcessedCount,
-} from "./services/metadata-processor.ts";
+} from "./tasks/index.ts";
 import {
 	subscribeToAllTokens,
 	unsubscribeAll,
@@ -39,7 +39,7 @@ export async function processAllTokensFromFetcher(
 				`Processing batch ${batchCount} from project ${projectId} with ${tokens.length} tokens...`,
 			);
 
-			await processTokens(state.metadataProcessorState, tokens);
+			await runTasksForTokenBatch(state.taskRunnerState, tokens);
 			totalProcessed += tokens.length;
 
 			const processingTime = Date.now() - startTime;
@@ -67,10 +67,10 @@ export async function processAllTokensLegacy(
 
 	try {
 		const tokens = await fetchAllTokens(state.tokenFetcherState);
-		await processTokens(state.metadataProcessorState, tokens);
+		await runTasksForTokenBatch(state.taskRunnerState, tokens);
 
 		state.logger.info(
-			`Processing complete. Processed ${await getProcessedCount(state.metadataProcessorState)} tokens`,
+			`Processing complete. Processed ${await getProcessedCount(state.taskRunnerState.metadataState)} tokens`,
 		);
 	} catch (error) {
 		state.logger.error(error, "Error during token processing");

@@ -6,9 +6,9 @@ import {
 	getToriiClients,
 } from "./services/token-fetcher.ts";
 import {
-	type MetadataProcessorState,
-	createMetadataProcessorState,
-} from "./services/metadata-processor.ts";
+	type TaskRunnerState,
+	createTaskRunnerState,
+} from "./tasks/index.ts";
 import {
 	type TokenSubscriptionState,
 	createTokenSubscriptionState,
@@ -24,7 +24,7 @@ import type { SchemaType } from "@cartridge/marketplace-sdk";
 export type WorkerState = {
 	logger: Logger;
 	tokenFetcherState: TokenFetcherState;
-	metadataProcessorState: MetadataProcessorState;
+	taskRunnerState: TaskRunnerState;
 	subscriptionState: TokenSubscriptionState;
 	provider: RpcProvider;
 	account: Account;
@@ -63,8 +63,8 @@ export async function createWorkerState(): Promise<WorkerState> {
 	// Initialize token fetcher
 	const tokenFetcherState = await initializeTokenFetcher({ provider, chainId });
 
-	// Initialize metadata processor
-	const metadataProcessorState = createMetadataProcessorState({
+	// Initialize task runner
+	const taskRunnerState = createTaskRunnerState({
 		provider,
 		account,
 		marketplaceAddress: env.MARKETPLACE_ADDRESS,
@@ -75,13 +75,13 @@ export async function createWorkerState(): Promise<WorkerState> {
 	// Initialize subscription service
 	const subscriptionState = createTokenSubscriptionState({
 		toriiClients: getToriiClients(tokenFetcherState),
-		metadataProcessorState,
+		taskRunnerState,
 	});
 
 	return {
 		logger,
 		tokenFetcherState,
-		metadataProcessorState,
+		taskRunnerState,
 		subscriptionState,
 		provider,
 		account,

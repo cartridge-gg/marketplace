@@ -2,9 +2,9 @@ import type { ToriiClient } from "@dojoengine/torii-wasm/node";
 import { createLogger, type Logger } from "../utils/logger.ts";
 import { type Token } from "./token-fetcher.ts";
 import {
-	type MetadataProcessorState,
-	processToken,
-} from "./metadata-processor.ts";
+	type TaskRunnerState,
+	runTasksForToken,
+} from "../tasks/index.ts";
 
 /**
  * Subscription type
@@ -24,7 +24,7 @@ export type TokenUpdateHandler = (
  */
 export type TokenSubscriptionState = {
 	toriiClients: Map<string, ToriiClient>;
-	metadataProcessorState: MetadataProcessorState;
+	taskRunnerState: TaskRunnerState;
 	subscriptions: Map<string, Subscription>;
 	logger: Logger;
 };
@@ -34,7 +34,7 @@ export type TokenSubscriptionState = {
  */
 export type TokenSubscriptionOptions = {
 	toriiClients: Map<string, ToriiClient>;
-	metadataProcessorState: MetadataProcessorState;
+	taskRunnerState: TaskRunnerState;
 };
 
 /**
@@ -45,7 +45,7 @@ export function createTokenSubscriptionState(
 ): TokenSubscriptionState {
 	return {
 		toriiClients: options.toriiClients,
-		metadataProcessorState: options.metadataProcessorState,
+		taskRunnerState: options.taskRunnerState,
 		subscriptions: new Map(),
 		logger: createLogger("TokenSubscription"),
 	};
@@ -83,7 +83,7 @@ export async function subscribeToProject(
 					token.contract_address,
 					token.token_id,
 				);
-				await processToken(state.metadataProcessorState, token);
+				await runTasksForToken(state.taskRunnerState, token);
 			} catch (err) {
 				state.logger.error(
 					"Failed to update metadata for token : ",
