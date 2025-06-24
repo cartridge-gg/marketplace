@@ -195,7 +195,6 @@ export async function checkTokenIntegrityBatch(
 			);
 			data.push(typedData);
 		}
-		console.log(data);
 
 		// Send message
 		const res = await state.client.sendMessageBatch(data, state.account);

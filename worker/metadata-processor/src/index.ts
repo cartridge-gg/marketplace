@@ -1,5 +1,6 @@
 import { initializeWorker } from "./init.ts";
 import { startWorker, setupGracefulShutdown } from "./worker.ts";
+import { createLogger } from "./utils/logger.ts";
 
 // Re-export types and functions for external use
 export type { WorkerState } from "./init.ts";
@@ -17,6 +18,8 @@ export {
  * Main entry point
  */
 async function main() {
+	const logger = createLogger("Main");
+	
 	try {
 		// Initialize worker
 		const state = await initializeWorker();
@@ -28,9 +31,9 @@ async function main() {
 		setupGracefulShutdown(state);
 
 		// Keep the process running
-		console.log("Metadata processor worker is running. Press Ctrl+C to stop.");
+		state.logger.info("Metadata processor worker is running. Press Ctrl+C to stop.");
 	} catch (error) {
-		console.error("Fatal error:", error);
+		logger.error(error, "Fatal error");
 		process.exit(1);
 	}
 }

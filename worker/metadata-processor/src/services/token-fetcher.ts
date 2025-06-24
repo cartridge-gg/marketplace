@@ -53,7 +53,7 @@ export function createTokenFetcherState(
 		toriiClients: new Map(),
 		ignoreProjects: [
 			...(options.ignoreProjects || []),
-			...["populariumdemo-game", "dragark-mainnet-v11-3"],
+			...env.IGNORED_PROJECTS,
 		],
 		registryState: createArcadeRegistryState(options.chainId),
 	};

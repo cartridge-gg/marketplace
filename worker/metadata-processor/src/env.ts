@@ -41,8 +41,7 @@ const envSchema = z.object({
 	RPC_URL: z
 		.string()
 		.url()
-		.default("https://api.cartridge.gg/rpc/starknet-mainnet")
-		.describe("StarkNet RPC endpoint"),
+		.describe("StarkNet RPC endpoint - must be explicitly set"),
 
 	// Account configuration (for sending transactions)
 	ACCOUNT_ADDRESS: z
@@ -131,6 +130,13 @@ const envSchema = z.object({
 		.pipe(z.number().positive())
 		.default("500")
 		.describe("Number of messages to send in a single batch"),
+	
+	// Project filtering configuration
+	IGNORED_PROJECTS: z
+		.string()
+		.optional()
+		.transform((val) => val?.split(',').map(s => s.trim()) || [])
+		.describe("Comma-separated list of projects to ignore"),
 });
 
 // Parse and validate environment variables

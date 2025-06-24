@@ -117,7 +117,7 @@ export function createMetadataProcessorState(
  * Gets a unique token key
  */
 export function getTokenKey(token: Token): string[] {
-	return [env.ACCOUNT_ADDRESS, token.contract_address, token.token_id];
+	return [token.contract_address, token.token_id];
 }
 
 /**
@@ -193,13 +193,13 @@ export function createMetadataMessages(
 
 		if (key === "attributes" && Array.isArray(value)) {
 			// Handle attributes array specially
-			value.forEach((attr, attrIndex) => {
+			value.forEach((attr: any, attrIndex) => {
+				const traitType = attr.trait_type ?? attr.trait ?? 'unknown';
 				messages.push(
 					createAttributeMessage(
 						token,
 						index + attrIndex + Object.keys(metadata).length,
-						// @ts-ignore
-						attr.trait_type ?? attr.trait,
+						traitType,
 						attr.value,
 					),
 				);
@@ -296,7 +296,6 @@ export async function processTokenForMessages(
 		return messages;
 	} catch (error) {
 		state.logger.error(error, `Failed to process token ${tokenKey}`);
-		console.log(token);
 		return [];
 	}
 }

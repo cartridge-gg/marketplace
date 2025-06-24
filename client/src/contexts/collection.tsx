@@ -81,6 +81,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 			const collections: Collections = {};
 			await Promise.all(
 				Object.keys(clients).map(async (project) => {
+					console.log(project);
 					const client = clients[project];
 					try {
 						const tokens = await client.getTokens([], []);
