@@ -30,6 +30,7 @@ export function MetadataFilters({
 				<h3 className="text-lg font-semibold text-primary-500">Filters</h3>
 				{selectedTraits.length > 0 && (
 					<button
+						type="button"
 						onClick={clearFilters}
 						className="text-sm text-primary-400 hover:text-primary-500 transition-colors"
 					>

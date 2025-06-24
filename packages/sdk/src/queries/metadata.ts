@@ -193,7 +193,18 @@ export function filterMetadataByTraits(
 	});
 }
 
-export function getMetadataStatistics(metadata: TokenMetadataUI[]) {
+export type MetadataStatistic = {
+	traitType: string;
+	values: Array<{
+		value: string;
+		count: number;
+		percentage: number;
+	}>;
+};
+export type MetadataStatistics = MetadataStatistic[];
+export function getMetadataStatistics(
+	metadata: TokenMetadataUI[],
+): MetadataStatistics {
 	const traitStats = new Map<string, Map<string, number>>();
 
 	for (const token of metadata) {
@@ -220,10 +231,10 @@ export function getMetadataStatistics(metadata: TokenMetadataUI[]) {
 				count,
 				percentage: (count / metadata.length) * 100,
 			}))
-			.sort((a, b) => b.count - a.count);
+			.sort((a, b) => a.value.localeCompare(b.value));
 
 		stats.push({ traitType, values });
 	});
 
-	return stats;
+	return stats.sort((a, b) => a.traitType.localeCompare(b.traitType));
 }

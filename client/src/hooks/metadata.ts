@@ -104,12 +104,14 @@ export function useMetadataFilters(
 	const [selectedTraits, setSelectedTraits] = useState<
 		{ traitType: string; value: string }[]
 	>([]);
+	const [statistics, setStatistics] = useState(getMetadataStatistics(tokens));
 
 	useEffect(() => {
-		handleChange(filterMetadataByTraits(tokens, selectedTraits));
-	}, [tokens, selectedTraits, handleChange]);
+		const filteredTokens = filterMetadataByTraits(tokens, selectedTraits);
 
-	const statistics = getMetadataStatistics(tokens);
+		handleChange(filteredTokens);
+		setStatistics(getMetadataStatistics(filteredTokens));
+	}, [tokens, selectedTraits, handleChange]);
 
 	const toggleTrait = useCallback((traitType: string, value: string) => {
 		setSelectedTraits((prev) => {
@@ -128,7 +130,8 @@ export function useMetadataFilters(
 
 	const clearFilters = useCallback(() => {
 		setSelectedTraits([]);
-	}, []);
+		setStatistics(getMetadataStatistics(tokens));
+	}, [tokens]);
 
 	const isTraitSelected = useCallback(
 		(traitType: string, value: string) => {
@@ -142,7 +145,6 @@ export function useMetadataFilters(
 	return {
 		selectedTraits,
 		statistics,
-		filteredTokens: [],
 		toggleTrait,
 		clearFilters,
 		isTraitSelected,

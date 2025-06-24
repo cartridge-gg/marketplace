@@ -1,4 +1,4 @@
-import { useContext, useState, useCallback, useEffect } from "react";
+import { useContext, useState, useCallback, useEffect, useRef } from "react";
 import { CollectionContext } from "../contexts";
 import { useArcade } from "./arcade";
 import { Token, ToriiClient } from "@dojoengine/torii-wasm";
@@ -80,6 +80,7 @@ export function useCollection(
 	const [currentCursor, setCurrentCursor] = useState<string | undefined>(
 		initialCursor,
 	);
+	const hasHadTokenIds = useRef(false);
 
 	const fetchCollection = useCallback(
 		async (
@@ -134,7 +135,7 @@ export function useCollection(
 	);
 
 	const loadPage = useCallback(
-		async (pageNumber: number, newCursor?: string, tokenIds: string[]) => {
+		async (pageNumber: number, tokenIds: string[], newCursor?: string) => {
 			setIsLoading(true);
 			try {
 				const {
@@ -176,7 +177,7 @@ export function useCollection(
 			const newPrevCursors = [...prevCursors];
 			const prevCursor = newPrevCursors.pop() || undefined;
 			setPrevCursors(newPrevCursors);
-			loadPage(currentPage - 1, prevCursor, tokenIds);
+			loadPage(currentPage - 1, tokenIds, prevCursor);
 		}
 	}, [currentPage, prevCursors, loadPage, tokenIds]);
 
@@ -185,32 +186,37 @@ export function useCollection(
 			if (currentCursor) {
 				setPrevCursors([...prevCursors, currentCursor]);
 			}
-			loadPage(currentPage + 1, cursor, tokenIds);
+			loadPage(currentPage + 1, tokenIds, cursor);
 		}
 	}, [cursor, prevCursors, currentPage, loadPage, currentCursor, tokenIds]);
 
 	// Handle initial load and cursor changes from URL
 	useEffect(() => {
 		if (!isLoading) {
+			// Track if tokenIds has ever had values
 			if (tokenIds.length > 0) {
-				loadPage(currentPage, cursor, tokenIds);
+				hasHadTokenIds.current = true;
+				loadPage(currentPage, tokenIds, cursor);
+			} else if (hasHadTokenIds.current && tokenIds.length === 0) {
+				// tokenIds was cleared after having values, load initial page
+				loadPage(1, tokenIds, undefined);
 			}
 
 			if (initialCursor !== currentCursor) {
 				// URL cursor changed, load the page with new cursor
 				if (initialCursor) {
 					// Navigate to specific cursor
-					loadPage(currentPage, initialCursor, tokenIds);
+					loadPage(currentPage, tokenIds, initialCursor);
 				} else {
 					// No cursor means first page
 					setCurrentPage(1);
 					setCursor(undefined);
 					setPrevCursors([]);
-					loadPage(1, undefined, tokenIds);
+					loadPage(1, tokenIds, undefined);
 				}
 			} else if (collection.length === 0) {
-				// Initial load
-				loadPage(1, initialCursor, tokenIds);
+				// Initial load with tokenIds
+				loadPage(1, tokenIds, initialCursor);
 			}
 		}
 	}, [initialCursor, collectionAddress, clients, tokenIds]); // React to cursor and address changes
