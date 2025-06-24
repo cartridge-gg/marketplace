@@ -97,14 +97,19 @@ export function useCollectionMetadata(
 	});
 }
 
-export function useMetadataFilters(tokens: TokenMetadataUI[]) {
+export function useMetadataFilters(
+	tokens: TokenMetadataUI[],
+	handleChange: (tokens: TokenMetadataUI[]) => void,
+) {
 	const [selectedTraits, setSelectedTraits] = useState<
 		{ traitType: string; value: string }[]
 	>([]);
 
-	const statistics = getMetadataStatistics(tokens);
+	useEffect(() => {
+		handleChange(filterMetadataByTraits(tokens, selectedTraits));
+	}, [tokens, selectedTraits, handleChange]);
 
-	const filteredTokens = filterMetadataByTraits(tokens, selectedTraits);
+	const statistics = getMetadataStatistics(tokens);
 
 	const toggleTrait = useCallback((traitType: string, value: string) => {
 		setSelectedTraits((prev) => {
@@ -116,9 +121,8 @@ export function useMetadataFilters(tokens: TokenMetadataUI[]) {
 				return prev.filter(
 					(t) => !(t.traitType === traitType && t.value === value),
 				);
-			} else {
-				return [...prev, { traitType, value }];
 			}
+			return [...prev, { traitType, value }];
 		});
 	}, []);
 
@@ -138,7 +142,7 @@ export function useMetadataFilters(tokens: TokenMetadataUI[]) {
 	return {
 		selectedTraits,
 		statistics,
-		filteredTokens,
+		filteredTokens: [],
 		toggleTrait,
 		clearFilters,
 		isTraitSelected,

@@ -2,6 +2,7 @@ import { useContext, useState, useCallback, useEffect } from "react";
 import { CollectionContext } from "../contexts";
 import { useArcade } from "./arcade";
 import { Token, ToriiClient } from "@dojoengine/torii-wasm";
+import { addAddressPadding } from "starknet";
 export type { Collection, Collections } from "../contexts/collection";
 
 /**
@@ -29,12 +30,14 @@ export const useCollections = () => {
 
 	return { collections };
 };
+
 async function fetchCollectionFromClient(
 	clients: { [key: string]: ToriiClient },
 	client: string,
 	address: string,
 	count: number,
 	cursor: string | undefined,
+	tokenIds: string[],
 ): Promise<{
 	items: Token[];
 	cursor: string | undefined;
@@ -43,7 +46,7 @@ async function fetchCollectionFromClient(
 	try {
 		const tokens = await clients[client].getTokens(
 			[address],
-			[],
+			tokenIds.map((t) => addAddressPadding(t)),
 			count,
 			cursor,
 		);
@@ -63,6 +66,7 @@ async function fetchCollectionFromClient(
 
 export function useCollection(
 	collectionAddress: string,
+	tokenIds: string[],
 	pageSize: number = 50,
 	initialCursor?: string,
 ) {
@@ -78,7 +82,12 @@ export function useCollection(
 	);
 
 	const fetchCollection = useCallback(
-		async (address: string, count: number, cursor: string | undefined) => {
+		async (
+			address: string,
+			count: number,
+			cursor: string | undefined,
+			tokenIds: string[],
+		) => {
 			if (client) {
 				return await fetchCollectionFromClient(
 					clients,
@@ -86,6 +95,7 @@ export function useCollection(
 					address,
 					count,
 					cursor,
+					tokenIds,
 				);
 			}
 
@@ -98,6 +108,7 @@ export function useCollection(
 							address,
 							count,
 							cursor,
+							tokenIds,
 						);
 					} catch (err) {
 						console.error(err);
@@ -123,14 +134,19 @@ export function useCollection(
 	);
 
 	const loadPage = useCallback(
-		async (pageNumber: number, newCursor?: string) => {
+		async (pageNumber: number, newCursor?: string, tokenIds: string[]) => {
 			setIsLoading(true);
 			try {
 				const {
 					items,
 					cursor: nextCursor,
 					client: fetchedClient,
-				} = await fetchCollection(collectionAddress, pageSize, newCursor);
+				} = await fetchCollection(
+					collectionAddress,
+					pageSize,
+					newCursor,
+					tokenIds,
+				);
 				if (items.length > 0) {
 					setCollection(
 						items.map((i: Token) => {
@@ -160,40 +176,44 @@ export function useCollection(
 			const newPrevCursors = [...prevCursors];
 			const prevCursor = newPrevCursors.pop() || undefined;
 			setPrevCursors(newPrevCursors);
-			loadPage(currentPage - 1, prevCursor);
+			loadPage(currentPage - 1, prevCursor, tokenIds);
 		}
-	}, [currentPage, prevCursors, loadPage]);
+	}, [currentPage, prevCursors, loadPage, tokenIds]);
 
 	const getNextPage = useCallback(() => {
 		if (cursor) {
 			if (currentCursor) {
 				setPrevCursors([...prevCursors, currentCursor]);
 			}
-			loadPage(currentPage + 1, cursor);
+			loadPage(currentPage + 1, cursor, tokenIds);
 		}
-	}, [cursor, prevCursors, currentPage, loadPage, currentCursor]);
+	}, [cursor, prevCursors, currentPage, loadPage, currentCursor, tokenIds]);
 
 	// Handle initial load and cursor changes from URL
 	useEffect(() => {
 		if (!isLoading) {
+			if (tokenIds.length > 0) {
+				loadPage(currentPage, cursor, tokenIds);
+			}
+
 			if (initialCursor !== currentCursor) {
 				// URL cursor changed, load the page with new cursor
 				if (initialCursor) {
 					// Navigate to specific cursor
-					loadPage(currentPage, initialCursor);
+					loadPage(currentPage, initialCursor, tokenIds);
 				} else {
 					// No cursor means first page
 					setCurrentPage(1);
 					setCursor(undefined);
 					setPrevCursors([]);
-					loadPage(1, undefined);
+					loadPage(1, undefined, tokenIds);
 				}
 			} else if (collection.length === 0) {
 				// Initial load
-				loadPage(1, initialCursor);
+				loadPage(1, initialCursor, tokenIds);
 			}
 		}
-	}, [initialCursor, collectionAddress, clients]); // React to cursor and address changes
+	}, [initialCursor, collectionAddress, clients, tokenIds]); // React to cursor and address changes
 
 	return {
 		collection,

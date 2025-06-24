@@ -32,6 +32,13 @@ function RouteComponent() {
 	const { collectionAddress } = Route.useParams();
 	const { cursor } = Route.useSearch();
 	const navigate = useNavigate({ from: Route.fullPath });
+
+	const { data: collectionMetadata } = useCollectionMetadata(
+		collectionAddress,
+		import.meta.env.VITE_IDENTITY,
+	);
+	const [filteredTokenIds, setFilteredTokenIds] = useState<string[]>([]);
+
 	const {
 		collection,
 		getPrevPage,
@@ -42,13 +49,7 @@ function RouteComponent() {
 		currentPage,
 		nextCursor,
 		prevCursor,
-	} = useCollection(collectionAddress, 50, cursor);
-
-	const { data: collectionMetadata } = useCollectionMetadata(collectionAddress);
-
-	const [filteredTokenIds, setFilteredTokenIds] = useState<Set<string> | null>(
-		null,
-	);
+	} = useCollection(collectionAddress, filteredTokenIds, 50, cursor);
 
 	const handlePrevPage = useCallback(() => {
 		if (hasPrev) {
@@ -73,22 +74,16 @@ function RouteComponent() {
 	// Get collection name from the first token
 	const collectionName = collection[0]?.name || "Collection";
 
-	// Filter collection based on metadata filters
-	const displayedCollection = useMemo(() => {
-		if (!filteredTokenIds) return collection;
-		return collection.filter((token) => filteredTokenIds.has(token.token_id));
-	}, [collection, filteredTokenIds]);
-
 	const handleFilteredTokensChange = useCallback(
 		(filteredTokens: TokenMetadataUI[]) => {
 			if (filteredTokens.length === collectionMetadata?.tokens.length) {
-				setFilteredTokenIds(null);
-			} else {
-				const tokenIds = new Set(filteredTokens.map((token) => token.tokenId));
-				setFilteredTokenIds(tokenIds);
+				setFilteredTokenIds([]);
+				return;
 			}
+			const tokenIds = filteredTokens.map((token) => token.tokenId);
+			setFilteredTokenIds(tokenIds);
 		},
-		[collectionMetadata],
+		[collectionMetadata, setFilteredTokenIds],
 	);
 
 	if (collection.length === 0 && isLoading) {
@@ -135,7 +130,7 @@ function RouteComponent() {
 					)}
 					<div className="flex-1">
 						<CollectionGrid
-							collection={displayedCollection}
+							collection={collection}
 							name={collectionName}
 							getPrevPage={handlePrevPage}
 							getNextPage={handleNextPage}

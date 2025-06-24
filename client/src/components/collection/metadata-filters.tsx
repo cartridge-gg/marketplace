@@ -14,18 +14,12 @@ export function MetadataFilters({
 }: MetadataFiltersProps) {
 	const {
 		statistics,
-		filteredTokens,
 		toggleTrait,
 		clearFilters,
 		isTraitSelected,
 		selectedTraits,
-	} = useMetadataFilters(tokens);
+	} = useMetadataFilters(tokens, onFilteredTokensChange);
 
-	useEffect(() => {
-		onFilteredTokensChange(filteredTokens);
-	}, [filteredTokens, onFilteredTokensChange]);
-
-	console.log(statistics);
 	if (statistics.length === 0) {
 		return null;
 	}

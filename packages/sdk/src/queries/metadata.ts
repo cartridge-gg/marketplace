@@ -6,6 +6,7 @@ import {
 } from "@dojoengine/sdk";
 import { ModelsMapping } from "../bindings";
 import { addAddressPadding, type BigNumberish } from "starknet";
+import { NAMESPACE } from "../constants";
 
 export function getTokenMetadataQuery(
 	identity: string,
@@ -42,13 +43,14 @@ export function getCollectionMetadataQuery(
 					addAddressPadding(collectionAddress),
 					undefined,
 					undefined,
+					undefined,
 				],
 				"FixedLen",
 			).build(),
 		)
 		.withEntityModels([ModelsMapping.MetadataAttribute])
-		.addOrderBy(ModelsMapping.MetadataAttribute, "token_id", "Asc")
-		.addOrderBy(ModelsMapping.MetadataAttribute, "index", "Asc");
+		.addOrderBy(ModelsMapping.MetadataAttribute, "index", "Asc")
+		.withLimit(100000);
 }
 
 export function getMetadataByTraitQuery(
@@ -140,11 +142,11 @@ export function transformMetadataForUI(
 ): TokenMetadataUI[] {
 	const tokenMap = new Map<string, TokenMetadataUI>();
 
-	metadataEntities.forEach((entity) => {
-		const metadata = entity.models?.["MARKETPLACE-MetadataAttribute"];
-		if (!metadata) return;
+	for (const entity of metadataEntities) {
+		const metadata = entity.models?.[NAMESPACE].MetadataAttribute;
+		if (!metadata) continue;
 
-		const tokenId = metadata.token_id.toString();
+		const tokenId = `0x${metadata.token_id.toString(16)}`;
 
 		if (!tokenMap.has(tokenId)) {
 			tokenMap.set(tokenId, {
@@ -153,12 +155,14 @@ export function transformMetadataForUI(
 			});
 		}
 
-		const token = tokenMap.get(tokenId)!;
-		token.attributes.push({
-			traitType: metadata.trait_type,
-			value: metadata.value,
-		});
-	});
+		const token = tokenMap.get(tokenId);
+		if (token) {
+			token.attributes.push({
+				traitType: metadata.trait_type,
+				value: metadata.value,
+			});
+		}
+	}
 
 	return Array.from(tokenMap.values()).sort((a, b) =>
 		BigInt(a.tokenId) > BigInt(b.tokenId) ? 1 : -1,
@@ -192,15 +196,17 @@ export function filterMetadataByTraits(
 export function getMetadataStatistics(metadata: TokenMetadataUI[]) {
 	const traitStats = new Map<string, Map<string, number>>();
 
-	metadata.forEach((token) => {
-		token.attributes.forEach((attr) => {
+	for (const token of metadata) {
+		for (const attr of token.attributes) {
 			if (!traitStats.has(attr.traitType)) {
 				traitStats.set(attr.traitType, new Map());
 			}
-			const valueMap = traitStats.get(attr.traitType)!;
-			valueMap.set(attr.value, (valueMap.get(attr.value) || 0) + 1);
-		});
-	});
+			const valueMap = traitStats.get(attr.traitType);
+			if (valueMap) {
+				valueMap.set(attr.value, (valueMap.get(attr.value) || 0) + 1);
+			}
+		}
+	}
 
 	const stats: Array<{
 		traitType: string;
