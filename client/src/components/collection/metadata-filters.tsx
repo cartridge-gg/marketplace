@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { MarketplaceFilters, MarketplacePropertyFilter } from "@cartridge/ui";
 import { useMetadataFilters } from "../../hooks/metadata";
 import type { TokenMetadataUI } from "@cartridge/marketplace-sdk";

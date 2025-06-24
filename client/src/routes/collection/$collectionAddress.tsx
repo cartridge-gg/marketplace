@@ -281,7 +281,6 @@ function Token({ token }: { token: Token }) {
 				<div>
 					<CollectibleCard
 						title=""
-						description=""
 						image={imageUrl}
 						className="w-full h-auto"
 						selectable={false}
