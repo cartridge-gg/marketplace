@@ -10,9 +10,9 @@ import { ArcadeContext } from "./arcade";
 import { Token } from "@dojoengine/torii-client";
 import { getChecksumAddress } from "starknet";
 
-export type Collection = Record<string, Token>;
+export type WithCount<T> = T & { count: number };
+export type Collection = Record<string, WithCount<Token>>;
 export type Collections = Record<string, Collection>;
-type WithCount<T> = T & { count: number };
 
 /**
  * Interface defining the shape of the Collection context.
@@ -92,22 +92,25 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 						}
 
 						const filtereds = allTokens.filter((token) => !!token.metadata);
+						if (filtereds.length === 0) return;
 
 						const collection: Record<
 							string,
 							WithCount<Token>
 						> = filtereds.reduce(
 							(acc: Record<string, WithCount<Token>>, curr: Token) => {
-								if (Object.hasOwn(acc, curr.contract_address)) {
-									acc[curr.contract_address].count += 1;
-									return acc;
-								}
-								curr.contract_address = getChecksumAddress(
+								const checksumAddress = getChecksumAddress(
 									curr.contract_address,
 								);
 
-								acc[curr.contract_address] = {
+								if (Object.hasOwn(acc, checksumAddress)) {
+									acc[checksumAddress].count += 1;
+									return acc;
+								}
+
+								acc[checksumAddress] = {
 									...curr,
+									contract_address: checksumAddress,
 									count: 1,
 								};
 
@@ -115,7 +118,6 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 							},
 							{},
 						);
-						if (filtereds.length === 0) return;
 
 						collections[project] = collection;
 						return;
