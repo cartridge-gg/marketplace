@@ -81,11 +81,17 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 			const collections: Collections = {};
 			await Promise.all(
 				Object.keys(clients).map(async (project) => {
-					console.log(project);
 					const client = clients[project];
 					try {
-						const tokens = await client.getTokens([], []);
-						const filtereds = tokens.items.filter((token) => !!token.metadata);
+						let tokens = await client.getTokens([], [], 5000);
+						const allTokens = [...tokens.items];
+
+						while (tokens.next_cursor) {
+							tokens = await client.getTokens([], [], 5000, tokens.next_cursor);
+							allTokens.push(...tokens.items);
+						}
+
+						const filtereds = allTokens.filter((token) => !!token.metadata);
 
 						const collection: Record<
 							string,
