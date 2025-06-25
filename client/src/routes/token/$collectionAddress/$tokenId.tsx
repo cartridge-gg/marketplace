@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMarketplaceActions, useToken } from "../../../hooks";
 import { useCallback, useMemo } from "react";
-import { CollectibleAsset } from "@cartridge/ui";
+import { CollectibleCard } from "@cartridge/ui";
 import { getChecksumAddress } from "starknet";
 import { BackButton } from "../../../components/ui/back-button";
 import { TokenActionsPanel } from "../../../components/ui/token-action-panel";
@@ -100,7 +100,7 @@ function RouteComponent() {
 				{/* Token Image */}
 				<div className="w-full md:w-1/2">
 					<div className="bg-background-200 rounded-lg overflow-hidden shadow-lg">
-						<CollectibleAsset
+						<CollectibleCard
 							title={tokenName}
 							image={imageUrl}
 							className="w-full h-auto"

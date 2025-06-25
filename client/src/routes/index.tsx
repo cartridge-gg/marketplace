@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCollections, type Collection as CollectionType } from "../hooks";
-import { CollectibleAsset } from "@cartridge/ui";
+import { CollectibleCard } from "@cartridge/ui";
 import { Token } from "@dojoengine/torii-client";
 import { useMemo } from "react";
 import { getChecksumAddress } from "starknet";
+import type { WithCount } from "../contexts/collection";
 
 // Define metadata interface based on the expected structure
 interface CollectionMetadata {
@@ -57,7 +58,7 @@ function Project({ collection }: { collection: CollectionType }) {
 	);
 }
 
-function Collection({ collection }: { collection: Token }) {
+function Collection({ collection }: { collection: WithCount<Token> }) {
 	const metadata = useMemo<CollectionMetadata>(() => {
 		if (!collection.metadata) return {};
 
@@ -89,17 +90,14 @@ function Collection({ collection }: { collection: Token }) {
 				className="block h-full"
 			>
 				<div className="relative">
-					<CollectibleAsset
+					<CollectibleCard
 						title=""
 						image={imageUrl}
-						// @ts-expect-error
-						count={collection.count}
 						className="w-full h-auto"
+						selectable={false}
 					/>
-					{/* @ts-expect-error */}
 					{collection.count && (
 						<div className="absolute bottom-2 right-2 bg-primary-500 text-white px-2 py-1 rounded-md text-sm font-medium">
-							{/* @ts-expect-error */}
 							{collection.count} items
 						</div>
 					)}

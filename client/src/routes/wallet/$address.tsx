@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useWalletTokens } from "../../hooks/token";
 import { getChecksumAddress } from "starknet";
-import { CollectibleAsset } from "@cartridge/ui";
+import { CollectibleAssetCard } from "@cartridge/ui";
 import type { Token } from "@dojoengine/torii-wasm";
 
 // Define metadata interface based on the expected structure
@@ -167,8 +167,9 @@ function TokenCard({ token }: { token: Token }) {
 				className="block h-full"
 			>
 				<div>
-					<CollectibleAsset
+					<CollectibleAssetCard
 						title=""
+						description=""
 						image={imageUrl}
 						className="w-full h-auto"
 					/>

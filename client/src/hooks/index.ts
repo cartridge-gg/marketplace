@@ -4,6 +4,7 @@ export * from "./collections";
 export * from "./arcade";
 export * from "./token";
 export * from "./marketplace";
+export * from "./metadata";
 
 /**
  * Custom hook that manages initialization state
