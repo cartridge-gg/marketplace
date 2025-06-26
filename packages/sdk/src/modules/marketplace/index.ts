@@ -62,6 +62,7 @@ export const Marketplace = {
 		const clauses = new ClauseBuilder().keys(keys, []);
 		return new ToriiQueryBuilder<SchemaType>()
 			.withClause(clauses.build())
+			.withEntityModels(keys)
 			.includeHashedKeys();
 	},
 
@@ -73,6 +74,7 @@ export const Marketplace = {
 		const clauses = new ClauseBuilder().keys(keys, []);
 		return new ToriiQueryBuilder<SchemaType>()
 			.withClause(clauses.build())
+			.withEntityModels(keys)
 			.includeHashedKeys();
 	},
 
@@ -137,7 +139,7 @@ export const Marketplace = {
 			);
 			callback(events);
 		};
-		const query = Marketplace.getEntityQuery(options);
+		const query = Marketplace.getEventQuery(options);
 		try {
 			const events = await Marketplace.sdk.getEventMessages({ query });
 			await wrappedCallback(events);
