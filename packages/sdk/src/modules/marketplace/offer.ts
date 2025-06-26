@@ -22,7 +22,7 @@ export class OfferEvent {
 
 	static from(identifier: string, model: any) {
 		if (!model) return OfferEvent.default(identifier);
-		const id = Number(model.id);
+		const id = Number(model.order_id);
 		const order = OrderModel.from(identifier, model.order);
 		const time = Number(model.time);
 		return new OfferEvent(identifier, id, order, time);
