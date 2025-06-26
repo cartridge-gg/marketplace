@@ -148,6 +148,7 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 					if (IGNORES.includes(edition.config.project)) return;
 					const url = `https://api.cartridge.gg/x/${edition.config.project}/torii`;
 					const client = await provider.getToriiClient(url);
+					// @ts-expect-error FIXME: torii-wasm version should match between client versions
 					clients[edition.config.project] = client;
 				}),
 			);
