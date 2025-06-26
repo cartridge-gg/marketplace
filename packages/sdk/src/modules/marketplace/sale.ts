@@ -27,7 +27,7 @@ export class SaleEvent {
 
 	static from(identifier: string, model: any) {
 		if (!model) return SaleEvent.default(identifier);
-		const id = Number(model.id);
+		const id = Number(model.order_id);
 		const order = OrderModel.from(identifier, model.order);
 		const from = getChecksumAddress(model.from);
 		const to = getChecksumAddress(model.to);
