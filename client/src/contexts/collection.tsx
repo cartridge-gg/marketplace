@@ -8,7 +8,7 @@ import {
 
 import { ArcadeContext } from "./arcade";
 import { Token } from "@dojoengine/torii-client";
-import { getChecksumAddress } from "starknet";
+import { Marketplace } from "@cartridge/marketplace-sdk";
 
 export type WithCount<T> = T & { count: number };
 export type Collection = Record<string, WithCount<Token>>;
@@ -77,59 +77,9 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 
 	useEffect(() => {
 		if (!clients || Object.keys(clients).length === 0) return;
-		const fetchCollections = async () => {
-			const collections: Collections = {};
-			await Promise.all(
-				Object.keys(clients).map(async (project) => {
-					const client = clients[project];
-					try {
-						let tokens = await client.getTokens([], [], 5000);
-						const allTokens = [...tokens.items];
-
-						while (tokens.next_cursor) {
-							tokens = await client.getTokens([], [], 5000, tokens.next_cursor);
-							allTokens.push(...tokens.items);
-						}
-
-						const filtereds = allTokens.filter((token) => !!token.metadata);
-						if (filtereds.length === 0) return;
-
-						const collection: Record<
-							string,
-							WithCount<Token>
-						> = filtereds.reduce(
-							(acc: Record<string, WithCount<Token>>, curr: Token) => {
-								const checksumAddress = getChecksumAddress(
-									curr.contract_address,
-								);
-
-								if (Object.hasOwn(acc, checksumAddress)) {
-									acc[checksumAddress].count += 1;
-									return acc;
-								}
-
-								acc[checksumAddress] = {
-									...curr,
-									contract_address: checksumAddress,
-									count: 1,
-								};
-
-								return acc;
-							},
-							{},
-						);
-
-						collections[project] = collection;
-						return;
-					} catch (error) {
-						console.error("Error fetching tokens:", error, project);
-						return;
-					}
-				}),
-			);
+		Marketplace.fetchCollections(clients).then((collections) => {
 			setCollections(deduplicateCollections(collections));
-		};
-		fetchCollections();
+		});
 	}, [clients]);
 
 	return (

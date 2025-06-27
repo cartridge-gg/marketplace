@@ -1,5 +1,5 @@
 import { initSDK } from "..";
-import type { constants } from "starknet";
+import { getChecksumAddress, type constants } from "starknet";
 import { Access, AccessModel } from "./access";
 import { Book, BookModel } from "./book";
 import { Order, OrderModel } from "./order";
@@ -18,6 +18,7 @@ import {
 import type { SchemaType } from "../../bindings";
 import { NAMESPACE } from "../../constants";
 import { MarketplaceOptions, DefaultMarketplaceOptions } from "./options";
+import { Token, ToriiClient } from "@dojoengine/torii-wasm";
 
 export * from "./policies";
 export {
@@ -37,6 +38,10 @@ export type MarketplaceModel =
 	| ListingEvent
 	| OfferEvent
 	| SaleEvent;
+
+export type WithCount<T> = T & { count: number };
+export type Collection = Record<string, WithCount<Token>>;
+export type Collections = Record<string, Collection>;
 
 export const Marketplace = {
 	sdk: undefined as SDK<SchemaType> | undefined,
@@ -259,5 +264,52 @@ export const Marketplace = {
 			Marketplace.unsubEntities();
 			Marketplace.unsubEntities = undefined;
 		}
+	},
+
+	fetchCollections: async (clients: { [key: string]: ToriiClient }) => {
+		const collections: Collections = {};
+		await Promise.all(
+			Object.keys(clients).map(async (project) => {
+				const client = clients[project];
+				try {
+					let tokens = await client.getTokens([], [], 5000);
+					const allTokens = [...tokens.items];
+					while (tokens.next_cursor) {
+						tokens = await client.getTokens([], [], 5000, tokens.next_cursor);
+						allTokens.push(...tokens.items);
+					}
+
+					const filtereds = allTokens.filter((token) => !!token.metadata);
+					if (filtereds.length === 0) return;
+
+					const collection: Collection = filtereds.reduce(
+						(acc: Collection, curr: Token) => {
+							const address = getChecksumAddress(curr.contract_address);
+
+							if (address in acc) {
+								acc[address].count += 1;
+								return acc;
+							}
+
+							acc[address] = {
+								...curr,
+								contract_address: address,
+								count: 1,
+							};
+
+							return acc;
+						},
+						{},
+					);
+
+					collections[project] = collection;
+					return;
+				} catch (error) {
+					console.error("Error fetching tokens:", error, project);
+					return;
+				}
+			}),
+		);
+		return collections;
 	},
 };
