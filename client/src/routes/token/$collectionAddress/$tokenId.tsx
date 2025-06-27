@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMarketplaceActions, useToken } from "../../../hooks";
+import { useToken } from "../../../hooks";
 import { useCallback, useMemo } from "react";
 import { CollectibleCard } from "@cartridge/ui";
 import { getChecksumAddress } from "starknet";
@@ -8,7 +8,10 @@ import { TokenActionsPanel } from "../../../components/ui/token-action-panel";
 import { useAccount } from "@starknet-react/core";
 import { TokenOrdersPanel } from "../../../components/ui/order/list";
 import { useIsTokenListed, useTokenOrders } from "../../../queries";
-import type { OrderModel } from "@cartridge/marketplace-sdk";
+import {
+	type OrderModel,
+	useMarketplaceActions,
+} from "@cartridge/marketplace-sdk";
 
 // Define metadata interface based on the expected structure
 interface TokenMetadata {

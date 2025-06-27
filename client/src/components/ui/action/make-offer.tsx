@@ -1,6 +1,6 @@
 import { Button } from "@cartridge/ui";
 import { TokenDetailsActionProps } from ".";
-import { useMarketplaceActions } from "../../../hooks";
+import { useMarketplaceActions } from "@cartridge/marketplace-sdk";
 import { useCallback } from "react";
 import { useAccount } from "@starknet-react/core";
 import { getCurrencyAddress, amountToCurrencyBigInt } from "../../../currency";
