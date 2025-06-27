@@ -20,6 +20,7 @@ import { NAMESPACE } from "../../constants";
 import { MarketplaceOptions, DefaultMarketplaceOptions } from "./options";
 import { Token, ToriiClient } from "@dojoengine/torii-wasm";
 
+export type { Token, ToriiClient };
 export * from "./policies";
 export {
 	AccessModel,
