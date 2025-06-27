@@ -284,16 +284,16 @@ export const Marketplace = {
 
 					const collection: Collection = filtereds.reduce(
 						(acc: Collection, curr: Token) => {
-							const address = getChecksumAddress(curr.contract_address);
+							const checksumAddress = getChecksumAddress(curr.contract_address);
 
-							if (address in acc) {
-								acc[address].count += 1;
+							if (Object.hasOwn(acc, checksumAddress)) {
+								acc[checksumAddress].count += 1;
 								return acc;
 							}
 
-							acc[address] = {
+							acc[checksumAddress] = {
 								...curr,
-								contract_address: address,
+								contract_address: checksumAddress,
 								count: 1,
 							};
 
