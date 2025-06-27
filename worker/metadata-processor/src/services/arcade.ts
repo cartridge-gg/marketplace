@@ -158,6 +158,13 @@ export async function fetchEditions(state: TokenFetcherState): Promise<void> {
 	handleArcadeRegistryModels(res);
 }
 
+export async function createArcadeProjectClient(project: string) {
+	return await new ToriiClient({
+		toriiUrl: `https://api.cartridge.gg/x/${project}/torii`,
+		worldAddress: env.MARKETPLACE_ADDRESS,
+	});
+}
+
 /**
  * Creates Torii clients for all editions
  */
@@ -168,11 +175,7 @@ export async function createToriiClients(
 		const cfg = JSON.parse(edition.config.toString());
 		const project = cfg.project;
 		try {
-			const url = `https://api.cartridge.gg/x/${project}/torii`;
-			const client = await new ToriiClient({
-				toriiUrl: url,
-				worldAddress: env.MARKETPLACE_ADDRESS,
-			});
+			const client = await createArcadeProjectClient(project);
 			state.toriiClients.set(project, client);
 			state.logger.info(`Created Torii client for project: ${project}`);
 		} catch (error) {

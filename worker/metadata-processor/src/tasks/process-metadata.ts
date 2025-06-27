@@ -4,6 +4,7 @@ import {
 	ToriiQueryBuilder,
 	type SDK,
 } from "@dojoengine/sdk/node";
+import type { Message } from "@dojoengine/torii-wasm";
 import { env } from "../env.ts";
 import { createLogger, type Logger } from "../utils/logger.ts";
 import type { Token } from "../services/token-fetcher.ts";
@@ -14,6 +15,8 @@ import {
 	type RpcProvider,
 } from "starknet";
 import type { SchemaType } from "@cartridge/marketplace-sdk";
+import { createMarketplaceClient } from "../init.ts";
+import { createSignedMessage } from "../utils/signature.ts";
 
 /**
  * Metadata attribute type
@@ -181,31 +184,38 @@ export function createAttributeMessage(
 /**
  * Creates metadata messages from token metadata
  */
-export function createMetadataMessages(
+export async function createMetadataMessages(
+	state: MetadataProcessorState,
 	token: Token,
 	metadata: TokenMetadata,
-): MetadataMessage[] {
-	const messages: MetadataMessage[] = [];
+): Promise<Message[]> {
+	const messages: Message[] = [];
 
 	// Iterate over all metadata keys
-	Object.keys(metadata).forEach((key, index) => {
+	for (const [index, key] of Object.keys(metadata).entries()) {
 		const value = metadata[key as keyof TokenMetadata];
 
 		if (key === "attributes" && Array.isArray(value)) {
 			// Handle attributes array specially
-			value.forEach((attr: any, attrIndex) => {
-				const traitType = attr.trait_type ?? attr.trait ?? 'unknown';
-				messages.push(
+			const attributePromises = value.map(async (attr: any, attrIndex) => {
+				const traitType = attr.trait_type ?? attr.trait ?? "unknown";
+				const typedData = state.client.generateTypedData(
+					"MARKETPLACE-MetadataAttribute",
 					createAttributeMessage(
 						token,
 						index + attrIndex + Object.keys(metadata).length,
 						traitType,
 						attr.value,
 					),
+					MetadataAttributedataTyped,
 				);
+				return createSignedMessage(state.account, typedData);
 			});
+
+			const attributeMessages = await Promise.all(attributePromises);
+			messages.push(...attributeMessages);
 		}
-	});
+	}
 
 	return messages;
 }
@@ -226,7 +236,7 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
  */
 export async function publishOffchainMetadataMessagesBatch(
 	state: MetadataProcessorState,
-	messages: MetadataMessage[],
+	messages: Message[],
 ): Promise<void> {
 	try {
 		const sdk = state.client;
@@ -240,18 +250,11 @@ export async function publishOffchainMetadataMessagesBatch(
 
 		// Process each batch sequentially
 		for (const [batchIndex, batch] of batches.entries()) {
-			state.logger.debug(
+			state.logger.info(
 				`Processing batch ${batchIndex + 1}/${batches.length} with ${batch.length} messages`,
 			);
 
-			const batchData = batch.map((message) =>
-				sdk.generateTypedData(
-					"MARKETPLACE-MetadataAttribute",
-					message,
-					MetadataAttributedataTyped,
-				),
-			);
-			const res = await sdk.sendMessageBatch(batchData, state.account);
+			const res = await sdk.sendSignedMessageBatch(batch);
 			if (res.isErr()) {
 				throw res.error;
 			}
@@ -274,16 +277,10 @@ export async function publishOffchainMetadataMessagesBatch(
 export async function processTokenForMessages(
 	state: MetadataProcessorState,
 	token: Token,
-): Promise<MetadataMessage[]> {
+): Promise<Message[]> {
 	const tokenKey = getTokenKey(token);
 	// Fetch token metadata
 	const metadata = await fetchTokenMetadata(state, token);
-
-	// Skip if already processed
-	if (await isTokenProcessed(state, token)) {
-		state.logger.debug(`Token ${tokenKey} already processed, skipping...`);
-		return [];
-	}
 
 	try {
 		if (!metadata) {
@@ -292,8 +289,7 @@ export async function processTokenForMessages(
 		}
 
 		// Create metadata messages
-		const messages = createMetadataMessages(token, metadata);
-		return messages;
+		return createMetadataMessages(state, token, metadata);
 	} catch (error) {
 		state.logger.error(error, `Failed to process token ${tokenKey}`);
 		return [];
@@ -325,19 +321,26 @@ export async function processTokens(
 	state.logger.info(`Processing metadata for ${tokens.length} tokens...`);
 
 	// Collect all messages from all tokens
-	const allMessages: MetadataMessage[] = [];
+	const allMessages: Message[] = [];
 	let processedCount = 0;
 
-	for (const token of tokens) {
+	const tokenPromises = tokens.map(async (token) => {
 		const messages = await processTokenForMessages(state, token);
-		if (messages.length > 0) {
-			allMessages.push(...messages);
+		return { messages, hasMessages: messages.length > 0 };
+	});
+
+	const results = await Promise.all(tokenPromises);
+
+	for (const result of results) {
+		if (result.hasMessages) {
+			allMessages.push(...result.messages);
 			processedCount++;
 		}
 	}
 
 	// Send all messages in a single batch
 	if (allMessages.length > 0) {
+		state.client = await createMarketplaceClient();
 		state.logger.info(
 			`Sending ${allMessages.length} messages from ${processedCount} tokens in batch`,
 		);

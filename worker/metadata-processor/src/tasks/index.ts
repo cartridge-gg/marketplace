@@ -17,6 +17,7 @@ import {
 	createMetadataProcessorState,
 	type MetadataProcessorState,
 } from "./process-metadata.ts";
+import { createMarketplaceClient } from "../init.ts";
 
 /**
  * Task state that combines all task-specific states
@@ -111,6 +112,7 @@ export async function runTasksForToken(
 	state.logger.debug(`Running tasks for token ${tokenKey}`);
 
 	for (const task of tasks) {
+		state.client = await createMarketplaceClient();
 		try {
 			state.logger.debug(`Running task '${task.name}' for token ${tokenKey}`);
 			await task.execute(state, token);
@@ -142,17 +144,16 @@ export async function runTasksForTokenBatch(
 	const startTime = Date.now();
 
 	// First, run integrity checks for all tokens
-	state.logger.info("Running integrity checks...");
 
-	// try {
-	// 	await checkTokenIntegrityBatch(state.integrityState, tokens);
-	// } catch (error) {
-	// 	state.logger.error(error, `Integrity check failed for token`);
-	// 	// Continue with other tokens even if one fails
-	// }
+	try {
+		state.integrityState.client = await createMarketplaceClient();
+		await checkTokenIntegrityBatch(state.integrityState, tokens);
+	} catch (error) {
+		state.logger.error(error, `Integrity check failed for token`);
+	}
 
 	// Then, process metadata in batch (more efficient)
-	state.logger.info("Processing metadata...");
+	state.metadataState.client = await createMarketplaceClient();
 	await processMetadataBatch(state.metadataState, tokens);
 
 	const duration = Date.now() - startTime;
@@ -165,4 +166,3 @@ export async function runTasksForTokenBatch(
 export type { MetadataProcessorState } from "./process-metadata.ts";
 export { createMetadataProcessorState } from "./process-metadata.ts";
 export { getProcessedCount } from "./process-metadata.ts";
-

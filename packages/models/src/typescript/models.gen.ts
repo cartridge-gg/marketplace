@@ -44,6 +44,19 @@ export interface MetadataAttribute {
 	value: string;
 }
 
+// Type definition for `orderbook::models::index::MetadataAttributeIntegrity` struct
+export interface MetadataAttributeIntegrity {
+	identity: string;
+	collection: BigNumberish;
+	token_id: BigNumberish;
+	state: BigNumberish;
+}
+
+// Type definition for `orderbook::models::index::MetadataAttributeIntegrityValue` struct
+export interface MetadataAttributeIntegrityValue {
+	state: BigNumberish;
+}
+
 // Type definition for `orderbook::models::index::MetadataAttributeValue` struct
 export interface MetadataAttributeValue {
 	trait_type: string;
@@ -127,6 +140,8 @@ export interface SchemaType extends ISchemaType {
 		Book: Book,
 		BookValue: BookValue,
 		MetadataAttribute: MetadataAttribute,
+		MetadataAttributeIntegrity: MetadataAttributeIntegrity,
+		MetadataAttributeIntegrityValue: MetadataAttributeIntegrityValue,
 		MetadataAttributeValue: MetadataAttributeValue,
 		Order: Order,
 		OrderValue: OrderValue,
@@ -171,6 +186,15 @@ export const schema: SchemaType = {
 			index: 0,
 		trait_type: "",
 		value: "",
+		},
+		MetadataAttributeIntegrity: {
+			identity: "",
+			collection: 0,
+		token_id: 0,
+			state: 0,
+		},
+		MetadataAttributeIntegrityValue: {
+			state: 0,
 		},
 		MetadataAttributeValue: {
 		trait_type: "",
@@ -238,6 +262,8 @@ export enum ModelsMapping {
 	Book = 'orderbook-Book',
 	BookValue = 'orderbook-BookValue',
 	MetadataAttribute = 'orderbook-MetadataAttribute',
+	MetadataAttributeIntegrity = 'orderbook-MetadataAttributeIntegrity',
+	MetadataAttributeIntegrityValue = 'orderbook-MetadataAttributeIntegrityValue',
 	MetadataAttributeValue = 'orderbook-MetadataAttributeValue',
 	Order = 'orderbook-Order',
 	OrderValue = 'orderbook-OrderValue',

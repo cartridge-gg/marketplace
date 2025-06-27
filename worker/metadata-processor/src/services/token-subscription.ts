@@ -1,10 +1,9 @@
 import type { ToriiClient } from "@dojoengine/torii-wasm/node";
 import { createLogger, type Logger } from "../utils/logger.ts";
 import { type Token } from "./token-fetcher.ts";
-import {
-	type TaskRunnerState,
-	runTasksForToken,
-} from "../tasks/index.ts";
+import { type TaskRunnerState, runTasksForToken } from "../tasks/index.ts";
+import { createMarketplaceClient } from "../init.ts";
+import { createArcadeProjectClient } from "./arcade.ts";
 
 /**
  * Subscription type
@@ -60,13 +59,6 @@ export async function subscribeToProject(
 	client: ToriiClient,
 ): Promise<void> {
 	try {
-		// Subscribe to entity updates
-		// This needs to be adapted based on the actual token model structure
-		// For now, log a warning as we need specific model information
-		state.logger.warn(
-			`Token subscription not yet implemented for project: ${projectId}`,
-		);
-
 		const sub = client.onTokenUpdated([], [], async (token: Token) => {
 			try {
 				// Ignore ack responses from Torii
@@ -83,6 +75,8 @@ export async function subscribeToProject(
 					token.contract_address,
 					token.token_id,
 				);
+
+				state.taskRunnerState.client = await createMarketplaceClient();
 				await runTasksForToken(state.taskRunnerState, token);
 			} catch (err) {
 				state.logger.error(
@@ -109,12 +103,16 @@ export async function subscribeToAllTokens(
 ): Promise<void> {
 	state.logger.info("Setting up subscriptions for all Torii instances...");
 
-	async function subscribeToClient([projectId, client]: [
+	async function subscribeToClient([projectId, _client]: [
 		string,
 		ToriiClient,
 	]): Promise<void> {
 		try {
-			await subscribeToProject(state, projectId, client);
+			await subscribeToProject(
+				state,
+				projectId,
+				await createArcadeProjectClient(projectId),
+			);
 			state.logger.info(
 				`Subscribed to token updates for project: ${projectId}`,
 			);

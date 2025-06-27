@@ -9,8 +9,6 @@ export {
 	startWorker,
 	stopWorker,
 	processAllTokensFromFetcher,
-	startPeriodicFetching,
-	stopPeriodicFetching,
 	setupGracefulShutdown,
 } from "./worker.ts";
 
@@ -19,7 +17,7 @@ export {
  */
 async function main() {
 	const logger = createLogger("Main");
-	
+
 	try {
 		// Initialize worker
 		const state = await initializeWorker();
@@ -31,7 +29,9 @@ async function main() {
 		setupGracefulShutdown(state);
 
 		// Keep the process running
-		state.logger.info("Metadata processor worker is running. Press Ctrl+C to stop.");
+		state.logger.info(
+			"Metadata processor worker is running. Press Ctrl+C to stop.",
+		);
 	} catch (error) {
 		logger.error(error, "Fatal error");
 		process.exit(1);
