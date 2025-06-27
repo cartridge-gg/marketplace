@@ -1,9 +1,11 @@
 import { Button } from "@cartridge/ui";
-import type { OrderModel } from "@cartridge/marketplace-sdk";
+import {
+	type OrderModel,
+	useMarketplaceActions,
+} from "@cartridge/marketplace-sdk";
 import { WithAccount } from "@dojoengine/sdk/react";
 import { useCallback } from "react";
 import type { AccountInterface } from "starknet";
-import { useMarketplaceActions } from "../../../hooks/marketplace";
 
 type AcceptOfferProps = {
 	isOwner: boolean;

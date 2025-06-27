@@ -1,6 +1,8 @@
 import { MarketplaceFilters, MarketplacePropertyFilter } from "@cartridge/ui";
-import { useMetadataFilters } from "../../hooks/metadata";
-import type { TokenMetadataUI } from "@cartridge/marketplace-sdk";
+import {
+	type TokenMetadataUI,
+	useMetadataFilters,
+} from "@cartridge/marketplace-sdk";
 
 interface MetadataFiltersProps {
 	tokens: TokenMetadataUI[];

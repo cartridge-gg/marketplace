@@ -1,19 +1,18 @@
 import { useCallback, useState, useMemo, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDojoSDK } from "@dojoengine/sdk/react";
-import {
-	getCollectionMetadataQuery,
-	transformCollectionMetadataForUI,
-	filterMetadataByTraits,
-	getMetadataStatistics,
-	type TokenMetadataUI,
-	type SchemaType,
-	setupWorld,
-	subscribeToMetadataUpdatesClause,
-} from "@cartridge/marketplace-sdk";
 import { addAddressPadding } from "starknet";
 import type { Subscription } from "@dojoengine/torii-wasm/types";
 import type { Clause } from "@dojoengine/torii-wasm/types";
+import { SchemaType, setupWorld } from "../bindings";
+import {
+	filterMetadataByTraits,
+	getCollectionMetadataQuery,
+	getMetadataStatistics,
+	subscribeToMetadataUpdatesClause,
+	TokenMetadataUI,
+	transformCollectionMetadataForUI,
+} from "../queries";
 
 /**
  * Hook to manage subscription lifecycle for metadata updates

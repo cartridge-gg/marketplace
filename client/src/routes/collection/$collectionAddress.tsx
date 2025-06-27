@@ -1,10 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useCallback, useState } from "react";
-import { useCollection, useCollectionMetadata } from "../../hooks";
+import { useCollection } from "../../hooks";
 import { getChecksumAddress } from "starknet";
 import { CollectibleCard, Button } from "@cartridge/ui";
 import type { Token } from "@dojoengine/torii-wasm";
-import type { TokenMetadataUI } from "@cartridge/marketplace-sdk";
+import {
+	type TokenMetadataUI,
+	useCollectionMetadata,
+} from "@cartridge/marketplace-sdk";
 import { MetadataFilters } from "../../components/collection/metadata-filters";
 
 // Define metadata interface based on the expected structure

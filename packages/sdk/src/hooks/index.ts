@@ -1,5 +1,6 @@
 export * from "./token";
 export * from "./marketplace";
+export * from "./metadata";
 import type { constants } from "starknet";
 import { configs } from "../configs";
 
