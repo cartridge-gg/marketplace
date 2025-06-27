@@ -1,9 +1,12 @@
 import type { SDK } from "@dojoengine/sdk/node";
+import type { Message } from "@dojoengine/torii-wasm";
 import { createLogger, type Logger } from "../utils/logger.ts";
 import type { Token } from "../services/token-fetcher.ts";
 import { env } from "../env.ts";
 import { cairo, type Account, type RpcProvider, hash } from "starknet";
 import type { SchemaType } from "@cartridge/marketplace-sdk";
+import { createMarketplaceClient } from "../init.ts";
+import { createSignedMessage } from "../utils/signature.ts";
 
 /**
  * Token integrity message type
@@ -183,22 +186,24 @@ export async function checkTokenIntegrityBatch(
 	try {
 		state.logger.debug(`Checking integrity for tokens`);
 
-		const data = [];
-		for (const t of tokens) {
-			const integrityHash = await computeTokenHash(t);
-			const message = createIntegrityMessage(t, integrityHash);
-
-			const typedData = state.client.generateTypedData(
-				"MARKETPLACE-MetadataAttributeIntegrity",
-				message,
-				TokenIntegrityTyped,
-			);
-			data.push(typedData);
-		}
+		const data: Message[] = await Promise.all(
+			tokens.map(async (t) => {
+				const client = await createMarketplaceClient();
+				const integrityHash = await computeTokenHash(t);
+				const message = createIntegrityMessage(t, integrityHash);
+				const typedData = client.generateTypedData(
+					"MARKETPLACE-MetadataAttributeIntegrity",
+					message,
+					TokenIntegrityTyped,
+				);
+				return createSignedMessage(state.account, typedData);
+			}),
+		);
 
 		// Send message
-		const res = await state.client.sendMessageBatch(data, state.account);
+		const res = await state.client.sendSignedMessageBatch(data);
 		if (res.isErr()) {
+			state.logger.error("Failed to send integrity check messages");
 			throw res.error;
 		}
 
@@ -212,4 +217,3 @@ export async function checkTokenIntegrityBatch(
 		throw error;
 	}
 }
-

@@ -1,27 +1,25 @@
 import { env } from "./env.ts";
-import {
-	fetchAllTokens,
-	fetchAllTokenBatches,
-} from "./services/token-fetcher.ts";
-import {
-	runTasksForTokenBatch,
-	getProcessedCount,
-} from "./tasks/index.ts";
+import { fetchAllTokenBatches } from "./services/token-fetcher.ts";
+import { runTasksForTokenBatch } from "./tasks/index.ts";
 import {
 	subscribeToAllTokens,
 	unsubscribeAll,
 } from "./services/token-subscription.ts";
 import type { WorkerState } from "./init.ts";
+import { waitForRetryDelay } from "./utils/index.ts";
 
 /**
  * Processes all tokens from all Torii instances using batches
  */
 export async function processAllTokensFromFetcher(
 	state: WorkerState,
+	retryCount = 0,
 ): Promise<void> {
 	const batchSize = env.TOKEN_FETCH_BATCH_SIZE;
+	const maxRetries = env.RETRY_ATTEMPTS;
+
 	state.logger.info(
-		`Starting batch token processing (batch size: ${batchSize})...`,
+		`Starting batch token processing (batch size: ${batchSize})${retryCount > 0 ? ` - Retry ${retryCount}/${maxRetries}` : ""}...`,
 	);
 
 	let totalProcessed = 0;
@@ -51,63 +49,21 @@ export async function processAllTokensFromFetcher(
 		state.logger.info(
 			`Processing complete. Processed ${totalProcessed} tokens in ${batchCount} batches`,
 		);
+		return; // Success, exit the retry loop
 	} catch (error) {
-		state.logger.error(error, "Error during batch token processing");
-		// Don't throw - we want the worker to continue even if processing fails
-	}
-}
-
-/**
- * Processes all tokens from all Torii instances (legacy mode - loads all into memory)
- */
-export async function processAllTokensLegacy(
-	state: WorkerState,
-): Promise<void> {
-	state.logger.info("Starting token processing (legacy mode)...");
-
-	try {
-		const tokens = await fetchAllTokens(state.tokenFetcherState);
-		await runTasksForTokenBatch(state.taskRunnerState, tokens);
-
-		state.logger.info(
-			`Processing complete. Processed ${await getProcessedCount(state.taskRunnerState.metadataState)} tokens`,
+		state.logger.error(
+			error,
+			`Error during batch token processing (attempt ${retryCount}/${maxRetries})`,
 		);
-	} catch (error) {
-		state.logger.error(error, "Error during token processing");
-		// Don't throw - we want the worker to continue even if processing fails
-	}
-}
 
-/**
- * Starts periodic token fetching
- */
-export function startPeriodicFetching(state: WorkerState): void {
-	const intervalMs = env.FETCH_INTERVAL * 60 * 1000; // Convert minutes to ms
-
-	state.logger.info(
-		`Setting up periodic token fetching every ${env.FETCH_INTERVAL} minutes`,
-	);
-
-	async function runPeriodicFetch(): Promise<void> {
-		state.logger.info("Running periodic token fetch...");
-
-		try {
-			await processAllTokensFromFetcher(state);
-		} catch (error) {
-			state.logger.error(error, "Error during periodic token fetch");
+		if (retryCount >= maxRetries) {
+			state.logger.error("Maximum retry attempts reached, giving up");
+			// Don't throw - we want the worker to continue even if processing fails
+			return;
 		}
-	}
 
-	state.intervalId = setInterval(runPeriodicFetch, intervalMs);
-}
-
-/**
- * Stops periodic fetching
- */
-export function stopPeriodicFetching(state: WorkerState): void {
-	if (state.intervalId) {
-		clearInterval(state.intervalId);
-		state.intervalId = undefined;
+		await waitForRetryDelay();
+		await processAllTokensFromFetcher(state, retryCount + 1);
 	}
 }
 
@@ -119,13 +75,10 @@ export async function startWorker(state: WorkerState): Promise<void> {
 
 	try {
 		// Perform initial token fetch and processing
-		await processAllTokensFromFetcher(state);
+		processAllTokensFromFetcher(state);
 
 		// Set up subscriptions for real-time updates
-		await subscribeToAllTokens(state.subscriptionState);
-
-		// Set up periodic token fetching
-		startPeriodicFetching(state);
+		subscribeToAllTokens(state.subscriptionState);
 
 		state.logger.info("Worker started successfully");
 	} catch (error) {
@@ -139,9 +92,6 @@ export async function startWorker(state: WorkerState): Promise<void> {
  */
 export async function stopWorker(state: WorkerState): Promise<void> {
 	state.logger.info("Stopping metadata processor worker...");
-
-	// Clear periodic interval
-	stopPeriodicFetching(state);
 
 	// Unsubscribe from all token updates
 	await unsubscribeAll(state.subscriptionState);
@@ -176,4 +126,3 @@ export function setupGracefulShutdown(state: WorkerState): void {
 	process.on("SIGINT", handleSigint);
 	process.on("SIGTERM", handleSigterm);
 }
-

@@ -5,10 +5,7 @@ import {
 	initializeTokenFetcher,
 	getToriiClients,
 } from "./services/token-fetcher.ts";
-import {
-	type TaskRunnerState,
-	createTaskRunnerState,
-} from "./tasks/index.ts";
+import { type TaskRunnerState, createTaskRunnerState } from "./tasks/index.ts";
 import {
 	type TokenSubscriptionState,
 	createTokenSubscriptionState,
@@ -31,6 +28,23 @@ export type WorkerState = {
 	intervalId?: NodeJS.Timeout;
 };
 
+export async function createMarketplaceClient() {
+	return await init<SchemaType>({
+		client: {
+			toriiUrl: env.MARKETPLACE_TORII_URL,
+			worldAddress: env.MARKETPLACE_ADDRESS,
+		},
+		domain: {
+			name: "Marketplace",
+			version: "1.0",
+			chainId: shortString.encodeShortString(env.CHAIN_ID),
+			revision: "1",
+		},
+		identity: env.ACCOUNT_ADDRESS,
+		signer: new SigningKey(env.ACCOUNT_PRIVATE_KEY),
+	});
+}
+
 /**
  * Creates the initial worker state
  */
@@ -45,21 +59,6 @@ export async function createWorkerState(): Promise<WorkerState> {
 		env.ACCOUNT_PRIVATE_KEY,
 	);
 
-	const marketplaceClient = await init<SchemaType>({
-		client: {
-			toriiUrl: env.MARKETPLACE_TORII_URL,
-			worldAddress: env.MARKETPLACE_ADDRESS,
-		},
-		domain: {
-			name: "Marketplace",
-			version: "1.0",
-			chainId: shortString.encodeShortString(env.CHAIN_ID),
-			revision: "1",
-		},
-		identity: env.ACCOUNT_ADDRESS,
-		signer: new SigningKey(env.ACCOUNT_PRIVATE_KEY),
-	});
-
 	// Initialize token fetcher
 	const tokenFetcherState = await initializeTokenFetcher({ provider, chainId });
 
@@ -68,7 +67,7 @@ export async function createWorkerState(): Promise<WorkerState> {
 		provider,
 		account,
 		marketplaceAddress: env.MARKETPLACE_ADDRESS,
-		client: marketplaceClient,
+		client: await createMarketplaceClient(),
 		batchSize: env.BATCH_SIZE,
 	});
 
