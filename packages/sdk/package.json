@@ -1,5 +1,5 @@
 {
-  "name": "@cartridge/marketplace-sdk",
+  "name": "@cartridge/marketplace",
   "version": "0.0.0",
   "description": "",
   "publishConfig": {
@@ -40,10 +40,13 @@
   "license": "ISC",
   "packageManager": "pnpm@10.10.0",
   "dependencies": {
+    "@cartridge/arcade": "catalog:",
     "@dojoengine/core": "catalog:",
     "@dojoengine/sdk": "catalog:",
     "@dojoengine/torii-client": "catalog:",
     "@dojoengine/torii-wasm": "catalog:",
+    "@starknet-react/core": "catalog:",
+    "@starknet-react/chains": "catalog:",
     "starknet": "catalog:"
   },
   "peerDependencies": {

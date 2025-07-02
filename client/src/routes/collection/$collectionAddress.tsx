@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useCallback, useState } from "react";
-import { useCollection } from "../../hooks";
 import { getChecksumAddress } from "starknet";
 import { CollectibleCard, Button } from "@cartridge/ui";
 import type { Token } from "@dojoengine/torii-wasm";
 import {
 	type TokenMetadataUI,
 	useCollectionMetadata,
+	useCollection,
 } from "@cartridge/marketplace-sdk";
 import { MetadataFilters } from "../../components/collection/metadata-filters";
 

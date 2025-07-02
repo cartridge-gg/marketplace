@@ -5,6 +5,7 @@ packages:
   - worker/*
 catalog:
   "@cartridge/ui": github:cartridge-gg/ui#460751b
+  "@cartridge/arcade": 0.0.0
   "@cartridge/controller": 0.7.13
   "@cartridge/connector": 0.7.13
   "@starknet-react/core": 3.7.4
