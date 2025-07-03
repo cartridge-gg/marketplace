@@ -39,7 +39,7 @@ async function fetchCollectionFromClient(
 export function useCollection(
 	collectionAddress: string,
 	tokenIds: string[],
-	pageSize: number = 50,
+	pageSize = 50,
 	initialCursor?: string,
 ) {
 	const { clients } = useArcade();

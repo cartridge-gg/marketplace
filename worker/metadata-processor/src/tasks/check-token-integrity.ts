@@ -4,7 +4,7 @@ import { createLogger, type Logger } from "../utils/logger.ts";
 import type { Token } from "../services/token-fetcher.ts";
 import { env } from "../env.ts";
 import { cairo, type Account, type RpcProvider, hash } from "starknet";
-import type { SchemaType } from "@cartridge/marketplace-sdk";
+import type { SchemaType } from "@cartridge/marketplace";
 import { createMarketplaceClient } from "../init.ts";
 import { createSignedMessage } from "../utils/signature.ts";
 

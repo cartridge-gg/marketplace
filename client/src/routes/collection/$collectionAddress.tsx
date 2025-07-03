@@ -7,7 +7,7 @@ import {
 	type TokenMetadataUI,
 	useCollectionMetadata,
 	useCollection,
-} from "@cartridge/marketplace-sdk";
+} from "@cartridge/marketplace";
 import { MetadataFilters } from "../../components/collection/metadata-filters";
 
 // Define metadata interface based on the expected structure
@@ -126,7 +126,7 @@ function RouteComponent() {
 					{collectionMetadata && collectionMetadata.tokens.length > 0 && (
 						<aside className="lg:w-80">
 							<MetadataFilters
-								tokens={collectionMetadata.tokens}
+								collectionAddress={collectionAddress}
 								onFilteredTokensChange={handleFilteredTokensChange}
 							/>
 						</aside>

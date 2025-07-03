@@ -2,15 +2,15 @@ import { MarketplaceFilters, MarketplacePropertyFilter } from "@cartridge/ui";
 import {
 	type TokenMetadataUI,
 	useMetadataFilters,
-} from "@cartridge/marketplace-sdk";
+} from "@cartridge/marketplace";
 
 interface MetadataFiltersProps {
-	tokens: TokenMetadataUI[];
+	collectionAddress: string;
 	onFilteredTokensChange: (tokens: TokenMetadataUI[]) => void;
 }
 
 export function MetadataFilters({
-	tokens,
+	collectionAddress,
 	onFilteredTokensChange,
 }: MetadataFiltersProps) {
 	const {
@@ -19,7 +19,11 @@ export function MetadataFilters({
 		clearFilters,
 		isTraitSelected,
 		selectedTraits,
-	} = useMetadataFilters(tokens, onFilteredTokensChange);
+	} = useMetadataFilters(
+		collectionAddress,
+		import.meta.env.VITE_IDENTITY,
+		onFilteredTokensChange,
+	);
 
 	if (statistics.length === 0) {
 		return null;

@@ -4,13 +4,13 @@ import { useDojoSDK } from "@dojoengine/sdk/react";
 import { addAddressPadding } from "starknet";
 import type { Subscription } from "@dojoengine/torii-wasm/types";
 import type { Clause } from "@dojoengine/torii-wasm/types";
-import { SchemaType, setupWorld } from "../bindings";
+import type { SchemaType, setupWorld } from "../bindings";
 import {
 	filterMetadataByTraits,
 	getCollectionMetadataQuery,
 	getMetadataStatistics,
 	subscribeToMetadataUpdatesClause,
-	TokenMetadataUI,
+	type TokenMetadataUI,
 	transformCollectionMetadataForUI,
 } from "../queries";
 
@@ -19,7 +19,7 @@ import {
  */
 function useMetadataSubscription(subscriptionClause: Clause, queryKey: any[]) {
 	const { sdk } = useDojoSDK<typeof setupWorld, SchemaType>();
-	const subscriptionRef = useRef<Subscription>(null);
+	const subscriptionRef = useRef<Subscription | null>(null);
 	const queryClient = useQueryClient();
 
 	useEffect(() => {

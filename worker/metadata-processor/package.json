@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@cartridge/arcade": "0.0.0",
-    "@cartridge/marketplace-sdk": "workspace:*",
+    "@cartridge/marketplace": "workspace:*",
     "@dojoengine/core": "catalog:",
     "@dojoengine/sdk": "catalog:",
     "@dojoengine/torii-wasm": "catalog:",

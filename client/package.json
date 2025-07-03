@@ -17,7 +17,7 @@
     "@cartridge/arcade": "0.0.0",
     "@cartridge/connector": "catalog:",
     "@cartridge/controller": "catalog:",
-    "@cartridge/marketplace-sdk": "workspace:*",
+    "@cartridge/marketplace": "workspace:*",
     "@cartridge/ui": "catalog:",
     "@dojoengine/sdk": "catalog:",
     "@dojoengine/torii-client": "catalog:",
@@ -29,18 +29,30 @@
     "@tanstack/react-router": "^1.119.0",
     "@tanstack/react-router-devtools": "^1.119.1",
     "class-variance-authority": "catalog:",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-hook-form": "^7.57.0",
     "starknet": "catalog:",
     "tailwindcss": "^4.1.7"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@tanstack/eslint-plugin-query": "^5.78.0",
     "@tanstack/router-plugin": "^1.119.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.18",

@@ -1,8 +1,5 @@
 import { Button } from "@cartridge/ui";
-import {
-	type OrderModel,
-	useMarketplaceActions,
-} from "@cartridge/marketplace-sdk";
+import { type OrderModel, useMarketplaceActions } from "@cartridge/marketplace";
 import { WithAccount } from "@dojoengine/sdk/react";
 import { useCallback } from "react";
 import { constants, type AccountInterface } from "starknet";

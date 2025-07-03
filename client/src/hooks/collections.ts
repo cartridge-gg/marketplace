@@ -1,8 +1,5 @@
-import { useContext, useState, useCallback, useEffect, useRef } from "react";
+import { useContext } from "react";
 import { CollectionContext } from "../contexts";
-import { useArcade } from "./arcade";
-import { Token, ToriiClient } from "@dojoengine/torii-wasm";
-import { addAddressPadding } from "starknet";
 export type { Collection, Collections } from "../contexts/collection";
 
 /**

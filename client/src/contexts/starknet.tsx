@@ -1,14 +1,14 @@
-import { Chain, mainnet, sepolia } from "@starknet-react/chains";
+import { type Chain, mainnet, sepolia } from "@starknet-react/chains";
 import { jsonRpcProvider, StarknetConfig, voyager } from "@starknet-react/core";
-import { PropsWithChildren, useContext, useMemo, useRef } from "react";
+import { type PropsWithChildren, useContext, useMemo, useRef } from "react";
 import { constants } from "starknet";
 import ControllerConnector from "@cartridge/connector/controller";
-import {
+import type {
 	KeychainOptions,
 	ProfileOptions,
 	ProviderOptions,
 } from "@cartridge/controller";
-import { getMarketplacePolicies } from "@cartridge/marketplace-sdk";
+import { getMarketplacePolicies } from "@cartridge/marketplace";
 import { DEFAULT_PRESET, DEFAULT_PROJECT } from "../constants";
 import { ArcadeContext } from "./arcade";
 
