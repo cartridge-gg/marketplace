@@ -33,6 +33,18 @@
     "starknet": "catalog:",
     "tailwindcss": "^4.1.7"
   },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@tailwindcss/vite": "^4.1.11",

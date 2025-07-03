@@ -46,17 +46,25 @@
     "@dojoengine/torii-client": "catalog:",
     "@dojoengine/torii-wasm": "catalog:",
     "@starknet-react/chains": "catalog:",
-    "@starknet-react/core": "catalog:",
+    "react": "^18.2.0",
     "starknet": "catalog:"
   },
   "peerDependencies": {
-    "@tanstack/react-query": "^5.79.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@cartridge/marketplace-config": "workspace:*",
-    "@types/react": "^18.3.23",
+    "@tanstack/react-query": "^5.79.0",
+    "@types/react": "^18.2.0",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "^3.2.4"
