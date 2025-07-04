@@ -2,7 +2,7 @@ import { type SDK } from "@dojoengine/sdk/node";
 import { createLogger, type Logger } from "../utils/logger.ts";
 import type { Token } from "../services/token-fetcher.ts";
 import type { Account, RpcProvider } from "starknet";
-import { type SchemaType } from "@cartridge/marketplace-sdk";
+import { type SchemaType } from "@cartridge/marketplace";
 
 // Import tasks
 import {

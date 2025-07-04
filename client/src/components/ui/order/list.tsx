@@ -4,7 +4,7 @@ import { constants } from "starknet";
 import { AcceptOfferAction } from "../action/accept-offer.tsx";
 import { CancelOrderAction } from "../action/cancel-order.tsx";
 import { DeleteOrderAction } from "../action/delete-order.tsx";
-import { type OrderModel, useOrderValidity } from "@cartridge/marketplace-sdk";
+import { type OrderModel, useOrderValidity } from "@cartridge/marketplace";
 
 interface OrderItemProps {
 	order: OrderModel;

@@ -1,5 +1,5 @@
-import { RegistryModel } from "@cartridge/arcade";
-import { MarketplaceModel } from "@cartridge/marketplace-sdk";
+import type { RegistryModel } from "@cartridge/arcade";
+import type { MarketplaceModel } from "@cartridge/marketplace";
 
 type SDKModel = RegistryModel | MarketplaceModel;
 type ExtractModel<T extends SDKModel> = T;

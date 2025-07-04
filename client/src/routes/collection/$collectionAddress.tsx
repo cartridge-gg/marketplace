@@ -1,13 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useCallback, useState } from "react";
-import { useCollection } from "../../hooks";
 import { getChecksumAddress } from "starknet";
 import { CollectibleCard, Button } from "@cartridge/ui";
 import type { Token } from "@dojoengine/torii-wasm";
 import {
 	type TokenMetadataUI,
 	useCollectionMetadata,
-} from "@cartridge/marketplace-sdk";
+	useCollection,
+} from "@cartridge/marketplace";
 import { MetadataFilters } from "../../components/collection/metadata-filters";
 
 // Define metadata interface based on the expected structure
@@ -126,7 +126,7 @@ function RouteComponent() {
 					{collectionMetadata && collectionMetadata.tokens.length > 0 && (
 						<aside className="lg:w-80">
 							<MetadataFilters
-								tokens={collectionMetadata.tokens}
+								collectionAddress={collectionAddress}
 								onFilteredTokensChange={handleFilteredTokensChange}
 							/>
 						</aside>

@@ -13,7 +13,7 @@ import {
 import { createLogger, type Logger } from "./utils/logger.ts";
 import { init } from "@dojoengine/sdk/node";
 import { SigningKey } from "@dojoengine/torii-wasm/node";
-import type { SchemaType } from "@cartridge/marketplace-sdk";
+import type { SchemaType } from "@cartridge/marketplace";
 
 /**
  * Worker state type

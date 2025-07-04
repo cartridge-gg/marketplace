@@ -20,7 +20,7 @@ export function useEntitySubscription(
 	queryKey: any[],
 ) {
 	const { sdk } = useDojoSDK<typeof setupWorld, SchemaType>();
-	const subscriptionRef = useRef<Subscription>(null);
+	const subscriptionRef = useRef<Subscription | null>(null);
 	const queryClient = useQueryClient();
 
 	useEffect(() => {

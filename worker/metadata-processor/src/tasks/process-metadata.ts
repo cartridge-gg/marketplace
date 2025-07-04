@@ -14,7 +14,7 @@ import {
 	type Account,
 	type RpcProvider,
 } from "starknet";
-import type { SchemaType } from "@cartridge/marketplace-sdk";
+import type { SchemaType } from "@cartridge/marketplace";
 import { createMarketplaceClient } from "../init.ts";
 import { createSignedMessage } from "../utils/signature.ts";
 

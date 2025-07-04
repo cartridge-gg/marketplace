@@ -3,7 +3,7 @@ import { ListTokenAction } from "./action/list-token";
 import { MakeOfferAction } from "./action/make-offer";
 import { BuyAction } from "./action/buy";
 import type { Token } from "@dojoengine/torii-wasm/types";
-import type { OrderModel } from "@cartridge/marketplace-sdk";
+import type { OrderModel } from "@cartridge/marketplace";
 
 interface TokenActionsPanelProps {
 	token: Token;
