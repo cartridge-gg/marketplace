@@ -1,5 +1,5 @@
-import { Effect, Stream, Option, Data, Metric, Chunk, Schedule } from "effect";
 import type { Token, ToriiClient } from "@dojoengine/torii-wasm/node";
+import { Chunk, Data, Effect, Metric, Option, Schedule, Stream } from "effect";
 import { DEFAULT_IGNORED_PROJECTS } from "../constants";
 import {
 	MessageConfigService,
@@ -56,7 +56,7 @@ const fetchTokenEffect = (
 	project: string,
 	cursor: string | undefined,
 	batchSize: number,
-): Effect.Effect<{ items: Token[]; next_cursor?: string }, Error> =>
+) =>
 	Effect.tryPromise({
 		try: () => client.getTokens([], [], batchSize, cursor),
 		catch: (error) => {

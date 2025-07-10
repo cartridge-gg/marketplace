@@ -17,7 +17,7 @@ export function isEditionModel(model: any): model is EditionModel {
 // Filter edition models by ignored projects
 export function filterEditionModels(
 	models: RegistryModel[],
-	ignoreProjects: readonly string[] = [],
+	ignoreProjects: string[] = [],
 ): EditionModel[] {
 	return models
 		.filter(isEditionModel)
