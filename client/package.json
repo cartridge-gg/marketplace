@@ -29,25 +29,9 @@
     "class-variance-authority": "catalog:",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-<<<<<<< HEAD
     "react-hook-form": "^7.60.0",
-=======
-    "react-hook-form": "^7.57.0",
->>>>>>> 050f4f3 (chore: integrate marketplace-sdk to arcade)
     "starknet": "catalog:",
     "tailwindcss": "^4.1.7"
-  },
-  "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": true
-    },
-    "react-dom": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
