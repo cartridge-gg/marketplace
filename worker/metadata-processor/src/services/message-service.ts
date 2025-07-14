@@ -153,3 +153,7 @@ export const publishMessages = (messages: Message[]) =>
 		yield* Effect.logDebug(`Publishing ${messages.length} messages`);
 		yield* publishOffchainMessagesBatch(sdk, messages);
 	});
+<<<<<<< HEAD
+=======
+
+>>>>>>> 09f3bb1 (chore: fix build)

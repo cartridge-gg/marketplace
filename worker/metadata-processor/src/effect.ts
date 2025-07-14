@@ -41,11 +41,11 @@ export const program = Effect.gen(function* () {
 	Effect.tapError((error) =>
 		Effect.logError(`Error occurred: ${error.message}`),
 	),
-	Effect.provide(ArcadeSDKLive),
-	Effect.provide(MarketplaceSDKLive),
-	Effect.provide(MarketplaceAccountLive),
-	Effect.provide(ConfigLive),
 	Effect.onInterrupt(() =>
 		Effect.logInfo("Main program interrupted, cleaning up..."),
 	),
 );
+<<<<<<< HEAD
+=======
+
+>>>>>>> 09f3bb1 (chore: fix build)
