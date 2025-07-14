@@ -1,5 +1,11 @@
 import { Effect, Fiber } from "effect";
 import { program } from "./effect";
+import { ConfigLive } from "./effect-config";
+import {
+	ArcadeSDKLive,
+	MarketplaceSDKLive,
+	MarketplaceAccountLive,
+} from "./services/sdk-services";
 
 // Run the program with proper scope and signal handling
 Effect.runPromise(
@@ -25,7 +31,12 @@ Effect.runPromise(
 				return exit.value;
 			}
 			throw new Error(`Program failed: ${JSON.stringify(exit.cause)}`);
-		}),
+		}).pipe(
+			Effect.provide(ArcadeSDKLive),
+			Effect.provide(MarketplaceSDKLive),
+			Effect.provide(MarketplaceAccountLive),
+			Effect.provide(ConfigLive),
+		),
 	),
 )
 	.then(() => {
@@ -35,3 +46,4 @@ Effect.runPromise(
 		console.error("Program failed:", error);
 		process.exit(1);
 	});
+

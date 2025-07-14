@@ -17,7 +17,7 @@ export function isEditionModel(model: any): model is EditionModel {
 // Filter edition models by ignored projects
 export function filterEditionModels(
 	models: RegistryModel[],
-	ignoreProjects: string[] = [],
+	ignoreProjects: readonly string[] = [],
 ): EditionModel[] {
 	return models
 		.filter(isEditionModel)
@@ -27,7 +27,7 @@ export function filterEditionModels(
 // Handle arcade registry models and return a map of editions
 export function handleArcadeRegistryModels(
 	models: RegistryModel[],
-): Effect.Effect<Map<string, EditionModel>, Error> {
+): Effect.Effect<Map<string, EditionModel>, Error, ProjectConfigService> {
 	return Effect.gen(function* () {
 		yield* Effect.logDebug(`Handling ${models.length} registry models`);
 

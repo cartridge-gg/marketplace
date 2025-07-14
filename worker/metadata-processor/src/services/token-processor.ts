@@ -1,12 +1,4 @@
-import {
-	Effect,
-	Stream,
-	Option,
-	Data,
-	Metric,
-	Chunk,
-	Schedule,
-} from "effect";
+import { Effect, Stream, Option, Data, Metric, Chunk, Schedule } from "effect";
 import type { Token, ToriiClient } from "@dojoengine/torii-wasm/node";
 import { createArcadeProjectClient } from "./arcade";
 import {
@@ -16,10 +8,15 @@ import {
 } from "../effect-config";
 import { DEFAULT_IGNORED_PROJECTS } from "../constants";
 import { processTokenMessages, publishMessages } from "./message-service";
+import { EditionModel } from "@cartridge/arcade";
 
 // Error types
-export class MessageTooLargeError extends Data.TaggedError("MessageTooLarge")<{}> {}
-export class ProtobufDecodeError extends Data.TaggedError("ProtobufDecodeError")<{}> {}
+export class MessageTooLargeError extends Data.TaggedError(
+	"MessageTooLarge",
+)<{}> {}
+export class ProtobufDecodeError extends Data.TaggedError(
+	"ProtobufDecodeError",
+)<{}> {}
 
 // Metrics for monitoring token processing
 export const tokensProcessedCounter = Metric.counter("tokens_processed", {
@@ -59,7 +56,7 @@ const fetchTokenEffect = (
 	project: string,
 	cursor: string | undefined,
 	batchSize: number,
-) =>
+): Effect.Effect<{ items: Token[]; next_cursor?: string }, Error> =>
 	Effect.tryPromise({
 		try: () => client.getTokens([], [], batchSize, cursor),
 		catch: (error) => {
@@ -77,31 +74,37 @@ const fetchTokenEffect = (
 		Effect.tapError((error) =>
 			Effect.logError(`Token fetch error for ${project}: ${error}`),
 		),
-		Effect.catchTag("MessageTooLarge", () =>
-			Effect.gen(function* () {
-				const newBatchSize = batchSize - 500;
+		Effect.catchIf(
+			(error): error is MessageTooLargeError =>
+				error instanceof MessageTooLargeError,
+			() =>
+				Effect.gen(function* () {
+					const newBatchSize = batchSize - 500;
 
-				// If batch size is still too large, we simply ignore batch and continue further
-				if (newBatchSize <= 0) {
-					return { items: [], next_cursor: cursor };
-				}
+					// If batch size is still too large, we simply ignore batch and continue further
+					if (newBatchSize <= 0) {
+						return { items: [], next_cursor: cursor };
+					}
 
-				yield* Effect.logWarning(
-					`Batch size too large for ${project}, reducing from ${batchSize} to ${batchSize - 500}`,
-				);
-				return yield* fetchTokenEffect(client, project, cursor, newBatchSize);
-			}),
+					yield* Effect.logWarning(
+						`Batch size too large for ${project}, reducing from ${batchSize} to ${batchSize - 500}`,
+					);
+					return yield* fetchTokenEffect(client, project, cursor, newBatchSize);
+				}),
 		),
-		Effect.catchTag("ProtobufDecodeError", () =>
-			Effect.gen(function* () {
-				// NOTE: this will occur if studios Torii does not share same grpc server version as marketplace grpc client.
-				// Thus we skip those
-				yield* Effect.logError(
-					`Protobuf decode error for ${project}, skipping batch at cursor: ${cursor}`,
-				);
-				// Return empty result to skip this batch
-				return { items: [], next_cursor: cursor };
-			}),
+		Effect.catchIf(
+			(error): error is ProtobufDecodeError =>
+				error instanceof ProtobufDecodeError,
+			() =>
+				Effect.gen(function* () {
+					// NOTE: this will occur if studios Torii does not share same grpc server version as marketplace grpc client.
+					// Thus we skip those
+					yield* Effect.logError(
+						`Protobuf decode error for ${project}, skipping batch at cursor: ${cursor}`,
+					);
+					// Return empty result to skip this batch
+					return { items: [], next_cursor: cursor };
+				}),
 		),
 	);
 
@@ -109,8 +112,8 @@ const fetchTokenEffect = (
 export const fetchPaginatedTokens = (
 	client: ToriiClient,
 	project: string,
-	batchSize: number = 5000,
-): Stream.Stream<Token[], Error> =>
+	batchSize = 5000,
+) =>
 	Stream.unfoldEffect(
 		Option.some<string | undefined>(undefined),
 		(maybeCursor) =>
@@ -150,7 +153,7 @@ export const fetchPaginatedTokens = (
 	).pipe(
 		Stream.filter((tokens) => tokens.length > 0),
 		Stream.tapError((error) =>
-			Effect.logError(`Error in token fetch: ${error?.message}`),
+			Effect.logError(`Error in token fetch: ${error}`),
 		),
 	);
 
@@ -223,12 +226,12 @@ export const fetchProjectToken = (client: ToriiClient, project: string) =>
 	});
 
 // Handle a single edition
-export const handleSingleEdition = (project: string, edition: any) =>
+export const handleSingleEdition = (project: string, edition: EditionModel) =>
 	Effect.gen(function* () {
 		yield* Effect.logDebug(`Starting to process project: ${project}`);
 		yield* Effect.logDebug(
 			`Edition data: ${JSON.stringify({
-				world_address: edition.world_address,
+				world_address: edition.worldAddress,
 				config: edition.config?.toString(),
 				published: edition.published,
 			})}`,

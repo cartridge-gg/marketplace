@@ -37,6 +37,7 @@ export type MetadataMessage = {
  * Creates a metadata attribute message
  */
 export function createAttributeMessage(
+	identity: string,
 	token: Token,
 	index: number,
 	traitType: string,
@@ -44,7 +45,7 @@ export function createAttributeMessage(
 ): MetadataMessage {
 	const tokenIdU256 = cairo.uint256(token.token_id);
 	return {
-		identity: token.owner,
+		identity: identity,
 		collection: token.contract_address,
 		token_id: { low: tokenIdU256.low, high: tokenIdU256.high },
 		index: index,
@@ -52,3 +53,4 @@ export function createAttributeMessage(
 		value: value,
 	};
 }
+

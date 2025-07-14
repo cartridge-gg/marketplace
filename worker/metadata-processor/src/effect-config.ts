@@ -370,7 +370,10 @@ export const createDotenvConfigProvider = (): ConfigProvider.ConfigProvider => {
 		path.resolve(__dirname, "../.env"),
 	];
 
-	let envVars: Record<string, string> = { ...process.env };
+	let envVars: Record<string, string> = { ...process.env } as Record<
+		string,
+		string
+	>;
 
 	// Try to load env files in order of preference
 	for (const envFile of envFiles) {
@@ -527,4 +530,3 @@ export const loadConfig = Effect.gen(function* () {
 		}),
 	),
 );
-

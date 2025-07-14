@@ -15,6 +15,7 @@ import {
 	makeMarketplaceSDK,
 } from "./sdk-services";
 import { MetadataAttributeTypedData } from "../constants";
+import { AccountConfigService, ConfigLive } from "../effect-config";
 
 // Fetch token metadata
 const fetchTokenMetadata = (token: Token) =>
@@ -38,6 +39,7 @@ const createSignedMessageEffect = (
 // Generate typed data effect
 const generateTypedDataEffect = (
 	sdk: SDK<SchemaType>,
+	identity: string,
 	metadata: TokenMetadata,
 	attr: MetadataAttribute,
 	attrIndex: number,
@@ -50,6 +52,7 @@ const generateTypedDataEffect = (
 			sdk.generateTypedData(
 				"MARKETPLACE-MetadataAttribute",
 				createAttributeMessage(
+					identity,
 					token,
 					idx + attrIndex + Object.keys(metadata).length,
 					traitType,
@@ -71,9 +74,11 @@ const createAttributeSignedMessage = (
 	Effect.gen(function* () {
 		const sdk = (yield* MarketplaceSDK).sdk;
 		const account = (yield* MarketplaceAccount).account;
+		const identity = (yield* AccountConfigService).address;
 		const traitType = attr.trait_type ?? attr.trait ?? "unknown";
 		const typedData = yield* generateTypedDataEffect(
 			sdk,
+			identity,
 			metadata,
 			attr,
 			attrIndex,
@@ -148,3 +153,4 @@ export const publishMessages = (messages: Message[]) =>
 		yield* Effect.logDebug(`Publishing ${messages.length} messages`);
 		yield* publishOffchainMessagesBatch(sdk, messages);
 	});
+
