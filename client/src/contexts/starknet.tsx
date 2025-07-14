@@ -1,6 +1,6 @@
 import { type Chain, mainnet, sepolia } from "@starknet-react/chains";
 import { jsonRpcProvider, StarknetConfig, voyager } from "@starknet-react/core";
-import { type PropsWithChildren, useContext, useMemo, useRef } from "react";
+import { type PropsWithChildren, useMemo, useRef } from "react";
 import { constants } from "starknet";
 import ControllerConnector from "@cartridge/connector/controller";
 import type {
@@ -10,7 +10,7 @@ import type {
 } from "@cartridge/controller";
 import { getMarketplacePolicies } from "@cartridge/marketplace";
 import { DEFAULT_PRESET, DEFAULT_PROJECT } from "../constants";
-import { ArcadeContext } from "./arcade";
+import { useArcade } from "@cartridge/marketplace";
 
 const CHAIN_ID = constants.StarknetChainId.SN_MAIN;
 const RPC_URL = "https://api.cartridge.gg/x/starknet/mainnet";
@@ -32,7 +32,7 @@ const profile: ProfileOptions = {
 };
 
 export function StarknetProvider({ children }: PropsWithChildren) {
-	const context = useContext(ArcadeContext);
+	const context = useArcade();
 
 	if (!context) {
 		throw new Error(

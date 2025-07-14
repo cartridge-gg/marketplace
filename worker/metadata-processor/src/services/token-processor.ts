@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-=======
 import { Effect, Stream, Option, Data, Metric, Chunk, Schedule } from "effect";
->>>>>>> 09f3bb1 (chore: fix build)
 import type { Token, ToriiClient } from "@dojoengine/torii-wasm/node";
-import { Chunk, Data, Effect, Metric, Option, Schedule, Stream } from "effect";
 import { DEFAULT_IGNORED_PROJECTS } from "../constants";
 import {
 	MessageConfigService,
@@ -12,7 +8,7 @@ import {
 } from "../effect-config";
 import { createArcadeProjectClient } from "./arcade";
 import { processTokenMessages, publishMessages } from "./message-service";
-import { EditionModel } from "@cartridge/arcade";
+import type { EditionModel } from "@cartridge/arcade";
 
 // Error types
 export class MessageTooLargeError extends Data.TaggedError(

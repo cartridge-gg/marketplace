@@ -101,9 +101,11 @@ export function useMetadataFilters(
 	identity: string,
 	handleChange: (tokens: TokenMetadataUI[]) => void,
 ) {
-	const metadata = useCollectionMetadata(collectionAddress, identity);
-	const tokens: TokenMetadataUI[] = [];
-	console.log(metadata);
+	const { data: metadata } = useCollectionMetadata(collectionAddress, identity);
+	const [tokens, _setTokens] = useState<TokenMetadataUI[]>(
+		null === metadata ? [] : metadata.tokens,
+	);
+
 	const [selectedTraits, setSelectedTraits] = useState<
 		{ traitType: string; value: string }[]
 	>([]);
@@ -113,7 +115,7 @@ export function useMetadataFilters(
 		const filteredTokens = filterMetadataByTraits(tokens, selectedTraits);
 		handleChange(filteredTokens);
 		setStatistics(getMetadataStatistics(filteredTokens));
-	}, [tokens, selectedTraits, handleChange, statistics]);
+	}, [tokens, handleChange, selectedTraits]);
 
 	const toggleTrait = useCallback((traitType: string, value: string) => {
 		setSelectedTraits((prev) => {
