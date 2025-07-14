@@ -45,7 +45,3 @@ export const program = Effect.gen(function* () {
 		Effect.logInfo("Main program interrupted, cleaning up..."),
 	),
 );
-<<<<<<< HEAD
-=======
-
->>>>>>> 09f3bb1 (chore: fix build)

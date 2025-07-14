@@ -25,13 +25,7 @@ export function filterEditionModels(
 }
 
 // Handle arcade registry models and return a map of editions
-<<<<<<< HEAD
 export function handleArcadeRegistryModels(models: RegistryModel[]) {
-=======
-export function handleArcadeRegistryModels(
-	models: RegistryModel[],
-): Effect.Effect<Map<string, EditionModel>, Error, ProjectConfigService> {
->>>>>>> 09f3bb1 (chore: fix build)
 	return Effect.gen(function* () {
 		yield* Effect.logDebug(`Handling ${models.length} registry models`);
 
