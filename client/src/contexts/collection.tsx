@@ -1,14 +1,14 @@
 import {
 	createContext,
-	ReactNode,
+	type ReactNode,
 	useContext,
 	useEffect,
 	useState,
 } from "react";
 
 import { ArcadeContext } from "./arcade";
-import { Token } from "@dojoengine/torii-client";
-import { Marketplace } from "@cartridge/marketplace-sdk";
+import type { Token } from "@dojoengine/torii-client";
+import { Marketplace } from "@cartridge/marketplace";
 
 export type WithCount<T> = T & { count: number };
 export type Collection = Record<string, WithCount<Token>>;

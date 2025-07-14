@@ -8,10 +8,7 @@ import { TokenActionsPanel } from "../../../components/ui/token-action-panel";
 import { useAccount } from "@starknet-react/core";
 import { TokenOrdersPanel } from "../../../components/ui/order/list";
 import { useIsTokenListed, useTokenOrders } from "../../../queries";
-import {
-	type OrderModel,
-	useMarketplaceActions,
-} from "@cartridge/marketplace-sdk";
+import { type OrderModel, useMarketplaceActions } from "@cartridge/marketplace";
 
 // Define metadata interface based on the expected structure
 interface TokenMetadata {

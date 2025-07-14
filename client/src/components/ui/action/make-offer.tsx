@@ -1,11 +1,11 @@
 import { Button } from "@cartridge/ui";
-import { TokenDetailsActionProps } from ".";
-import { useMarketplaceActions } from "@cartridge/marketplace-sdk";
+import type { TokenDetailsActionProps } from ".";
+import { useMarketplaceActions } from "@cartridge/marketplace";
 import { useCallback } from "react";
 import { useAccount } from "@starknet-react/core";
 import { getCurrencyAddress, amountToCurrencyBigInt } from "../../../currency";
 import { constants } from "starknet";
-import { ActionForm, ActionFormData } from "../action-form";
+import { ActionForm, type ActionFormData } from "../action-form";
 
 /**
  * Adds a specified number of days to a given date

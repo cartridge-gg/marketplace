@@ -23,11 +23,6 @@ import { constants } from "starknet";
 
 const CHAIN_ID = constants.StarknetChainId.SN_MAIN;
 
-export interface ProjectProps {
-	namespace: string;
-	project: string;
-}
-
 export type MarketplaceStateInnerType<T extends MarketplaceModel> = {
 	[key: string]: T;
 };

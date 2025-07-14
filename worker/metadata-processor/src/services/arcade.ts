@@ -14,9 +14,6 @@ import {
 } from "@dojoengine/sdk/node";
 import { ToriiClient } from "@dojoengine/torii-wasm/node";
 import { type constants, shortString } from "starknet";
-import { type Logger, createLogger } from "../utils/logger.ts";
-import type { TokenFetcherState } from "./token-fetcher.ts";
-import { env } from "../env.ts";
 
 // TODO: use imports from Arcade, when rewriting with torii-wasm is done
 export const NAMESPACE = "ARCADE";
@@ -48,7 +45,6 @@ export interface ArcadeSchemaType extends ISchemaType {
  */
 export type ArcadeRegistryState = {
 	sdk: SDK<ArcadeSchemaType> | null;
-	logger: Logger;
 	chainId: constants.StarknetChainId;
 };
 
@@ -85,7 +81,6 @@ export function createArcadeRegistryState(
 ): ArcadeRegistryState {
 	return {
 		sdk: null,
-		logger: createLogger("ArcadeRegistry"),
 		chainId,
 	};
 }
@@ -107,8 +102,6 @@ export async function initArcadeRegistry(
 	try {
 		const config = getToriiConfig(state.chainId);
 
-		state.logger.info("Initializing Arcade Registry SDK...");
-
 		state.sdk = await initSDK({
 			client: {
 				toriiUrl: config.toriiUrl,
@@ -121,73 +114,19 @@ export async function initArcadeRegistry(
 				revision: "1",
 			},
 		});
-
-		state.logger.info("Arcade Registry SDK initialized successfully");
 	} catch (error) {
-		state.logger.error(error, "Failed to initialize Arcade Registry SDK");
 		throw error;
 	}
 }
 
-/**
- * Fetches all editions from the arcade registry
- */
-export async function fetchEditions(state: TokenFetcherState): Promise<void> {
-	function handleArcadeRegistryModels(models: RegistryModel[]): void {
-		try {
-			// Filter and process edition models
-			const editions = filterEditionModels(models, state.ignoreProjects);
 
-			// Store valid editions
-			for (const edition of editions) {
-				if (!edition.config) {
-					continue;
-				}
-
-				const cfg = JSON.parse(edition.config.toString() as string);
-				state.editions.set(cfg.project, edition);
-			}
-		} catch (error) {}
-	}
-
-	const res = await fetchArcadeRegistryModels(state.registryState, {
-		access: false,
-		game: true,
-		edition: true,
-	});
-	handleArcadeRegistryModels(res);
-}
-
-export async function createArcadeProjectClient(project: string) {
+export async function createArcadeProjectClient(project: string, worldAddress: string) {
 	return await new ToriiClient({
 		toriiUrl: `https://api.cartridge.gg/x/${project}/torii`,
-		worldAddress: env.MARKETPLACE_ADDRESS,
+		worldAddress,
 	});
 }
 
-/**
- * Creates Torii clients for all editions
- */
-export async function createToriiClients(
-	state: TokenFetcherState,
-): Promise<void> {
-	async function createClientForEdition(edition: EditionModel): Promise<void> {
-		const cfg = JSON.parse(edition.config.toString());
-		const project = cfg.project;
-		try {
-			const client = await createArcadeProjectClient(project);
-			state.toriiClients.set(project, client);
-			state.logger.info(`Created Torii client for project: ${project}`);
-		} catch (error) {
-			state.logger.error(error, `Failed to create Torii client for ${project}`);
-		}
-	}
-
-	const clientPromises = Array.from(state.editions.values()).map(
-		createClientForEdition,
-	);
-	await Promise.all(clientPromises);
-}
 
 /**
  * Builds query for fetching arcade registry models
@@ -234,15 +173,16 @@ export function parseArcadeRegistryModels(
 
 		try {
 			if (arcadeModels.Edition) {
-				models.push(arcadeModels.Edition as EditionModel);
+				// The raw model data is what we need
+				models.push(arcadeModels.Edition as any);
 			}
 
 			if (arcadeModels.Game) {
-				models.push(arcadeModels.Game as GameModel);
+				models.push(arcadeModels.Game as any);
 			}
 
 			if (arcadeModels.Access) {
-				models.push(arcadeModels.Access as AccessModel);
+				models.push(arcadeModels.Access as any);
 			}
 		} catch (error) {
 			console.error(
@@ -271,18 +211,12 @@ export async function fetchArcadeRegistryModels(
 	try {
 		const query = buildArcadeRegistryQuery(options);
 
-		state.logger.info("Fetching arcade registry models...");
-
 		const result = await state.sdk.getEntities({ query });
 		const items = result.getItems();
 		const models = parseArcadeRegistryModels(items);
 
-		state.logger.info(`Fetched ${models.length} arcade registry models`);
-
-		// Call the callback with the parsed models
 		return models;
 	} catch (error) {
-		state.logger.error(error, "Failed to fetch arcade registry models");
 		throw error;
 	}
 }

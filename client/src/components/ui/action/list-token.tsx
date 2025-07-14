@@ -1,5 +1,5 @@
 import { Button } from "@cartridge/ui";
-import { useMarketplaceActions } from "@cartridge/marketplace-sdk";
+import { useMarketplaceActions } from "@cartridge/marketplace";
 import type { TokenDetailsActionProps } from ".";
 import { useCallback } from "react";
 import { useAccount } from "@starknet-react/core";

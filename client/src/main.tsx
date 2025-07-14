@@ -9,7 +9,7 @@ import { Provider } from "./contexts";
 
 import "./index.css";
 import { DojoSdkProvider } from "@dojoengine/sdk/react";
-import { initSDK, configs, setupWorld } from "@cartridge/marketplace-sdk";
+import { initSDK, configs, setupWorld } from "@cartridge/marketplace";
 import { constants } from "starknet";
 
 // Create a new router instance
@@ -36,6 +36,7 @@ async function main() {
 			<StrictMode>
 				<QueryClientProvider client={queryClient}>
 					<DojoSdkProvider
+						// @ts-ignore
 						sdk={sdk}
 						dojoConfig={dojoConfig}
 						clientFn={setupWorld}
