@@ -132,5 +132,7 @@ fn test_list_remove_execute_revert_cannot_be_executed() {
             asset_id: TOKEN_ID,
             quantity: 0,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }

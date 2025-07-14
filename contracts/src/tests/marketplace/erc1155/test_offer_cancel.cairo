@@ -89,6 +89,8 @@ fn test_offer_cancel_execute_revert_cannot_be_executed() {
             asset_id: TOKEN_ID,
             quantity: QUANTITY,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 

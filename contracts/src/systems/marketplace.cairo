@@ -69,6 +69,8 @@ pub trait IMarketplace<TContractState> {
         asset_id: u256,
         quantity: u128,
         royalties: bool,
+        client_fee: u32,
+        client_receiver: starknet::ContractAddress,
     );
 }
 
@@ -296,14 +298,36 @@ pub mod Marketplace {
             asset_id: u256,
             quantity: u128,
             royalties: bool,
+            client_fee: u32,
+            client_receiver: starknet::ContractAddress,
         ) {
             let world = self.world_storage();
             if self.sellable.is_sell_order(world, order_id, collection, token_id) {
-                return self.sellable.execute(world, order_id, collection, token_id, quantity);
+                return self
+                    .sellable
+                    .execute(
+                        world,
+                        order_id,
+                        collection,
+                        token_id,
+                        quantity,
+                        client_fee,
+                        client_receiver,
+                    );
             }
             self
                 .buyable
-                .execute(world, order_id, collection, token_id, asset_id, quantity, royalties)
+                .execute(
+                    world,
+                    order_id,
+                    collection,
+                    token_id,
+                    asset_id,
+                    quantity,
+                    royalties,
+                    client_fee,
+                    client_receiver,
+                )
         }
     }
 

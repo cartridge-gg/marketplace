@@ -170,6 +170,8 @@ pub mod BuyableComponent {
             asset_id: u256,
             quantity: u128,
             royalties: bool,
+            client_fee: u32,
+            client_receiver: ContractAddress,
         ) {
             // [Check] Book is not paused
             let mut store = StoreTrait::new(world);
@@ -183,6 +185,9 @@ pub mod BuyableComponent {
             // [Check] Order category
             order.assert_buy_order();
 
+            // [Check] Client fee
+            BookAssert::assert_valid_client_fee(client_fee, client_receiver.into());
+
             // [Check] Order data
             let spender: ContractAddress = order.owner.try_into().unwrap();
             let collection: ContractAddress = order.collection.try_into().unwrap();
@@ -191,7 +196,12 @@ pub mod BuyableComponent {
             let verifiable = get_dep_component!(self, Verify);
             let owner: ContractAddress = starknet::get_caller_address();
             // [Info] Price is a unit price in case or ERC1155 otherwise the asset price
-            let price: u256 = core::cmp::max(order.price.into(), order.price.into() * value);
+            let nominal_price: u256 = core::cmp::max(
+                order.price.into(), order.price.into() * value,
+            );
+            // [Info] Price is inflated by the client fee since it must be paid by the buyer
+            let (client_receiver, client_fee) = book
+                .client_fee(nominal_price, client_fee, client_receiver.into());
             // [Info] In case of buy any order, the token id is the asset id
             let token_id: u256 = if order.is_buy_any() {
                 asset_id
@@ -205,14 +215,15 @@ pub mod BuyableComponent {
             store.set_order(@order);
 
             // [Interaction] Process sale
-            let (orderbook_receiver, orderbook_fee) = book.fee(price);
+            let (orderbook_receiver, orderbook_fee) = book.protocol_fee(nominal_price);
             // [Info] Royalties are toggled by the seller (executor of the order)
             let (creator_receiver, creator_fee) = if royalties || book.royalties {
-                verifiable.royalties(collection, token_id, price)
+                verifiable.royalties(collection, token_id, nominal_price)
             } else {
                 (starknet::get_contract_address(), 0)
             };
             let mut fees = array![
+                (client_receiver.try_into().unwrap(), client_fee),
                 (orderbook_receiver.try_into().unwrap(), orderbook_fee),
                 (creator_receiver, creator_fee),
             ]
@@ -225,7 +236,7 @@ pub mod BuyableComponent {
                     token_id: token_id,
                     value: value,
                     currency: currency,
-                    price: price,
+                    price: nominal_price + client_fee,
                     expiration: order.expiration,
                     ref fees: fees,
                 );
