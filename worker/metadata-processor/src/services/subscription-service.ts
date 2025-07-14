@@ -6,7 +6,10 @@ import { DEFAULT_IGNORED_PROJECTS } from "../constants";
 import { createToriiClient, processTokens } from "./token-processor";
 
 // Subscribe to token updates for a project
-export const subscribeToTokenUpdated = (project: string, edition: EditionModel) =>
+export const subscribeToTokenUpdated = (
+	project: string,
+	edition: EditionModel,
+) =>
 	Effect.gen(function* () {
 		// Skip ignored projects
 		const projectConfig = yield* ProjectConfigService;
@@ -27,6 +30,15 @@ export const subscribeToTokenUpdated = (project: string, edition: EditionModel) 
 
 		// Create Torii client
 		const client = yield* createToriiClient(project, edition);
+
+		yield* Effect.addFinalizer(() =>
+			Effect.gen(function* () {
+				yield* Effect.logInfo(`Cancelling subscription for ${project}`);
+				if (client?.free) {
+					client.free();
+				}
+			}),
+		);
 
 		// Create stream from token updates
 		const tokenStream = Stream.async<Token, Error>((emit) => {
@@ -100,3 +112,4 @@ export const tokenMetadataUpdater = (editions: Map<string, EditionModel>) =>
 
 		return editions;
 	});
+
