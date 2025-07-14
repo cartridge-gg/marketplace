@@ -31,7 +31,12 @@ Effect.runPromise(
 				return exit.value;
 			}
 			throw new Error(`Program failed: ${JSON.stringify(exit.cause)}`);
-		}),
+		}).pipe(
+			Effect.provide(ArcadeSDKLive),
+			Effect.provide(MarketplaceSDKLive),
+			Effect.provide(MarketplaceAccountLive),
+			Effect.provide(ConfigLive),
+		),
 	),
 )
 	.then(() => {
@@ -41,3 +46,7 @@ Effect.runPromise(
 		console.error("Program failed:", error);
 		process.exit(1);
 	});
+<<<<<<< HEAD
+=======
+
+>>>>>>> 09f3bb1 (chore: fix build)
