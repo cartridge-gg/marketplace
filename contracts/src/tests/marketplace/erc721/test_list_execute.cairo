@@ -25,7 +25,7 @@ const PRICE: u128 = 1_000_000_000_000_000_000;
 // Tests
 
 #[test]
-fn test_list() {
+fn test_list_execute() {
     // [Setup] World
     let (world, contracts, context) = spawn();
     // [Sell] Create a sell order on the Marketplace
