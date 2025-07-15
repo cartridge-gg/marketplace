@@ -67,6 +67,8 @@ fn test_offer() {
             asset_id: order.token_id,
             quantity: order.quantity / 2,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
     // [Assert] Order is executed
     let order = store.order(ORDER_ID, collection, TOKEN_ID);
@@ -81,6 +83,8 @@ fn test_offer() {
             asset_id: order.token_id,
             quantity: order.quantity,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
     // [Assert] Order is executed
     let order = store.order(ORDER_ID, collection, TOKEN_ID);
@@ -155,6 +159,8 @@ fn test_offer_revert_not_holder() {
             asset_id: TOKEN_ID,
             quantity: QUANTITY,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 
@@ -187,6 +193,8 @@ fn test_offer_revert_not_approved() {
             asset_id: TOKEN_ID,
             quantity: QUANTITY,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 
@@ -222,5 +230,7 @@ fn test_offer_revert_invalid_buy() {
             asset_id: TOKEN_ID,
             quantity: QUANTITY,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }

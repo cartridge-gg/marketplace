@@ -65,6 +65,8 @@ fn test_intent() {
             asset_id: TOKEN_ID,
             quantity: 0,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
     // [Assert] Order is executed
     let order = store.order(ORDER_ID, collection, 0);
@@ -100,5 +102,7 @@ fn test_intent_revert_order_not_found() {
             asset_id: TOKEN_ID,
             quantity: 0,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }

@@ -37,6 +37,14 @@ pub mod setup {
         starknet::contract_address_const::<'OWNER'>()
     }
 
+    pub fn CREATOR() -> ContractAddress {
+        starknet::contract_address_const::<'CREATOR'>()
+    }
+
+    pub fn CLIENT_RECEIVER() -> ContractAddress {
+        starknet::contract_address_const::<'CLIENT_RECEIVER'>()
+    }
+
     pub fn RECEIVER() -> ContractAddress {
         starknet::contract_address_const::<'RECEIVER'>()
     }
@@ -63,6 +71,8 @@ pub mod setup {
         pub receiver: starknet::ContractAddress,
         pub spender: starknet::ContractAddress,
         pub holder: starknet::ContractAddress,
+        pub creator: starknet::ContractAddress,
+        pub client_receiver: starknet::ContractAddress,
     }
 
     /// Drop all events from the given contract address
@@ -93,11 +103,11 @@ pub mod setup {
         }
     }
 
-    fn setup_contracts() -> Span<ContractDef> {
+    fn setup_contracts(receiver: ContractAddress) -> Span<ContractDef> {
         [
             ContractDefTrait::new(@"MARKETPLACE", @"Marketplace")
                 .with_writer_of([dojo::utils::bytearray_hash(@"MARKETPLACE")].span())
-                .with_init_calldata(array![0x1, 0x1F4, OWNER().into(), RECEIVER().into()].span()),
+                .with_init_calldata(array![0x1, 0x1F4, receiver.into(), OWNER().into()].span()),
         ]
             .span()
     }
@@ -124,22 +134,22 @@ pub mod setup {
         IERC20Dispatcher { contract_address: erc20_address }
     }
 
-    fn setup_erc721(recipient: ContractAddress) -> IERC721Dispatcher {
+    fn setup_erc721(recipient: ContractAddress, creator: ContractAddress) -> IERC721Dispatcher {
         let (erc721_address, _) = deploy_syscall(
             class_hash: ERC721::TEST_CLASS_HASH.try_into().unwrap(),
             contract_address_salt: 'ERC721',
-            calldata: [recipient.into()].span(),
+            calldata: [recipient.into(), creator.into()].span(),
             deploy_from_zero: false,
         )
             .unwrap_syscall();
         IERC721Dispatcher { contract_address: erc721_address }
     }
 
-    fn setup_erc1155(recipient: ContractAddress) -> IERC1155Dispatcher {
+    fn setup_erc1155(recipient: ContractAddress, creator: ContractAddress) -> IERC1155Dispatcher {
         let (erc1155_address, _) = deploy_syscall(
             class_hash: ERC1155::TEST_CLASS_HASH.try_into().unwrap(),
             contract_address_salt: 'ERC1155',
-            calldata: [recipient.into()].span(),
+            calldata: [recipient.into(), creator.into()].span(),
             deploy_from_zero: false,
         )
             .unwrap_syscall();
@@ -151,21 +161,23 @@ pub mod setup {
         // [Setup] World
         let namespace_def = setup_namespace();
         let world = spawn_test_world([namespace_def].span());
-        world.sync_perms_and_inits(setup_contracts());
         // [Setup] Context
         let context = Context {
             owner: setup_account(OWNER().into()),
             receiver: setup_account(RECEIVER().into()),
             spender: setup_account(SPENDER().into()),
             holder: setup_account(HOLDER().into()),
+            creator: setup_account(CREATOR().into()),
+            client_receiver: setup_account(CLIENT_RECEIVER().into()),
         };
+        world.sync_perms_and_inits(setup_contracts(context.receiver));
         // [Setup] Systems
         let (marketplace_address, _) = world.dns(@"Marketplace").unwrap();
         let systems = Contracts {
             marketplace: IMarketplaceDispatcher { contract_address: marketplace_address },
             erc20: setup_erc20(context.spender),
-            erc721: setup_erc721(context.holder),
-            erc1155: setup_erc1155(context.holder),
+            erc721: setup_erc721(context.holder, context.creator),
+            erc1155: setup_erc1155(context.holder, context.creator),
         };
 
         // [Return]

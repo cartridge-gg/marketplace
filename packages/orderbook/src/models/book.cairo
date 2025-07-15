@@ -33,9 +33,17 @@ pub impl BookImpl of BookTrait {
     }
 
     #[inline]
-    fn fee(self: Book, price: u256) -> (felt252, u256) {
+    fn protocol_fee(self: Book, price: u256) -> (felt252, u256) {
         // [Return] Fee
         (self.fee_receiver, price * self.fee_num.into() / DEFAULT_FEE_DENOMINATOR.into())
+    }
+
+    #[inline]
+    fn client_fee(
+        self: Book, price: u256, client_fee: u32, client_receiver: felt252,
+    ) -> (felt252, u256) {
+        // [Return] Fee
+        (client_receiver, price * client_fee.into() / DEFAULT_FEE_DENOMINATOR.into())
     }
 
     #[inline]
@@ -104,6 +112,13 @@ pub impl BookAssert of AssertTrait {
     #[inline]
     fn assert_not_paused(self: Book) {
         assert(!self.paused, errors::BOOK_IS_PAUSED);
+    }
+
+    #[inline]
+    fn assert_valid_client_fee(fee: u32, receiver: felt252) {
+        Self::assert_valid_fee(fee);
+        // [Check] We cannot have non zero fee without receiver
+        assert(fee == 0 || receiver != 0, errors::BOOK_INVALID_ADDRESS);
     }
 }
 

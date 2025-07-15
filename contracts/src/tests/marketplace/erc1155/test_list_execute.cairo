@@ -68,6 +68,8 @@ fn test_list() {
             asset_id: order.token_id,
             quantity: order.quantity / 2,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
     // [Assert] Order is executed
     let order = store.order(ORDER_ID, collection, TOKEN_ID);
@@ -84,6 +86,8 @@ fn test_list() {
             asset_id: order.token_id,
             quantity: order.quantity,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
     // [Assert] Order is executed
     let order = store.order(ORDER_ID, collection, TOKEN_ID);
@@ -124,6 +128,8 @@ fn test_list_revert_cannot_execute() {
             asset_id: order.token_id,
             quantity: order.quantity * 2,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 
@@ -199,6 +205,8 @@ fn test_list_revert_not_allowed() {
             asset_id: TOKEN_ID,
             quantity: QUANTITY,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 
@@ -233,6 +241,8 @@ fn test_list_revert_not_invalid_balance() {
             asset_id: TOKEN_ID,
             quantity: QUANTITY,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 
@@ -269,6 +279,8 @@ fn test_list_revert_invalid_sell() {
             asset_id: TOKEN_ID,
             quantity: QUANTITY,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 

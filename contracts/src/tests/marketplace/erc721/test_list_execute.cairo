@@ -25,7 +25,7 @@ const PRICE: u128 = 1_000_000_000_000_000_000;
 // Tests
 
 #[test]
-fn test_list() {
+fn test_list_execute() {
     // [Setup] World
     let (world, contracts, context) = spawn();
     // [Sell] Create a sell order on the Marketplace
@@ -67,6 +67,8 @@ fn test_list() {
             asset_id: TOKEN_ID,
             quantity: 0,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
     // [Assert] Order is executed
     let order = store.order(ORDER_ID, collection, TOKEN_ID);
@@ -145,6 +147,8 @@ fn test_list_revert_not_allowed() {
             asset_id: TOKEN_ID,
             quantity: 0,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 
@@ -179,6 +183,8 @@ fn test_list_revert_not_invalid_balance() {
             asset_id: TOKEN_ID,
             quantity: 0,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 
@@ -215,6 +221,8 @@ fn test_list_revert_invalid_sell() {
             asset_id: TOKEN_ID,
             quantity: 0,
             royalties: true,
+            client_fee: 0,
+            client_receiver: context.receiver,
         );
 }
 
