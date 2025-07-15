@@ -53,4 +53,3 @@ export function createAttributeMessage(
 		value: value,
 	};
 }
-

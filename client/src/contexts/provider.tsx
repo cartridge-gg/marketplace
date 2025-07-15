@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import { ArcadeProvider } from "./arcade";
+import { ArcadeProvider } from "@cartridge/marketplace";
 import { MarketplaceProvider } from "./marketplace";
 import { CollectionProvider } from "./collection";
 import { StarknetProvider } from "./starknet";

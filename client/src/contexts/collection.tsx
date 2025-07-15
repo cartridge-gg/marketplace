@@ -6,9 +6,9 @@ import {
 	useState,
 } from "react";
 
-import { ArcadeContext } from "./arcade";
 import type { Token } from "@dojoengine/torii-client";
 import { Marketplace } from "@cartridge/marketplace";
+import { useArcade } from "@cartridge/marketplace";
 
 export type WithCount<T> = T & { count: number };
 export type Collection = Record<string, WithCount<Token>>;
@@ -66,7 +66,7 @@ export const CollectionProvider = ({ children }: { children: ReactNode }) => {
 		throw new Error("CollectionProvider can only be used once");
 	}
 
-	const context = useContext(ArcadeContext);
+	const context = useArcade();
 
 	if (!context) {
 		throw new Error("CollectionProvider must be used within ArcadeProvider");

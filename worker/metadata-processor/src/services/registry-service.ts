@@ -25,9 +25,7 @@ export function filterEditionModels(
 }
 
 // Handle arcade registry models and return a map of editions
-export function handleArcadeRegistryModels(
-	models: RegistryModel[],
-): Effect.Effect<Map<string, EditionModel>, Error, ProjectConfigService> {
+export function handleArcadeRegistryModels(models: RegistryModel[]) {
 	return Effect.gen(function* () {
 		yield* Effect.logDebug(`Handling ${models.length} registry models`);
 
@@ -36,7 +34,7 @@ export function handleArcadeRegistryModels(
 			yield* Effect.logDebug(
 				`First model structure: ${JSON.stringify(Object.keys(models[0]))}`,
 			);
-			yield* Effect.logDebug(`Model type: ${(models[0] as any).type}`);
+			yield* Effect.logDebug(`Model type: ${(models[0] as EditionModel).type}`);
 		}
 
 		const res: Map<string, EditionModel> = new Map();
@@ -46,7 +44,7 @@ export function handleArcadeRegistryModels(
 			projectConfig.ignoredProjects.length > 0
 				? projectConfig.ignoredProjects
 				: DEFAULT_IGNORED_PROJECTS;
-		const editions = filterEditionModels(models, ignoredProjects);
+		const editions = filterEditionModels(models, ignoredProjects as string[]);
 		yield* Effect.logDebug(`Filtered to ${editions.length} editions`);
 
 		// Store valid editions

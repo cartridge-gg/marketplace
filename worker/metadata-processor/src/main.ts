@@ -1,4 +1,4 @@
-import { Effect, Fiber } from "effect";
+import { Effect, Fiber, Layer } from "effect";
 import { program } from "./effect";
 import { ConfigLive } from "./effect-config";
 import {
@@ -6,44 +6,14 @@ import {
 	MarketplaceSDKLive,
 	MarketplaceAccountLive,
 } from "./services/sdk-services";
+import { BunRuntime } from "@effect/platform-bun";
 
-// Run the program with proper scope and signal handling
-Effect.runPromise(
-	Effect.scoped(
-		Effect.gen(function* () {
-			// Run the program in a forked fiber
-			const fiber = yield* Effect.fork(program);
+const AppServices = Layer.mergeAll(
+	ArcadeSDKLive,
+	MarketplaceSDKLive,
+	MarketplaceAccountLive,
+);
 
-			// Setup graceful shutdown handlers
-			const shutdown = () => {
-				console.log("Shutting down gracefully...");
-				Effect.runFork(Fiber.interrupt(fiber));
-			};
+const AllServices = AppServices.pipe(Layer.provideMerge(ConfigLive));
 
-			process.on("SIGINT", shutdown);
-			process.on("SIGTERM", shutdown);
-
-			// Wait for the fiber to complete
-			const exit = yield* Fiber.await(fiber);
-
-			if (exit._tag === "Success") {
-				console.log("Program completed successfully");
-				return exit.value;
-			}
-			throw new Error(`Program failed: ${JSON.stringify(exit.cause)}`);
-		}).pipe(
-			Effect.provide(ArcadeSDKLive),
-			Effect.provide(MarketplaceSDKLive),
-			Effect.provide(MarketplaceAccountLive),
-			Effect.provide(ConfigLive),
-		),
-	),
-)
-	.then(() => {
-		process.exit(0);
-	})
-	.catch((error) => {
-		console.error("Program failed:", error);
-		process.exit(1);
-	});
-
+Effect.scoped(program).pipe(Effect.provide(AllServices), BunRuntime.runMain);

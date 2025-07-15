@@ -1,11 +1,5 @@
 import { Effect, Fiber } from "effect";
 import type { EditionModel } from "@cartridge/arcade";
-import { ConfigLive } from "./effect-config";
-import {
-	ArcadeSDKLive,
-	MarketplaceSDKLive,
-	MarketplaceAccountLive,
-} from "./services/sdk-services";
 import { fetchEditions } from "./services/registry-service";
 import { handleSingleEdition } from "./services/token-processor";
 import { tokenMetadataUpdater } from "./services/subscription-service";
@@ -33,18 +27,14 @@ const processTokenMetadata = (editions: Map<string, EditionModel>) =>
 
 // Main program logic
 export const program = Effect.gen(function* () {
-	// Add finalizers for cleanup
-	yield* Effect.addFinalizer(() =>
-		Effect.gen(function* () {
-			yield* Effect.logInfo("Starting cleanup process...");
-			yield* Effect.logInfo("All resources cleaned up");
-		}),
-	);
-
 	// Run the main program
 	const editions = yield* fetchEditions;
-	yield* processTokenMetadata(editions);
-	yield* tokenMetadataUpdater(editions);
+	yield* Effect.all(
+		[processTokenMetadata(editions), tokenMetadataUpdater(editions)],
+		{
+			concurrency: "unbounded",
+		},
+	);
 
 	return editions;
 }).pipe(
@@ -55,4 +45,3 @@ export const program = Effect.gen(function* () {
 		Effect.logInfo("Main program interrupted, cleaning up..."),
 	),
 );
-

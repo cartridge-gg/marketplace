@@ -17,6 +17,7 @@
     "@dojoengine/core": "1.5.17",
     "@dojoengine/sdk": "1.5.18",
     "@dojoengine/torii-wasm": "1.5.16",
+    "@effect/platform-bun": "^0.73.0",
     "dotenv": "^16.6.1",
     "effect": "^3.16.12",
     "pino": "^9.7.0",
