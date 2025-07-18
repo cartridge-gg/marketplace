@@ -1,4 +1,4 @@
-import { Effect, Fiber, Layer } from "effect";
+import { Effect, Layer } from "effect";
 import { program } from "./effect";
 import { ConfigLive } from "./effect-config";
 import {
