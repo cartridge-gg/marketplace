@@ -7,4 +7,5 @@ export default defineConfig({
 	entry: {
 		index: "src/index.ts",
 	},
+	external: ["react", "react-dom", "@tanstack/react-query"],
 });

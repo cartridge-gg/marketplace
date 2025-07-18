@@ -2,6 +2,14 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import type { Token, ToriiClient } from "@dojoengine/torii-wasm";
 import { addAddressPadding } from "starknet";
 import { useArcade } from "./arcade";
+import {
+	useQuery,
+	useInfiniteQuery,
+	keepPreviousData,
+	type UseQueryResult,
+	type UseInfiniteQueryResult,
+	type InfiniteData,
+} from "@tanstack/react-query";
 
 async function fetchCollectionFromClient(
 	clients: { [key: string]: ToriiClient },
@@ -34,6 +42,85 @@ async function fetchCollectionFromClient(
 		console.error(err);
 		return { items: [], cursor: undefined, client: undefined };
 	}
+}
+
+async function fetchCollectionData(
+	clients: { [key: string]: ToriiClient },
+	collectionAddress: string,
+	pageSize: number,
+	cursor: string | undefined,
+	tokenIds: string[],
+	specificClient?: string,
+): Promise<{
+	items: Token[];
+	cursor: string | undefined;
+	client: string | undefined;
+}> {
+	if (specificClient && clients[specificClient]) {
+		const result = await fetchCollectionFromClient(
+			clients,
+			specificClient,
+			collectionAddress,
+			pageSize,
+			cursor,
+			tokenIds,
+		);
+		if (result.items.length > 0) {
+			return {
+				items: result.items.map((item: Token) => {
+					try {
+						item.metadata = JSON.parse(item.metadata);
+						return item;
+					} catch (_err) {
+						console.error(item, _err);
+						return item;
+					}
+				}),
+				cursor: result.cursor,
+				client: result.client,
+			};
+		}
+	}
+
+	const collections = await Promise.all(
+		Object.keys(clients).map(async (project) => {
+			try {
+				return await fetchCollectionFromClient(
+					clients,
+					project,
+					collectionAddress,
+					pageSize,
+					cursor,
+					tokenIds,
+				);
+			} catch (err) {
+				console.error(err);
+				return { items: [], cursor: undefined, client: undefined };
+			}
+		}),
+	);
+
+	const validCollection = collections.find(
+		(c) => c?.items && c.items.length > 0,
+	);
+
+	if (!validCollection) {
+		return { items: [], cursor: undefined, client: undefined };
+	}
+
+	return {
+		items: validCollection.items.map((item: Token) => {
+			try {
+				item.metadata = JSON.parse(item.metadata);
+				return item;
+			} catch (_err) {
+				console.error(item, _err);
+				return item;
+			}
+		}),
+		cursor: validCollection.cursor,
+		client: validCollection.client,
+	};
 }
 
 export function useCollection(
@@ -205,4 +292,105 @@ export function useCollection(
 		prevCursor:
 			prevCursors.length > 0 ? prevCursors[prevCursors.length - 1] : undefined,
 	};
+}
+
+interface CollectionQueryResult {
+	items: Token[];
+	hasMore: boolean;
+	client: string | undefined;
+}
+
+export function useCollectionQuery(
+	collectionAddress: string,
+	tokenIds: string[],
+	page = 1,
+	pageSize = 50,
+): UseQueryResult<CollectionQueryResult> {
+	const { clients } = useArcade();
+
+	return useQuery({
+		queryKey: ["collection", collectionAddress, tokenIds, page, pageSize],
+		queryFn: async (): Promise<CollectionQueryResult> => {
+			let currentCursor: string | undefined = undefined;
+			let items: Token[] = [];
+			let client: string | undefined = undefined;
+
+			for (let i = 1; i <= page; i++) {
+				const result = await fetchCollectionData(
+					clients,
+					collectionAddress,
+					pageSize,
+					currentCursor,
+					tokenIds,
+					client,
+				);
+
+				if (i === page) {
+					items = result.items;
+					client = result.client;
+				}
+
+				currentCursor = result.cursor;
+				if (i < page && !currentCursor) {
+					break;
+				}
+			}
+
+			return {
+				items,
+				hasMore: !!currentCursor,
+				client,
+			};
+		},
+		placeholderData: keepPreviousData,
+		enabled: !!collectionAddress && Object.keys(clients).length > 0,
+	});
+}
+
+interface InfiniteCollectionPage {
+	items: Token[];
+	cursor: string | undefined;
+	client: string | undefined;
+}
+
+export function useInfiniteCollectionQuery(
+	collectionAddress: string,
+	tokenIds: string[],
+	pageSize = 50,
+): UseInfiniteQueryResult<InfiniteData<InfiniteCollectionPage>, Error> {
+	const { clients } = useArcade();
+	const [client, setClient] = useState<string>("");
+
+	return useInfiniteQuery<
+		InfiniteCollectionPage,
+		Error,
+		InfiniteData<InfiniteCollectionPage>,
+		(string | number | string[])[],
+		string | undefined
+	>({
+		queryKey: ["collection-infinite", collectionAddress, tokenIds, pageSize],
+		queryFn: async ({ pageParam }): Promise<InfiniteCollectionPage> => {
+			const result = await fetchCollectionData(
+				clients,
+				collectionAddress,
+				pageSize,
+				pageParam,
+				tokenIds,
+				client === "" ? undefined : client,
+			);
+
+			if (client === "" && result.client) {
+				setClient(result.client);
+			}
+
+			return {
+				items: result.items,
+				cursor: result.cursor,
+				client: result.client,
+			};
+		},
+		initialPageParam: undefined,
+		getNextPageParam: (lastPage) => lastPage.cursor,
+		enabled: !!collectionAddress && Object.keys(clients).length > 0,
+	});
 }

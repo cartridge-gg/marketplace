@@ -130,6 +130,7 @@ export type TokenMetadataUI = {
 		traitType: string;
 		value: string;
 	}>;
+	image?: string;
 };
 
 export type CollectionMetadataUI = {
