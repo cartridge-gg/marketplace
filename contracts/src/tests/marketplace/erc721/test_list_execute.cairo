@@ -76,6 +76,27 @@ fn test_list_execute() {
 }
 
 #[test]
+#[should_panic(expected: ('Sale: invalid value', 'ENTRYPOINT_FAILED'))]
+fn test_list_execute_revert_invalid_value() {
+    // [Setup] World
+    let (_world, contracts, context) = spawn();
+    // [Sell] Create a sell order on the Marketplace
+    starknet::testing::set_contract_address(context.holder);
+    contracts.erc721.set_approval_for_all(contracts.marketplace.contract_address, true);
+    contracts
+        .marketplace
+        .list(
+            collection: contracts.erc721.contract_address,
+            token_id: TOKEN_ID,
+            quantity: 1,
+            price: PRICE,
+            currency: contracts.erc20.contract_address,
+            expiration: EXPIRATION,
+            royalties: true,
+        );
+}
+
+#[test]
 #[should_panic(expected: ('Sale: not owner', 'ENTRYPOINT_FAILED'))]
 fn test_list_revert_not_owner() {
     // [Setup] World
