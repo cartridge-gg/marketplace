@@ -78,7 +78,7 @@ pub mod VerifiableComponent {
                     token_id: token_id,
                     value: value,
                 );
-                if (!has_enough_balance) {
+                if (!has_enough_balance || value == 0) {
                     return (false, errors::SALE_INVALID_VALUE);
                 }
             } else if src5_dispatcher.supports_interface(IERC721_ID) {
@@ -119,6 +119,9 @@ pub mod VerifiableComponent {
             expiration: u64,
             currency: ContractAddress,
             price: u256,
+            collection: ContractAddress,
+            token_id: u256,
+            value: u256,
         ) -> (bool, felt252) {
             // [Check] Expiration
             if (expiration < starknet::get_block_timestamp()) {
@@ -138,6 +141,19 @@ pub mod VerifiableComponent {
             );
             if (!spender_is_allowed) {
                 return (false, errors::SALE_NOT_ALLOWED);
+            }
+            // [Check] Collection value
+            let src5_dispatcher = ISRC5Dispatcher { contract_address: collection };
+            if src5_dispatcher.supports_interface(IERC1155_ID) {
+                // [Check] ERC1155 value
+                if (value == 0) {
+                    return (false, errors::SALE_INVALID_VALUE);
+                }
+            } else if src5_dispatcher.supports_interface(IERC721_ID) {
+                // [Check] ERC721 value
+                if (value != 0) {
+                    return (false, errors::SALE_INVALID_VALUE);
+                }
             }
             (true, 0)
         }
@@ -204,7 +220,13 @@ pub mod VerifiableComponent {
             // [Check] Process requirements
             self
                 .assert_buy_validity(
-                    owner: spender, expiration: expiration, currency: currency, price: price,
+                    owner: spender,
+                    expiration: expiration,
+                    currency: currency,
+                    price: price,
+                    collection: collection,
+                    token_id: token_id,
+                    value: value,
                 );
             self
                 .assert_sell_validity(
@@ -304,10 +326,19 @@ pub mod VerifiableComponent {
             expiration: u64,
             currency: ContractAddress,
             price: u256,
+            collection: ContractAddress,
+            token_id: u256,
+            value: u256,
         ) {
             let (is_valid, error) = self
                 .get_buy_validity(
-                    owner: owner, expiration: expiration, currency: currency, price: price,
+                    owner: owner,
+                    expiration: expiration,
+                    currency: currency,
+                    price: price,
+                    collection: collection,
+                    token_id: token_id,
+                    value: value,
                 );
             assert(is_valid, error);
         }
@@ -319,10 +350,19 @@ pub mod VerifiableComponent {
             expiration: u64,
             currency: ContractAddress,
             price: u256,
+            collection: ContractAddress,
+            token_id: u256,
+            value: u256,
         ) {
             let (is_valid, _) = self
                 .get_buy_validity(
-                    owner: owner, expiration: expiration, currency: currency, price: price,
+                    owner: owner,
+                    expiration: expiration,
+                    currency: currency,
+                    price: price,
+                    collection: collection,
+                    token_id: token_id,
+                    value: value,
                 );
             assert(!is_valid, errors::SALE_NOT_INVALID);
         }
