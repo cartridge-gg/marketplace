@@ -21,7 +21,7 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"packageManager": "pnpm@10.10.0",
+	"packageManager": "pnpm@10.13.1",
 	"dependencies": {
 		"@cartridge/presets": "github:cartridge-gg/presets#2cc76cc",
 		"@cartridge/ui": "github:cartridge-gg/ui#460751b"

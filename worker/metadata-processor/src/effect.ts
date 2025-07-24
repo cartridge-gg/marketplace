@@ -1,4 +1,4 @@
-import { Effect, Fiber } from "effect";
+import { Effect, Fiber, FiberSet } from "effect";
 import type { EditionModel } from "@cartridge/arcade";
 import { fetchEditions } from "./services/registry-service";
 import { handleSingleEdition } from "./services/token-processor";
@@ -7,20 +7,13 @@ import { tokenMetadataUpdater } from "./services/subscription-service";
 // Process token metadata for all editions
 const processTokenMetadata = (editions: Map<string, EditionModel>) =>
 	Effect.gen(function* () {
-		const fibers: Fiber.RuntimeFiber<void, Error>[] = [];
+		const fibers = yield* FiberSet.make();
 
 		for (const [project, edition] of editions) {
-			const fiber = yield* Effect.fork(handleSingleEdition(project, edition));
-			fibers.push(fiber);
+			yield* FiberSet.run(fibers, handleSingleEdition(project, edition));
 		}
 
-		// Wait for all fibers to complete
-		yield* Effect.all(
-			fibers.map((fiber) => Fiber.join(fiber)),
-			{
-				concurrency: "unbounded",
-			},
-		);
+		yield* FiberSet.awaitEmpty(fibers);
 
 		return editions;
 	});

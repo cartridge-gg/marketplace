@@ -1,4 +1,4 @@
-import { Effect, Stream, Fiber, Chunk } from "effect";
+import { Effect, Stream, Fiber, Chunk, FiberSet } from "effect";
 import type { Token } from "@dojoengine/torii-wasm/node";
 import type { EditionModel } from "@cartridge/arcade";
 import { ProjectConfigService } from "../effect-config";
@@ -31,15 +31,6 @@ export const subscribeToTokenUpdated = (
 		// Create Torii client
 		const client = yield* createToriiClient(project, edition);
 
-		yield* Effect.addFinalizer(() =>
-			Effect.gen(function* () {
-				yield* Effect.logInfo(`Cancelling subscription for ${project}`);
-				if (client?.free) {
-					client.free();
-				}
-			}),
-		);
-
 		// Create stream from token updates
 		const tokenStream = Stream.async<Token, Error>((emit) => {
 			const subscription = client.onTokenUpdated([], [], (token: Token) => {
@@ -58,10 +49,10 @@ export const subscribeToTokenUpdated = (
 
 			// Return cleanup function
 			return Effect.sync(() => {
-				Effect.logInfo(`Cleaning up subscription for project: ${project}`).pipe(
-					Effect.runSync,
-				);
-				if (subscription && subscription.cancel) {
+				Effect.logDebug(
+					`Cleaning up subscription for project: ${project}`,
+				).pipe(Effect.runSync);
+				if (subscription?.cancel) {
 					subscription.cancel();
 				}
 			});
@@ -79,7 +70,7 @@ export const subscribeToTokenUpdated = (
 				processTokens(project)(Chunk.toArray(tokens)),
 			),
 			Effect.onInterrupt(() =>
-				Effect.logInfo(
+				Effect.logDebug(
 					`Token subscription interrupted for project: ${project}`,
 				),
 			),
@@ -93,23 +84,13 @@ export const subscribeToTokenUpdated = (
 // Token metadata updater - manages subscriptions for all projects
 export const tokenMetadataUpdater = (editions: Map<string, EditionModel>) =>
 	Effect.gen(function* () {
-		const fibers: Fiber.RuntimeFiber<void, Error>[] = [];
+		const fibers = yield* FiberSet.make();
 
 		for (const [project, edition] of editions) {
-			const fiber = yield* Effect.fork(
-				subscribeToTokenUpdated(project, edition),
-			);
-			fibers.push(fiber);
+			yield* FiberSet.run(fibers, subscribeToTokenUpdated(project, edition));
 		}
 
-		// Wait for all fibers to complete
-		yield* Effect.all(
-			fibers.map((fiber) => Fiber.join(fiber)),
-			{
-				concurrency: "unbounded",
-			},
-		);
+		yield* FiberSet.awaitEmpty(fibers);
 
 		return editions;
 	});
-

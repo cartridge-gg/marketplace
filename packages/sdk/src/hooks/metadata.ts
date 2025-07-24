@@ -109,32 +109,48 @@ export function useMetadataFilters(
 	const [selectedTraits, setSelectedTraits] = useState<
 		{ traitType: string; value: string }[]
 	>([]);
-	const [statistics, setStatistics] = useState(getMetadataStatistics(tokens));
+
+	const filteredTokens = useMemo(
+		() => filterMetadataByTraits(metadata?.tokens ?? [], selectedTraits),
+		[selectedTraits, metadata?.tokens],
+	);
+	// handleChange(filteredTokens);
+	const statistics = useMemo(
+		() => getMetadataStatistics(filteredTokens),
+		[filteredTokens],
+	);
 
 	useEffect(() => {
-		const filteredTokens = filterMetadataByTraits(tokens, selectedTraits);
-		handleChange(filteredTokens);
-		setStatistics(getMetadataStatistics(filteredTokens));
-	}, [tokens, handleChange, selectedTraits]);
-
-	const toggleTrait = useCallback((traitType: string, value: string) => {
-		setSelectedTraits((prev) => {
-			const exists = prev.some(
-				(t) => t.traitType === traitType && t.value === value,
-			);
-
-			if (exists) {
-				return prev.filter(
-					(t) => !(t.traitType === traitType && t.value === value),
-				);
+		if (typeof handleChange === "function") {
+			if (filteredTokens.length === metadata?.tokens.length) {
+				handleChange([]);
+			} else {
+				handleChange(filteredTokens);
 			}
-			return [...prev, { traitType, value }];
-		});
-	}, []);
+		}
+	}, [filteredTokens, handleChange]);
+
+	const toggleTrait = useCallback(
+		(traitType: string, value: string) => {
+			setSelectedTraits((prev) => {
+				const exists = prev.some(
+					(t) => t.traitType === traitType && t.value === value,
+				);
+
+				if (exists) {
+					return prev.filter(
+						(t) => !(t.traitType === traitType && t.value === value),
+					);
+				}
+				return [...prev, { traitType, value }];
+			});
+		},
+		[filteredTokens],
+	);
 
 	const clearFilters = useCallback(() => {
 		setSelectedTraits([]);
-		setStatistics(getMetadataStatistics(tokens));
+		// setStatistics(getMetadataStatistics(tokens));
 	}, [tokens]);
 
 	const isTraitSelected = useCallback(

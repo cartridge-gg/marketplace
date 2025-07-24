@@ -7,7 +7,11 @@ import {
 	ProjectConfigService,
 } from "../effect-config";
 import { createArcadeProjectClient } from "./arcade";
-import { processTokenMessages, publishMessages } from "./message-service";
+import {
+	InvalidContentError,
+	processTokenMessages,
+	publishMessages,
+} from "./message-service";
 import type { EditionModel } from "@cartridge/arcade";
 
 // Error types
@@ -17,6 +21,10 @@ export class MessageTooLargeError extends Data.TaggedError(
 export class ProtobufDecodeError extends Data.TaggedError(
 	"ProtobufDecodeError",
 )<{}> {}
+
+export class InvalidContentTypeError extends Data.TaggedError(
+	"InvalidContentTypeError",
+) {}
 
 // Metrics for monitoring token processing
 export const tokensProcessedCounter = Metric.counter("tokens_processed", {
@@ -38,16 +46,21 @@ export const messagesPublishedCounter = Metric.counter("messages_published", {
 // Create Torii client for a project
 export const createToriiClient = (project: string, edition: any) =>
 	Effect.gen(function* () {
-		const cfg = JSON.parse(edition.config.toString());
+		// const cfg = JSON.parse(edition.config.toString());
 		const worldAddress = edition.world_address;
 
-		const client = yield* Effect.tryPromise({
-			try: () => createArcadeProjectClient(project, worldAddress),
-			catch: (error) =>
-				new Error(`Failed to create torii client for ${project}: ${error}`),
-		});
-
-		return client;
+		return yield* Effect.acquireRelease(
+			Effect.tryPromise({
+				try: () => createArcadeProjectClient(project, worldAddress),
+				catch: (error) =>
+					new Error(`Failed to create torii client for ${project}: ${error}`),
+			}),
+			(client) =>
+				Effect.sync(() => {
+					Effect.logInfo(`Freeing ${project} ToriiClient`);
+					client.free();
+				}),
+		);
 	});
 
 // Fetch tokens with error handling
@@ -67,27 +80,31 @@ const fetchTokenEffect = (
 				if (error.includes("failed to decode Protobuf message")) {
 					return new ProtobufDecodeError();
 				}
+				if (error.includes("invalid content type")) {
+					return new InvalidContentTypeError();
+				}
 			}
 			return new Error(`Failed fetching tokens for ${project} batch: ${error}`);
 		},
 	}).pipe(
-		Effect.tapError((error) =>
-			Effect.logError(`Token fetch error for ${project}: ${error}`),
-		),
 		Effect.catchIf(
 			(error): error is MessageTooLargeError =>
 				error instanceof MessageTooLargeError,
 			() =>
 				Effect.gen(function* () {
-					const newBatchSize = batchSize - 500;
+					let newBatchSize = batchSize - 500;
+
+					if (batchSize > 0 && batchSize <= 500) {
+						newBatchSize = batchSize - 100;
+					}
 
 					// If batch size is still too large, we simply ignore batch and continue further
 					if (newBatchSize <= 0) {
 						return { items: [], next_cursor: cursor };
 					}
 
-					yield* Effect.logWarning(
-						`Batch size too large for ${project}, reducing from ${batchSize} to ${batchSize - 500}`,
+					yield* Effect.logDebug(
+						`Batch size too large for ${project}, reducing from ${batchSize} to ${newBatchSize}`,
 					);
 					return yield* fetchTokenEffect(client, project, cursor, newBatchSize);
 				}),
@@ -105,6 +122,15 @@ const fetchTokenEffect = (
 					// Return empty result to skip this batch
 					return { items: [], next_cursor: cursor };
 				}),
+		),
+		Effect.catchIf(
+			// NOTE: this error is likely due to studio's torii not up to date or down
+			(error): error is InvalidContentTypeError =>
+				error instanceof InvalidContentTypeError,
+			() => Effect.succeed({ items: [], next_cursor: undefined }),
+		),
+		Effect.tapError((error) =>
+			Effect.logError(`Token fetch error for ${project}: ${error}`),
 		),
 	);
 
@@ -178,13 +204,12 @@ export const processTokens = (project: string) => (tokens: Token[]) =>
 		yield* messageStream.pipe(
 			Stream.grouped(messageConfig.batchSize),
 			Stream.tap((n) => messagesBatchedCounter(Effect.succeed(n.length))),
+			Stream.filter((batch) => batch.length > 0),
 			Stream.runForEach((batch) =>
 				Effect.gen(function* () {
 					const messages = Chunk.toArray(batch);
-					if (messages.length > 0) {
-						yield* publishMessages(messages);
-						yield* messagesPublishedCounter(Effect.succeed(messages.length));
-					}
+					yield* publishMessages(messages);
+					yield* messagesPublishedCounter(Effect.succeed(messages.length));
 				}),
 			),
 		);
