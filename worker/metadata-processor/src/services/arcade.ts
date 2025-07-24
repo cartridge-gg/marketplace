@@ -62,7 +62,7 @@ export type FetchOptions = {
  */
 const TORII_CONFIG = {
 	SN_MAIN: {
-		toriiUrl: "https://api.cartridge.gg/x/arcade-mainnet/torii",
+		toriiUrl: "https://api.cartridge.gg/x/arcade-mainnet-2/torii",
 		worldAddress:
 			"0x25c70b1422f7ee0bddb6a52b8d3c2f7251cc9e5b5b0401d5db18a37ca4e1f36",
 	},
