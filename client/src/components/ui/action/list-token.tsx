@@ -56,7 +56,7 @@ export function ListTokenAction({
 			}
 
 			const priceInWei = amountToCurrencyBigInt(
-				parseFloat(formData.price),
+				Number.parseFloat(formData.price),
 				formData.currency,
 			);
 
@@ -64,10 +64,10 @@ export function ListTokenAction({
 				account,
 				collectionAddress,
 				tokenId,
-				parseInt(formData.quantity),
+				Number.parseInt(formData.quantity),
 				priceInWei,
 				currencyAddress,
-				addDays(new Date(), parseInt(formData.expirationDays)),
+				addDays(new Date(), Number.parseInt(formData.expirationDays)),
 			);
 
 			onHideForm();

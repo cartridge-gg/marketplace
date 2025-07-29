@@ -147,7 +147,7 @@ function TokenCard({ token }: { token: Token }) {
 
 	const tokenName = useMemo(() => {
 		const prefix = tokenMetadata.name ?? token.name;
-		const suffix = parseInt(token.token_id, 16);
+		const suffix = Number.parseInt(token.token_id ?? "0x0", 16);
 		return `${prefix} #${suffix}`;
 	}, [token, tokenMetadata]);
 
@@ -162,7 +162,7 @@ function TokenCard({ token }: { token: Token }) {
 				to="/token/$collectionAddress/$tokenId"
 				params={{
 					collectionAddress: getChecksumAddress(token.contract_address),
-					tokenId: token.token_id,
+					tokenId: token.token_id ?? "0x0",
 				}}
 				className="block h-full"
 			>

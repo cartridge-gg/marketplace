@@ -3,6 +3,7 @@ import { type OrderModel, useMarketplaceActions } from "@cartridge/marketplace";
 import { WithAccount } from "@dojoengine/sdk/react";
 import { useCallback } from "react";
 import type { AccountInterface } from "starknet";
+import { CLIENT_FEE, CLIENT_RECEIVER } from "../../../constants";
 
 type AcceptOfferProps = {
 	isOwner: boolean;
@@ -27,6 +28,8 @@ function AcceptOffer({ isOwner, order, account }: AcceptOfferProps) {
 				true,
 				order.currency,
 				order.price,
+				CLIENT_FEE,
+				CLIENT_RECEIVER,
 			);
 		} catch (error) {
 			console.error("Failed to accept offer", error);
