@@ -31,10 +31,9 @@ export function useEntitySubscription(
 				});
 			};
 
-			subscriptionRef.current = sdk.client.onEntityUpdated(
-				subscriptionClause,
-				wrappedCallback,
-			);
+			sdk.client
+				.onEntityUpdated(subscriptionClause, wrappedCallback)
+				.then((s) => (subscriptionRef.current = s));
 		}
 
 		return () => {

@@ -16,12 +16,16 @@ async function fetchCollectionFromClient(
 	client: string | undefined;
 }> {
 	try {
-		const tokens = await clients[client].getTokens(
-			[address],
-			tokenIds.map((t) => addAddressPadding(t)),
-			count,
-			cursor,
-		);
+		const tokens = await clients[client].getTokens({
+			contract_addresses: [address],
+			token_ids: tokenIds.map((t) => addAddressPadding(t)),
+			pagination: {
+				limit: count,
+				cursor: cursor,
+				order_by: [],
+				direction: "Forward",
+			},
+		});
 		if (tokens.items.length !== 0) {
 			return {
 				items: tokens.items,

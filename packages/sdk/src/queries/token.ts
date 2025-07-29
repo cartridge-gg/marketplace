@@ -58,7 +58,7 @@ export function getTokenQuery(collectionAddress: string, tokenId: string) {
 		)
 		.includeHashedKeys()
 		.withEntityModels([ModelsMapping.Order])
-		.addOrderBy(ModelsMapping.Order, "expiration", "Asc");
+		.addOrderBy("expiration", "Asc");
 }
 
 // Get orders for given token
@@ -67,7 +67,7 @@ export function getTokenOrders(collectionAddress: string, tokenId: string) {
 		.withClause(
 			getOrderBaseClause(collectionAddress, tokenId, OrderCategory.Buy).build(),
 		)
-		.addOrderBy(ModelsMapping.Order, "expiration", "Desc")
+		.addOrderBy("expiration", "Desc")
 		.withEntityModels([ModelsMapping.Order])
 		.includeHashedKeys();
 }
@@ -82,7 +82,7 @@ export function getListedTokensForCollection(collectionAddress: string) {
 				OrderCategory.Sell,
 			).build(),
 		)
-		.addOrderBy(ModelsMapping.Order, "expiration", "Asc")
+		.addOrderBy("expiration", "Asc")
 		.withEntityModels([ModelsMapping.Order])
 		.includeHashedKeys();
 }

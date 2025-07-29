@@ -106,6 +106,7 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 
 	const provider = useMemo(
 		// TODO: Update here to select either Mainnet or Sepolia
+		// @ts-ignore arcade dojo.js version mismatch
 		() => new ExternalProvider(CHAIN_ID),
 		[],
 	);
@@ -120,6 +121,7 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		if (initialized) return;
 		const initialize = async () => {
+			// @ts-ignore arcade dojo.js version mismatch
 			await Registry.init(CHAIN_ID);
 			setInitialized(true);
 		};

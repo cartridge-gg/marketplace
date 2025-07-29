@@ -27,7 +27,7 @@ export function getTokenMetadataQuery(
 			).build(),
 		)
 		.withEntityModels([ModelsMapping.MetadataAttribute])
-		.addOrderBy(ModelsMapping.MetadataAttribute, "index", "Asc");
+		.addOrderBy("index", "Asc");
 }
 
 export function getCollectionMetadataQuery(
@@ -49,7 +49,7 @@ export function getCollectionMetadataQuery(
 			).build(),
 		)
 		.withEntityModels([ModelsMapping.MetadataAttribute])
-		.addOrderBy(ModelsMapping.MetadataAttribute, "index", "Asc")
+		.addOrderBy("index", "Asc")
 		.withLimit(100000);
 }
 
@@ -80,7 +80,7 @@ export function getMetadataByTraitQuery(
 			]).build(),
 		)
 		.withEntityModels([ModelsMapping.MetadataAttribute])
-		.addOrderBy(ModelsMapping.MetadataAttribute, "token_id", "Asc");
+		.addOrderBy("token_id", "Asc");
 }
 
 export function getMetadataByValueQuery(
@@ -105,7 +105,7 @@ export function getMetadataByValueQuery(
 			]).build(),
 		)
 		.withEntityModels([ModelsMapping.MetadataAttribute])
-		.addOrderBy(ModelsMapping.MetadataAttribute, "token_id", "Asc");
+		.addOrderBy("token_id", "Asc");
 }
 
 export function subscribeToMetadataUpdatesClause(

@@ -181,6 +181,8 @@ export function useMarketplaceActions() {
 		royalties: boolean,
 		currency: string,
 		price: BigNumberish,
+		clientFee: BigNumberish,
+		clientReceiver: string,
 	) => {
 		try {
 			const calls = buildExecuteOfferCalls(
@@ -191,6 +193,8 @@ export function useMarketplaceActions() {
 				royalties,
 				currency,
 				price,
+				clientFee,
+				clientReceiver,
 			);
 			return await ctx.provider.execute(snAccount, calls, "MARKETPLACE");
 		} catch (error) {
@@ -207,6 +211,8 @@ export function useMarketplaceActions() {
 		royalties: boolean,
 		currency: string,
 		price: BigNumberish,
+		clientFee: BigNumberish,
+		clientReceiver: string,
 	) => {
 		return [
 			{
@@ -225,6 +231,8 @@ export function useMarketplaceActions() {
 				tokenId,
 				quantity,
 				royalties,
+				clientFee,
+				clientReceiver,
 			),
 		];
 	};
@@ -239,6 +247,8 @@ export function useMarketplaceActions() {
 		royalties: boolean,
 		currency: string,
 		price: BigNumberish,
+		clientFee: BigNumberish,
+		clientReceiver: string,
 	) => {
 		try {
 			const calls = buildExecuteListingCalls(
@@ -249,6 +259,8 @@ export function useMarketplaceActions() {
 				royalties,
 				currency,
 				price,
+				clientFee,
+				clientReceiver,
 			);
 			return await ctx.provider.execute(snAccount, calls, "MARKETPLACE");
 		} catch (error) {
@@ -265,6 +277,8 @@ export function useMarketplaceActions() {
 		royalties: boolean,
 		currency: string,
 		price: BigNumberish,
+		clientFee: BigNumberish,
+		clientReceiver: string,
 	) => {
 		return [
 			{
@@ -283,6 +297,8 @@ export function useMarketplaceActions() {
 				tokenId,
 				quantity,
 				royalties,
+				clientFee,
+				clientReceiver,
 			),
 		];
 	};
