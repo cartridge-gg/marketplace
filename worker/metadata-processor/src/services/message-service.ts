@@ -1,21 +1,21 @@
-import { Effect } from "effect";
-import { AccountInterface, TypedData } from "starknet";
-import { Message, type Token } from "@dojoengine/torii-wasm/node";
-import type { SDK } from "@dojoengine/sdk/node";
 import type { SchemaType } from "@cartridge/marketplace";
+import type { SDK } from "@dojoengine/sdk/node";
+import { Message, type Token } from "@dojoengine/torii-wasm/node";
+import { Data, Effect, Schedule } from "effect";
+import { AccountInterface, TypedData } from "starknet";
+import { MetadataAttributeTypedData } from "../constants";
+import { AccountConfigService, ConfigLive } from "../effect-config";
 import {
-	createAttributeMessage,
 	type MetadataAttribute,
 	type TokenMetadata,
+	createAttributeMessage,
 } from "../tasks/process-metadata";
 import { createSignedMessage } from "../utils/signature";
 import {
-	MarketplaceSDK,
 	MarketplaceAccount,
+	MarketplaceSDK,
 	makeMarketplaceSDK,
 } from "./sdk-services";
-import { MetadataAttributeTypedData } from "../constants";
-import { AccountConfigService, ConfigLive } from "../effect-config";
 
 // Fetch token metadata
 const fetchTokenMetadata = (token: Token) =>
@@ -122,26 +122,59 @@ const generateTokenMessage = (token: Token) =>
 // Process token messages
 export const processTokenMessages = (token: Token) =>
 	Effect.gen(function* () {
-		const messages = yield* generateTokenMessage(token);
-		return messages;
+		return yield* generateTokenMessage(token);
 	});
+
+// Error types
+export class AbortError extends Data.TaggedError("AbortError") {}
+export class InvalidContentError extends Data.TaggedError(
+	"InvalidContentError",
+) {}
 
 // Publish offchain messages batch
 const publishOffchainMessagesBatch = (
 	sdk: SDK<SchemaType>,
 	messages: Message[],
 ) =>
-	Effect.tryPromise({
-		try: async () => {
-			const res = await sdk.sendSignedMessageBatch(messages);
-			if (!res.isOk()) {
-				throw new Error(res.error);
-			}
-			return res.value;
-		},
-		catch: (err) =>
-			new Error(`Failed to publish batch offchain messages ${err}`),
-	});
+	Effect.retry(
+		Effect.tryPromise({
+			try: async () => {
+				const res = await sdk.sendSignedMessageBatch(messages);
+				if (!res.isOk()) {
+					throw new Error(res.error);
+				}
+				return res.value;
+			},
+			catch: (error) => {
+				if (typeof error === "string") {
+					if (error.includes("AbortError")) {
+						return new AbortError();
+					}
+					if (error.includes("invalid content type")) {
+						return new InvalidContentError();
+					}
+				}
+				return new Error(`Failed to publish batch offchain messages ${error}`);
+			},
+		}),
+		Schedule.addDelay(Schedule.recurs(5), () => `5000 millis`),
+	).pipe(
+		Effect.catchIf(
+			(error): error is AbortError => error instanceof AbortError,
+			() =>
+				Effect.fail(
+					new Error(`Failed to publish ${messages.length} after 5 retries.`),
+				),
+		),
+		Effect.catchIf(
+			(error): error is InvalidContentError =>
+				error instanceof InvalidContentError,
+			() =>
+				Effect.fail(
+					new Error(`Failed to publish ${messages.length} after 5 retries.`),
+				),
+		),
+	);
 
 // Publish messages
 export const publishMessages = (messages: Message[]) =>
