@@ -1,5 +1,5 @@
 rpc = "https://api.cartridge.gg/x/starknet/mainnet"
-world_address = "0x046d17ca0b6856d4f1cc635b753b296d57b0a8382c492a9f55686ee6b314ba0e"
+world_address = "0x07b148de519d33d46d1b2b232ae41f63971a2000297440110cc8da11902e9950"
 
 [indexing]
 events_chunk_size = 1024
@@ -7,7 +7,7 @@ blocks_chunk_size = 1024
 pending = true
 polling_interval = 500
 max_concurrent_tasks = 100
-world_block = 1464035
+world_block = 1650167
 contracts = []
 transactions = true
 

@@ -273,10 +273,28 @@ export const Marketplace = {
 			Object.keys(clients).map(async (project) => {
 				const client = clients[project];
 				try {
-					let tokens = await client.getTokens([], [], 5000);
+					let tokens = await client.getTokens({
+						contract_addresses: [],
+						token_ids: [],
+						pagination: {
+							cursor: undefined,
+							limit: 5000,
+							order_by: [],
+							direction: "Forward",
+						},
+					});
 					const allTokens = [...tokens.items];
 					while (tokens.next_cursor) {
-						tokens = await client.getTokens([], [], 5000, tokens.next_cursor);
+						tokens = await client.getTokens({
+							contract_addresses: [],
+							token_ids: [],
+							pagination: {
+								limit: 5000,
+								cursor: tokens.next_cursor,
+								order_by: [],
+								direction: "Forward",
+							},
+						});
 						allTokens.push(...tokens.items);
 					}
 

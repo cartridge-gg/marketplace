@@ -9,6 +9,7 @@ import { useAccount } from "@starknet-react/core";
 import { TokenOrdersPanel } from "../../../components/ui/order/list";
 import { useIsTokenListed, useTokenOrders } from "../../../queries";
 import { type OrderModel, useMarketplaceActions } from "@cartridge/marketplace";
+import { CLIENT_FEE, CLIENT_RECEIVER } from "../../../constants";
 
 // Define metadata interface based on the expected structure
 interface TokenMetadata {
@@ -56,7 +57,7 @@ function RouteComponent() {
 	const tokenName = useMemo(() => {
 		if (!token) return "Loading...";
 		const prefix = tokenMetadata.name ?? token.name;
-		const suffix = Number.parseInt(token.token_id);
+		const suffix = Number.parseInt(token.token_id ?? "0x0");
 		return `${prefix} #${suffix}`;
 	}, [token, tokenMetadata]);
 
@@ -81,6 +82,8 @@ function RouteComponent() {
 				true,
 				order.currency,
 				order.price,
+				CLIENT_FEE,
+				CLIENT_RECEIVER,
 			);
 		},
 		[account, collectionAddress, tokenId, executeListing],
@@ -146,7 +149,7 @@ function RouteComponent() {
 									<div className="bg-background-300 p-3 rounded-md">
 										<p className="text-sm text-gray-500">Token ID</p>
 										<p className="font-medium">
-											{parseInt(token.token_id, 16)}
+											{Number.parseInt(token.token_id ?? "0x0", 16)}
 										</p>
 									</div>
 									<div className="bg-background-300 p-3 rounded-md">

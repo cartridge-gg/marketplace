@@ -73,7 +73,7 @@ export class MarketplaceProvider extends DojoProvider {
 		// Check if the transaction was reverted and throw an error if it was
 		if (receipt.isReverted()) {
 			throw new Error(
-				`Transaction failed with reason: ${receipt.revert_reason}`,
+				`Transaction failed with reason: ${receipt.value.revert_reason}`,
 			);
 		}
 		return receipt;

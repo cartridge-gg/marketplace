@@ -1,7 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useArcade } from "./arcade";
-import type { Token, TokenBalance, ToriiClient } from "@dojoengine/torii-wasm";
+import type {
+	Pagination,
+	Token,
+	TokenBalance,
+	ToriiClient,
+} from "@dojoengine/torii-wasm";
 import { getChecksumAddress } from "starknet";
+const defaultPagination: Pagination = {
+	limit: 5000,
+	cursor: undefined,
+	order_by: [],
+	direction: "Forward",
+};
 
 // Common function to parse token metadata
 function parseTokenMetadata(token: Token): Token {
@@ -68,11 +79,12 @@ async function fetchTokenBalancesForAccount(
 	client: ToriiClient,
 	accountAddress: string,
 ): Promise<TokenBalance[]> {
-	const balancesResponse = await client.getTokenBalances(
-		[],
-		[accountAddress.toLowerCase()],
-		[],
-	);
+	const balancesResponse = await client.getTokenBalances({
+		contract_addresses: [],
+		account_addresses: [accountAddress.toLowerCase()],
+		token_ids: [],
+		pagination: defaultPagination,
+	});
 	return balancesResponse.items || [];
 }
 
@@ -82,7 +94,11 @@ async function fetchTokensByAddressesAndIds(
 	contractAddresses: string[],
 	tokenIds: string[],
 ): Promise<Token[]> {
-	const tokensResponse = await client.getTokens(contractAddresses, tokenIds);
+	const tokensResponse = await client.getTokens({
+		contract_addresses: contractAddresses,
+		token_ids: tokenIds,
+		pagination: defaultPagination,
+	});
 	return tokensResponse.items || [];
 }
 
@@ -121,7 +137,12 @@ export function useWalletTokens(accountAddress: string) {
 					}
 
 					// Get unique contract addresses and token IDs
-					const tokenIds = ownedBalances.map((b) => b.token_id);
+					const tokenIds = ownedBalances
+						.filter((b) => undefined !== b.token_id)
+						.map((b) => {
+							if (b.token_id) return b.token_id;
+							return "";
+						});
 					const contractAddresses = getUniqueContractAddresses(ownedBalances);
 
 					// Fetch the actual tokens

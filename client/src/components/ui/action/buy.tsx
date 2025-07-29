@@ -4,6 +4,7 @@ import { WithAccount } from "@dojoengine/sdk/react";
 import { useCallback } from "react";
 import { constants, type AccountInterface } from "starknet";
 import { currencyToDecimal, getCurrencyByAddress } from "../../../currency";
+import { CLIENT_FEE, CLIENT_RECEIVER } from "../../../constants";
 
 type BuyProps = {
 	listing: OrderModel | null;
@@ -53,6 +54,8 @@ function Buy({ isListed, listing, account }: BuyProps) {
 				true,
 				listing.currency,
 				listing.price,
+				CLIENT_FEE,
+				CLIENT_RECEIVER,
 			);
 		} catch (error) {
 			console.error("Failed to buy token", error);
