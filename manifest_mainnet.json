@@ -1,8 +1,8 @@
 {
   "world": {
-    "class_hash": "0x4c60dc46a8ca8bb47675b7b914053cef769afbf0e340523187336b72bd71d1f",
-    "address": "0x46d17ca0b6856d4f1cc635b753b296d57b0a8382c492a9f55686ee6b314ba0e",
-    "seed": "Marketplace-0.0.5",
+    "class_hash": "0x13d92333361bb7049c1232c0a5404e2c19082ededc3a73d75cb33fa952adec7",
+    "address": "0x7b148de519d33d46d1b2b232ae41f63971a2000297440110cc8da11902e9950",
+    "seed": "Marketplace-0.0.6",
     "name": "Cartridge Marketplace",
     "entrypoints": [
       "uuid",
@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x1f0817826ab9ebe94953239aab59f2a4aa57e510f17690a2a49cd104e2f3a6f",
-      "class_hash": "0x46f8727e7d088d8970ebbf8ff7e6073cfeae65e7495561f0634a86cd8b3dff6",
+      "address": "0x75583edda5d9a6ebf49af4eb208c49d3f457506ab0ba04debacd1e9d76cf242",
+      "class_hash": "0x5a0b7549aeb4238123c2a07eccfbd45bb32f706e49150c80ae6547f7e45f071",
       "abi": [
         {
           "type": "impl",
@@ -1757,6 +1757,14 @@
                 {
                   "name": "royalties",
                   "type": "core::bool"
+                },
+                {
+                  "name": "client_fee",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "client_receiver",
+                  "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
               "outputs": [],
@@ -1918,7 +1926,7 @@
       ],
       "init_calldata": [
         "0x1",
-        "0x1F4",
+        "0x0",
         "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b",
         "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b"
       ],

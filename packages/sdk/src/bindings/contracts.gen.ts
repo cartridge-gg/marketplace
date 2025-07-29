@@ -1,5 +1,5 @@
-import type { DojoProvider, DojoCall } from "@dojoengine/core";
-import type { Account, AccountInterface, BigNumberish } from "starknet";
+import { DojoProvider, DojoCall } from "@dojoengine/core";
+import { Account, AccountInterface, BigNumberish } from "starknet";
 
 export function setupWorld(provider: DojoProvider) {
 	const build_Marketplace_cancel_calldata = (
@@ -39,11 +39,22 @@ export function setupWorld(provider: DojoProvider) {
 		assetId: BigNumberish,
 		quantity: BigNumberish,
 		royalties: boolean,
+		clientFee: BigNumberish,
+		clientReceiver: string,
 	): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "execute",
-			calldata: [orderId, collection, tokenId, assetId, quantity, royalties],
+			calldata: [
+				orderId,
+				collection,
+				tokenId,
+				assetId,
+				quantity,
+				royalties,
+				clientFee,
+				clientReceiver,
+			],
 		};
 	};
 
@@ -55,6 +66,8 @@ export function setupWorld(provider: DojoProvider) {
 		assetId: BigNumberish,
 		quantity: BigNumberish,
 		royalties: boolean,
+		clientFee: BigNumberish,
+		clientReceiver: string,
 	) => {
 		try {
 			return await provider.execute(
@@ -66,6 +79,8 @@ export function setupWorld(provider: DojoProvider) {
 					assetId,
 					quantity,
 					royalties,
+					clientFee,
+					clientReceiver,
 				),
 				"MARKETPLACE",
 			);
