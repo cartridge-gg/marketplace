@@ -26,7 +26,7 @@ const PRICE: u128 = 1_000_000_000_000_000_000;
 // Tests
 
 #[test]
-fn test_intent() {
+fn test_intent_execute() {
     // [Setup] World
     let (world, contracts, context) = spawn();
     // [Buy] Create a buy order on the Marketplace
@@ -90,6 +90,25 @@ fn test_intent() {
     // [Assert] Order is executed
     let order = store.order(order.id, collection, order.token_id);
     assert_eq!(order.status, Status::Executed.into());
+}
+
+#[test]
+#[should_panic(expected: ('Sale: invalid value', 'ENTRYPOINT_FAILED'))]
+fn test_intent_execute_revert_invalid_value() {
+    // [Setup] World
+    let (_world, contracts, context) = spawn();
+    // [Buy] Create a buy order on the Marketplace
+    starknet::testing::set_contract_address(context.spender);
+    contracts.erc20.approve(contracts.marketplace.contract_address, QUANTITY.into() * PRICE.into());
+    contracts
+        .marketplace
+        .intent(
+            collection: contracts.erc1155.contract_address,
+            quantity: 0,
+            price: PRICE,
+            currency: contracts.erc20.contract_address,
+            expiration: EXPIRATION,
+        );
 }
 
 #[test]

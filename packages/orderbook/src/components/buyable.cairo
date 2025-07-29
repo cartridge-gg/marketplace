@@ -56,12 +56,16 @@ pub mod BuyableComponent {
             // [Check] Validity requirements
             let caller_address = starknet::get_caller_address();
             let verifiable = get_dep_component!(self, Verify);
+            let value: u256 = quantity.into();
             verifiable
                 .assert_buy_validity(
                     owner: caller_address,
                     expiration: expiration,
                     currency: currency,
                     price: price.into(),
+                    collection: collection,
+                    token_id: token_id,
+                    value: value,
                 );
 
             // [Effect] Create order
@@ -149,9 +153,16 @@ pub mod BuyableComponent {
             let currency: ContractAddress = order.currency.try_into().unwrap();
             let price: u256 = order.price.into();
             let verifiable = get_dep_component!(self, Verify);
+            let value: u256 = order.quantity.into();
             verifiable
                 .assert_buy_invalidity(
-                    owner: owner, expiration: order.expiration, currency: currency, price: price,
+                    owner: owner,
+                    expiration: order.expiration,
+                    currency: currency,
+                    price: price,
+                    collection: collection,
+                    token_id: token_id,
+                    value: value,
                 );
 
             // [Effect] Update order
@@ -258,10 +269,14 @@ pub mod BuyableComponent {
             let mut store = StoreTrait::new(world);
             let order = store.order(order_id, collection.into(), token_id);
             let verifiable = get_dep_component!(self, Verify);
-            let owner: ContractAddress = starknet::get_caller_address();
+            let owner: ContractAddress = order.owner.try_into().unwrap();
             let currency: ContractAddress = order.currency.try_into().unwrap();
             let price: u256 = order.price.into();
-            verifiable.get_buy_validity(owner, order.expiration, currency, price)
+            let value: u256 = order.quantity.into();
+            verifiable
+                .get_buy_validity(
+                    owner, order.expiration, currency, price, collection, token_id, value,
+                )
         }
 
         fn is_buy_order(
