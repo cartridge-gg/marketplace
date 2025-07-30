@@ -14,7 +14,7 @@
     "type:check": "tsc -b"
   },
   "dependencies": {
-    "@cartridge/arcade": "0.0.0",
+    "@cartridge/arcade": "catalog:",
     "@cartridge/connector": "catalog:",
     "@cartridge/controller": "catalog:",
     "@cartridge/marketplace": "workspace:*",

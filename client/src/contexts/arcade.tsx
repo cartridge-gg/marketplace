@@ -106,7 +106,6 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 
 	const provider = useMemo(
 		// TODO: Update here to select either Mainnet or Sepolia
-		// @ts-expect-error this is due to dojo.js version mismatch
 		() => new ExternalProvider(CHAIN_ID),
 		[],
 	);
@@ -120,7 +119,6 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		if (initialized) return;
 		const initialize = async () => {
-			// @ts-expect-error this is due to dojo.js version mismatch
 			await Registry.init(CHAIN_ID);
 			setInitialized(true);
 		};
@@ -150,7 +148,6 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 					if (IGNORES.includes(edition.config.project)) return;
 					const url = `https://api.cartridge.gg/x/${edition.config.project}/torii`;
 					const client = await provider.getToriiClient(url);
-					// @ts-expect-error FIXME: torii-wasm version should match between client versions
 					clients[edition.config.project] = client;
 				}),
 			);
