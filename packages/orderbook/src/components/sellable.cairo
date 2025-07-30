@@ -252,7 +252,7 @@ pub mod SellableComponent {
             let mut store = StoreTrait::new(world);
             let order = store.order(order_id, collection.into(), token_id);
             let verifiable = get_dep_component!(self, Verify);
-            let owner: ContractAddress = starknet::get_caller_address();
+            let owner: ContractAddress = order.owner.try_into().unwrap();
             let collection: ContractAddress = order.collection.try_into().unwrap();
             let value: u256 = order.quantity.into();
             verifiable.get_sell_validity(owner, order.expiration, collection, order.token_id, value)
