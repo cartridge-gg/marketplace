@@ -3,11 +3,7 @@ import { jsonRpcProvider, StarknetConfig, voyager } from "@starknet-react/core";
 import { type PropsWithChildren, useMemo, useRef } from "react";
 import { constants } from "starknet";
 import ControllerConnector from "@cartridge/connector/controller";
-import type {
-	KeychainOptions,
-	ProfileOptions,
-	ProviderOptions,
-} from "@cartridge/controller";
+import type { KeychainOptions, ProviderOptions } from "@cartridge/controller";
 import { getMarketplacePolicies } from "@cartridge/marketplace";
 import { DEFAULT_PRESET, DEFAULT_PROJECT } from "../constants";
 import { useArcade } from "@cartridge/marketplace";
@@ -21,9 +17,6 @@ const keychain: KeychainOptions = {
 			...getMarketplacePolicies(CHAIN_ID).contracts,
 		},
 	},
-};
-
-const profile: ProfileOptions = {
 	preset: DEFAULT_PRESET,
 	slot: DEFAULT_PROJECT,
 	tokens: {
@@ -77,7 +70,6 @@ export function StarknetProvider({ children }: PropsWithChildren) {
 		controllerRef.current = new ControllerConnector({
 			...provider,
 			...keychain,
-			...profile,
 		});
 		return controllerRef.current;
 	}, [controllerRef, provider]);
