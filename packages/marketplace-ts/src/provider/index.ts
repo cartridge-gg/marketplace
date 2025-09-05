@@ -13,6 +13,7 @@ import type {
 	AllowArray,
 	Call,
 	constants,
+	GetTransactionReceiptResponse,
 } from "starknet";
 import { NAMESPACE } from "../constants";
 import { configs } from "../configs";
@@ -60,8 +61,10 @@ export class MarketplaceProvider extends DojoProvider {
 	 * @returns Transaction receipt
 	 * @throws Error if transaction fails or is reverted
 	 */
-	async process(transactionHash: string) {
-		let receipt;
+	async process(
+		transactionHash: string,
+	): Promise<GetTransactionReceiptResponse> {
+		let receipt: GetTransactionReceiptResponse;
 		try {
 			receipt = await this.provider.waitForTransaction(transactionHash, {
 				retryInterval: 500,

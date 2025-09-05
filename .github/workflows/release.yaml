@@ -5,7 +5,7 @@ on:
     types: [release]
 
 env:
-  WORKING_DIRECTORY: ./packages/sdk
+  WORKING_DIRECTORY: ./packages/marketplace-ts
 
 jobs:
   release:
