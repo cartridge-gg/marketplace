@@ -33,27 +33,27 @@ pub mod setup {
     // Constant
 
     pub fn OWNER() -> ContractAddress {
-        starknet::contract_address_const::<'OWNER'>()
+        'OWNER'.try_into().unwrap()
     }
 
     pub fn CREATOR() -> ContractAddress {
-        starknet::contract_address_const::<'CREATOR'>()
+        'CREATOR'.try_into().unwrap()
     }
 
     pub fn CLIENT_RECEIVER() -> ContractAddress {
-        starknet::contract_address_const::<'CLIENT_RECEIVER'>()
+        'CLIENT_RECEIVER'.try_into().unwrap()
     }
 
     pub fn RECEIVER() -> ContractAddress {
-        starknet::contract_address_const::<'RECEIVER'>()
+        'RECEIVER'.try_into().unwrap()
     }
 
     pub fn SPENDER() -> ContractAddress {
-        starknet::contract_address_const::<'SPENDER'>()
+        'SPENDER'.try_into().unwrap()
     }
 
     pub fn HOLDER() -> ContractAddress {
-        starknet::contract_address_const::<'HOLDER'>()
+        'HOLDER'.try_into().unwrap()
     }
 
     #[derive(Copy, Drop)]
@@ -89,14 +89,14 @@ pub mod setup {
         NamespaceDef {
             namespace: "MARKETPLACE",
             resources: [
-                TestResource::Model(models::m_Access::TEST_CLASS_HASH),
-                TestResource::Model(models::m_Book::TEST_CLASS_HASH),
-                TestResource::Model(models::m_Order::TEST_CLASS_HASH),
-                TestResource::Model(models::m_MetadataAttribute::TEST_CLASS_HASH),
-                TestResource::Event(events::e_Listing::TEST_CLASS_HASH),
-                TestResource::Event(events::e_Sale::TEST_CLASS_HASH),
-                TestResource::Event(events::e_Offer::TEST_CLASS_HASH),
-                TestResource::Contract(Marketplace::TEST_CLASS_HASH),
+                TestResource::Model(models::m_Access::TEST_CLASS_HASH.into()),
+                TestResource::Model(models::m_Book::TEST_CLASS_HASH.into()),
+                TestResource::Model(models::m_Order::TEST_CLASS_HASH.into()),
+                TestResource::Model(models::m_MetadataAttribute::TEST_CLASS_HASH.into()),
+                TestResource::Event(events::e_Listing::TEST_CLASS_HASH.into()),
+                TestResource::Event(events::e_Sale::TEST_CLASS_HASH.into()),
+                TestResource::Event(events::e_Offer::TEST_CLASS_HASH.into()),
+                TestResource::Contract(Marketplace::TEST_CLASS_HASH.into()),
             ]
                 .span(),
         }
