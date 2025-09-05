@@ -33,8 +33,8 @@ pub impl ListingAssert of AssertTrait {
 mod tests {
     // Local imports
 
-    pub use orderbook::models::order::tests::{setup, ORDER_ID};
-    use super::{ListingTrait, ListingAssert};
+    pub use orderbook::models::order::tests::{ORDER_ID, setup};
+    use super::{ListingAssert, ListingTrait};
 
     // Constants
 

@@ -10,14 +10,14 @@ pub mod types {
 pub mod events {
     pub mod index;
     pub mod listing;
-    pub mod sale;
     pub mod offer;
+    pub mod sale;
 }
 
 pub mod models {
-    pub mod index;
     pub mod access;
     pub mod book;
+    pub mod index;
     pub mod order;
 }
 

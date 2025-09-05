@@ -1,6 +1,6 @@
 // Internal imports
 
-pub use orderbook::constants::{VERSION, DEFAULT_FEE_DENOMINATOR};
+pub use orderbook::constants::{DEFAULT_FEE_DENOMINATOR, VERSION};
 pub use orderbook::models::index::Book;
 
 // Errors
@@ -127,7 +127,7 @@ mod tests {
     // Local imports
 
     use orderbook::constants::{BOOK_ID, VERSION};
-    use super::{BookTrait, BookAssert};
+    use super::{BookAssert, BookTrait};
 
     // Constants
 

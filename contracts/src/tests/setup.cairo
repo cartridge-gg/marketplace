@@ -1,60 +1,59 @@
 pub mod setup {
     // Starknet imports
 
-    use starknet::{ContractAddress, SyscallResultTrait};
-    use starknet::syscalls::deploy_syscall;
-
     // Dojo imports
 
     use dojo::world::{WorldStorage, WorldStorageTrait};
     use dojo_cairo_test::{
-        spawn_test_world, NamespaceDef, ContractDef, TestResource, ContractDefTrait,
-        WorldStorageTestTrait,
+        ContractDef, ContractDefTrait, NamespaceDef, TestResource, WorldStorageTestTrait,
+        spawn_test_world,
     };
+    use marketplace::systems::marketplace::{IMarketplaceDispatcher, Marketplace};
+
+    // Internal imports
+
+    use marketplace::tests::mocks::account::Account;
+    use marketplace::tests::mocks::erc1155::ERC1155;
+    use marketplace::tests::mocks::erc20::ERC20;
+    use marketplace::tests::mocks::erc721::ERC721;
+    use openzeppelin_token::erc1155::interface::IERC1155Dispatcher;
 
     // External imports
 
     use openzeppelin_token::erc20::interface::IERC20Dispatcher;
     use openzeppelin_token::erc721::interface::IERC721Dispatcher;
-    use openzeppelin_token::erc1155::interface::IERC1155Dispatcher;
 
     // Packages imports
 
     use orderbook::events::{index as events};
-    use orderbook::models::{index as models};
-
-    // Internal imports
-
-    use marketplace::tests::mocks::account::Account;
-    use marketplace::tests::mocks::erc20::ERC20;
-    use marketplace::tests::mocks::erc721::ERC721;
-    use marketplace::tests::mocks::erc1155::ERC1155;
-    use marketplace::systems::marketplace::{Marketplace, IMarketplaceDispatcher};
+    use orderbook::models::index as models;
+    use starknet::syscalls::deploy_syscall;
+    use starknet::{ContractAddress, SyscallResultTrait};
 
     // Constant
 
     pub fn OWNER() -> ContractAddress {
-        starknet::contract_address_const::<'OWNER'>()
+        'OWNER'.try_into().unwrap()
     }
 
     pub fn CREATOR() -> ContractAddress {
-        starknet::contract_address_const::<'CREATOR'>()
+        'CREATOR'.try_into().unwrap()
     }
 
     pub fn CLIENT_RECEIVER() -> ContractAddress {
-        starknet::contract_address_const::<'CLIENT_RECEIVER'>()
+        'CLIENT_RECEIVER'.try_into().unwrap()
     }
 
     pub fn RECEIVER() -> ContractAddress {
-        starknet::contract_address_const::<'RECEIVER'>()
+        'RECEIVER'.try_into().unwrap()
     }
 
     pub fn SPENDER() -> ContractAddress {
-        starknet::contract_address_const::<'SPENDER'>()
+        'SPENDER'.try_into().unwrap()
     }
 
     pub fn HOLDER() -> ContractAddress {
-        starknet::contract_address_const::<'HOLDER'>()
+        'HOLDER'.try_into().unwrap()
     }
 
     #[derive(Copy, Drop)]
@@ -90,14 +89,14 @@ pub mod setup {
         NamespaceDef {
             namespace: "MARKETPLACE",
             resources: [
-                TestResource::Model(models::m_Access::TEST_CLASS_HASH),
-                TestResource::Model(models::m_Book::TEST_CLASS_HASH),
-                TestResource::Model(models::m_Order::TEST_CLASS_HASH),
-                TestResource::Model(models::m_MetadataAttribute::TEST_CLASS_HASH),
-                TestResource::Event(events::e_Listing::TEST_CLASS_HASH),
-                TestResource::Event(events::e_Sale::TEST_CLASS_HASH),
-                TestResource::Event(events::e_Offer::TEST_CLASS_HASH),
-                TestResource::Contract(Marketplace::TEST_CLASS_HASH),
+                TestResource::Model(models::m_Access::TEST_CLASS_HASH.into()),
+                TestResource::Model(models::m_Book::TEST_CLASS_HASH.into()),
+                TestResource::Model(models::m_Order::TEST_CLASS_HASH.into()),
+                TestResource::Model(models::m_MetadataAttribute::TEST_CLASS_HASH.into()),
+                TestResource::Event(events::e_Listing::TEST_CLASS_HASH.into()),
+                TestResource::Event(events::e_Sale::TEST_CLASS_HASH.into()),
+                TestResource::Event(events::e_Offer::TEST_CLASS_HASH.into()),
+                TestResource::Contract(Marketplace::TEST_CLASS_HASH.into()),
             ]
                 .span(),
         }

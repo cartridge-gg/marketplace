@@ -2,8 +2,6 @@
 pub mod ManageableComponent {
     // Starknet imports
 
-    use starknet::ContractAddress;
-
     // Dojo imports
 
     use dojo::world::WorldStorage;
@@ -11,10 +9,11 @@ pub mod ManageableComponent {
     // Internal imports
 
     use orderbook::constants::BOOK_ID;
+    use orderbook::models::access::{AccessAssert, AccessTrait};
+    use orderbook::models::book::{BookAssert, BookTrait};
     use orderbook::store::StoreTrait;
     use orderbook::types::role::Role;
-    use orderbook::models::access::{AccessTrait, AccessAssert};
-    use orderbook::models::book::{BookTrait, BookAssert};
+    use starknet::ContractAddress;
 
     // Constants
 

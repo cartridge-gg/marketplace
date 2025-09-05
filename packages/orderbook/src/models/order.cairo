@@ -2,8 +2,8 @@
 
 pub use orderbook::constants::ORDER_MINIMUM_DURATION;
 pub use orderbook::models::index::Order;
-pub use orderbook::types::status::Status;
 pub use orderbook::types::category::Category;
+pub use orderbook::types::status::Status;
 
 // Errors
 
@@ -85,7 +85,7 @@ pub impl OrderImpl of OrderTrait {
         self.quantity -= quantity;
         if self.quantity != 0 {
             return;
-        };
+        }
         self.status = Status::Executed.into();
     }
 
@@ -186,7 +186,7 @@ pub impl OrderAssert of AssertTrait {
 pub mod tests {
     // Local imports
 
-    use super::{Order, OrderTrait, OrderAssert, Category, Status, ORDER_MINIMUM_DURATION};
+    use super::{Category, ORDER_MINIMUM_DURATION, Order, OrderAssert, OrderTrait, Status};
 
     // Constants
 

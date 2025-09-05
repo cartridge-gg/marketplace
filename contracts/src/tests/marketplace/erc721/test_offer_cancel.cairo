@@ -1,18 +1,17 @@
 // External imports
 
-use openzeppelin_token::erc20::interface::IERC20DispatcherTrait;
-use openzeppelin_token::erc721::interface::IERC721DispatcherTrait;
-
-// Package imports
-
-use orderbook::store::StoreTrait;
-use orderbook::models::order::OrderAssert;
-use orderbook::types::status::Status;
-
 // Internal imports
 
 use marketplace::systems::marketplace::IMarketplaceDispatcherTrait;
 use marketplace::tests::setup::setup::spawn;
+use openzeppelin_token::erc20::interface::IERC20DispatcherTrait;
+use openzeppelin_token::erc721::interface::IERC721DispatcherTrait;
+use orderbook::models::order::OrderAssert;
+
+// Package imports
+
+use orderbook::store::StoreTrait;
+use orderbook::types::status::Status;
 
 // Constants
 

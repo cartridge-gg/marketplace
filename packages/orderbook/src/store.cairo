@@ -2,18 +2,18 @@
 
 // Dojo imports
 
-use dojo::world::WorldStorage;
-use dojo::model::ModelStorage;
 use dojo::event::EventStorage;
+use dojo::model::ModelStorage;
+use dojo::world::WorldStorage;
+use orderbook::events::listing::ListingTrait;
+use orderbook::events::offer::OfferTrait;
+use orderbook::events::sale::SaleTrait;
 
 // Models imports
 
 use orderbook::models::access::Access;
 use orderbook::models::book::Book;
 use orderbook::models::order::Order;
-use orderbook::events::listing::ListingTrait;
-use orderbook::events::sale::SaleTrait;
-use orderbook::events::offer::OfferTrait;
 
 
 // Structs
