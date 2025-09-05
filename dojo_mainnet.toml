@@ -2,7 +2,7 @@
 name = "Cartridge Marketplace"
 description = "Cartridge Marketplace"
 website = "https://github.com/dojoengine/dojo-starter"
-seed = "Marketplace-0.0.6"
+seed = "Marketplace-glihm-test1"
 
 [world.socials]
 x = "https://x.com/ohayo_dojo"
@@ -26,8 +26,9 @@ default = "MARKETPLACE"
 
 [env]
 rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
-account_address = "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b"
-world_address = "0x07b148de519d33d46d1b2b232ae41f63971a2000297440110cc8da11902e9950"
+account_address = "0x1024e16519da35d35b0637c32d0611cc36b724f69cdea25e8007cd6a7cffa51"
+keystore_path = "/Users/glihm/.snaccounts/dev-mainnet.key"
+world_address = "0x7877234d6cf8a1e060e30ef57b2a87bc685ae3066ea0295167985eac6a0bb48"
 world_block = 1650167
 ipfs_config.url = "https://ipfs.infura.io:5001"
 ipfs_config.username = "2EBrzr7ZASQZKH32sl2xWauXPSA"

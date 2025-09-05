@@ -80,22 +80,21 @@ pub trait IMarketplace<TContractState> {
 pub mod Marketplace {
     // Starknet imports
 
-    use starknet::ContractAddress;
-
     // Dojo imports
 
     use dojo::world::WorldStorage;
 
-    // Component imports
-
-    use orderbook::components::manageable::ManageableComponent;
-    use orderbook::components::buyable::BuyableComponent;
-    use orderbook::components::sellable::SellableComponent;
-    use orderbook::components::verifiable::VerifiableComponent;
-
     // Internal imports
 
     use marketplace::constants::NAMESPACE;
+    use orderbook::components::buyable::BuyableComponent;
+
+    // Component imports
+
+    use orderbook::components::manageable::ManageableComponent;
+    use orderbook::components::sellable::SellableComponent;
+    use orderbook::components::verifiable::VerifiableComponent;
+    use starknet::ContractAddress;
 
     // Local imports
 
@@ -214,7 +213,7 @@ pub mod Marketplace {
             while let Option::Some((order_id, collection, token_id)) = orders.pop_front() {
                 let validity = self.get_validity(*order_id, *collection, *token_id);
                 validities.append(validity);
-            };
+            }
             validities.span()
         }
     }

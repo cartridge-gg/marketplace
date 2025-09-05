@@ -1,35 +1,34 @@
 pub mod setup {
     // Starknet imports
 
-    use starknet::{ContractAddress, SyscallResultTrait};
-    use starknet::syscalls::deploy_syscall;
-
     // Dojo imports
 
     use dojo::world::{WorldStorage, WorldStorageTrait};
     use dojo_cairo_test::{
-        spawn_test_world, NamespaceDef, ContractDef, TestResource, ContractDefTrait,
-        WorldStorageTestTrait,
+        ContractDef, ContractDefTrait, NamespaceDef, TestResource, WorldStorageTestTrait,
+        spawn_test_world,
     };
+    use marketplace::systems::marketplace::{IMarketplaceDispatcher, Marketplace};
+
+    // Internal imports
+
+    use marketplace::tests::mocks::account::Account;
+    use marketplace::tests::mocks::erc1155::ERC1155;
+    use marketplace::tests::mocks::erc20::ERC20;
+    use marketplace::tests::mocks::erc721::ERC721;
+    use openzeppelin_token::erc1155::interface::IERC1155Dispatcher;
 
     // External imports
 
     use openzeppelin_token::erc20::interface::IERC20Dispatcher;
     use openzeppelin_token::erc721::interface::IERC721Dispatcher;
-    use openzeppelin_token::erc1155::interface::IERC1155Dispatcher;
 
     // Packages imports
 
     use orderbook::events::{index as events};
-    use orderbook::models::{index as models};
-
-    // Internal imports
-
-    use marketplace::tests::mocks::account::Account;
-    use marketplace::tests::mocks::erc20::ERC20;
-    use marketplace::tests::mocks::erc721::ERC721;
-    use marketplace::tests::mocks::erc1155::ERC1155;
-    use marketplace::systems::marketplace::{Marketplace, IMarketplaceDispatcher};
+    use orderbook::models::index as models;
+    use starknet::syscalls::deploy_syscall;
+    use starknet::{ContractAddress, SyscallResultTrait};
 
     // Constant
 

@@ -40,8 +40,8 @@ pub impl SaleAssert of AssertTrait {
 mod tests {
     // Local imports
 
-    pub use orderbook::models::order::tests::{setup, ORDER_ID};
-    use super::{SaleTrait, SaleAssert};
+    pub use orderbook::models::order::tests::{ORDER_ID, setup};
+    use super::{SaleAssert, SaleTrait};
 
     // Constants
 

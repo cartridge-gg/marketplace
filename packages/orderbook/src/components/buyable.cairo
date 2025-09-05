@@ -2,22 +2,20 @@
 pub mod BuyableComponent {
     // Starknet imports
 
-    use starknet::ContractAddress;
-
     // Dojo imports
 
     use dojo::world::WorldStorage;
+    use orderbook::components::verifiable::VerifiableComponent;
+    use orderbook::components::verifiable::VerifiableComponent::InternalImpl as VerifiableImpl;
 
     // Internal imports
 
     use orderbook::constants::BOOK_ID;
+    use orderbook::models::book::{BookAssert, BookTrait};
+    use orderbook::models::order::{OrderAssert, OrderTrait};
     use orderbook::store::StoreTrait;
     use orderbook::types::category::Category;
-    use orderbook::models::book::{BookTrait, BookAssert};
-    use orderbook::models::order::{OrderTrait, OrderAssert};
-    use orderbook::components::verifiable::{
-        VerifiableComponent, VerifiableComponent::InternalImpl as VerifiableImpl,
-    };
+    use starknet::ContractAddress;
 
     // Storage
 

@@ -1,7 +1,7 @@
 // Internal imports
 
-pub use orderbook::models::index::Order;
 pub use orderbook::events::index::Offer;
+pub use orderbook::models::index::Order;
 
 // Errors
 
@@ -33,8 +33,8 @@ pub impl OfferAssert of AssertTrait {
 mod tests {
     // Local imports
 
-    pub use orderbook::models::order::tests::{setup, ORDER_ID};
-    use super::{OfferTrait, OfferAssert};
+    pub use orderbook::models::order::tests::{ORDER_ID, setup};
+    use super::{OfferAssert, OfferTrait};
 
     // Constants
 

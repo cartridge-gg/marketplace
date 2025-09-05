@@ -2,21 +2,20 @@
 pub mod VerifiableComponent {
     // Starknet imports
 
-    use starknet::ContractAddress;
-
     // External imports
 
     use openzeppelin_introspection::interface::{ISRC5Dispatcher, ISRC5DispatcherTrait};
-    use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
-    use openzeppelin_token::erc721::interface::{
-        IERC721_ID, IERC721Dispatcher, IERC721DispatcherTrait,
+    use openzeppelin_token::common::erc2981::interface::{
+        IERC2981Dispatcher, IERC2981DispatcherTrait, IERC2981_ID,
     };
     use openzeppelin_token::erc1155::interface::{
-        IERC1155_ID, IERC1155Dispatcher, IERC1155DispatcherTrait,
+        IERC1155Dispatcher, IERC1155DispatcherTrait, IERC1155_ID,
     };
-    use openzeppelin_token::common::erc2981::interface::{
-        IERC2981_ID, IERC2981Dispatcher, IERC2981DispatcherTrait,
+    use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use openzeppelin_token::erc721::interface::{
+        IERC721Dispatcher, IERC721DispatcherTrait, IERC721_ID,
     };
+    use starknet::ContractAddress;
 
     // Errors
 
@@ -108,7 +107,7 @@ pub mod VerifiableComponent {
             } else {
                 // [Panic] Unsupported collection
                 return (false, errors::SALE_INVALID_COLLECTION);
-            };
+            }
             (true, 0)
         }
 
@@ -248,7 +247,7 @@ pub mod VerifiableComponent {
                         currency: currency,
                         amount: *amount,
                     );
-            };
+            }
             // [Interaction] Pay owner
             self.pay(spender: spender, recipient: owner, currency: currency, amount: remaining);
             // [Interaction] Transfer asset
@@ -274,7 +273,7 @@ pub mod VerifiableComponent {
                 // [Interaction] ERC2981 royalties
                 let collection_dispatcher = IERC2981Dispatcher { contract_address: collection };
                 return collection_dispatcher.royalty_info(token_id, sale_price);
-            };
+            }
             // [Fallback] No royalties
             (starknet::get_contract_address(), 0)
         }
