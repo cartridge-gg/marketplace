@@ -1,8 +1,8 @@
 {
   "world": {
     "class_hash": "0x1061b9a1632c994a7597cf1ee44cda68429091da490f95630f6dab0c47955c6",
-    "address": "0x7877234d6cf8a1e060e30ef57b2a87bc685ae3066ea0295167985eac6a0bb48",
-    "seed": "Marketplace-glihm-test1",
+    "address": "0x299109d4b17f83ea113efd6f8db76b3c5d644c403670c7ca7ed930047273af2",
+    "seed": "Marketplace-0.0.10",
     "name": "Cartridge Marketplace",
     "entrypoints": [
       "uuid",
@@ -1479,7 +1479,7 @@
   },
   "contracts": [
     {
-      "address": "0x346b2f9ed805ec0586318ef1dd3aa01dd7a044d1f59ae643ae93b7596eff1c5",
+      "address": "0x61b50bb6313adc35e70b76b766b0edc0bb1936ff2f5ea8fb16f1cc72d7b8af3",
       "class_hash": "0x7f5cb70373beb9c2ae448898c206690390f95a0b85ce4238ec082180c7be185",
       "abi": [
         {
@@ -2078,7 +2078,7 @@
       "init_calldata": [
         "0x1",
         "0x0",
-        "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b",
+        "0x03F7F4E5a23A712787F0C100f02934c4A88606B7F0C880c2FD43e817E6275d83",
         "0x041aad5a7493b75f240f418cb5f052d1a68981af21e813ed0a35e96d3e83123b"
       ],
       "tag": "MARKETPLACE-Marketplace",

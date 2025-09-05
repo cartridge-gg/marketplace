@@ -47,7 +47,7 @@
     "@dojoengine/torii-wasm": "catalog:",
     "@starknet-react/chains": "catalog:",
     "@starknet-react/core": "catalog:",
-    "starknet": "catalog:"
+    "starknet": "8.5.2"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.79.0",
