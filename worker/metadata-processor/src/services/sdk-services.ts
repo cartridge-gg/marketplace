@@ -99,11 +99,11 @@ export const makeMarketplaceAccount = () =>
 
 		// Initialize provider and account
 		const provider = new RpcProvider({ nodeUrl: chainConfig.rpcUrl });
-		const account = new Account(
+		const account = new Account({
 			provider,
-			accountConfig.address,
-			Redacted.value(accountConfig.privateKey),
-		);
+			address: accountConfig.address,
+			signer: Redacted.value(accountConfig.privateKey),
+		});
 		return { account } satisfies MarketplaceAccountService;
 	});
 
