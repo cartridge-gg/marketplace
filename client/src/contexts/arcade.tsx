@@ -90,6 +90,7 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 							symbol: "ETH",
 							decimals: 18,
 						},
+						paymasterRpcUrls: {},
 					};
 				}),
 			);

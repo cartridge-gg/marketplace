@@ -267,7 +267,10 @@ export const Marketplace = {
 		}
 	},
 
-	fetchCollections: async (clients: { [key: string]: ToriiClient }) => {
+	fetchCollections: async (
+		clients: { [key: string]: ToriiClient },
+		limit: number = 1000,
+	) => {
 		const collections: Collections = {};
 		await Promise.all(
 			Object.keys(clients).map(async (project) => {
@@ -278,7 +281,7 @@ export const Marketplace = {
 						token_ids: [],
 						pagination: {
 							cursor: undefined,
-							limit: 5000,
+							limit: limit,
 							order_by: [],
 							direction: "Forward",
 						},
@@ -289,7 +292,7 @@ export const Marketplace = {
 							contract_addresses: [],
 							token_ids: [],
 							pagination: {
-								limit: 5000,
+								limit: limit,
 								cursor: tokens.next_cursor,
 								order_by: [],
 								direction: "Forward",

@@ -1,5 +1,5 @@
 import { DojoProvider, DojoCall } from "@dojoengine/core";
-import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum, ByteArray } from "starknet";
+import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum } from "starknet";
 import * as models from "./models.gen";
 
 export function setupWorld(provider: DojoProvider) {
@@ -25,19 +25,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_Marketplace_execute_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish, assetId: BigNumberish, quantity: BigNumberish, royalties: boolean): DojoCall => {
+	const build_Marketplace_execute_calldata = (orderId: BigNumberish, collection: string, tokenId: BigNumberish, assetId: BigNumberish, quantity: BigNumberish, royalties: boolean, clientFee: BigNumberish, clientReceiver: string): DojoCall => {
 		return {
 			contractName: "Marketplace",
 			entrypoint: "execute",
-			calldata: [orderId, collection, tokenId, assetId, quantity, royalties],
+			calldata: [orderId, collection, tokenId, assetId, quantity, royalties, clientFee, clientReceiver],
 		};
 	};
 
-	const Marketplace_execute = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish, assetId: BigNumberish, quantity: BigNumberish, royalties: boolean) => {
+	const Marketplace_execute = async (snAccount: Account | AccountInterface, orderId: BigNumberish, collection: string, tokenId: BigNumberish, assetId: BigNumberish, quantity: BigNumberish, royalties: boolean, clientFee: BigNumberish, clientReceiver: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_Marketplace_execute_calldata(orderId, collection, tokenId, assetId, quantity, royalties),
+				build_Marketplace_execute_calldata(orderId, collection, tokenId, assetId, quantity, royalties, clientFee, clientReceiver),
 				"MARKETPLACE",
 			);
 		} catch (error) {

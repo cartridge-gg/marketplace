@@ -1,6 +1,6 @@
 import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
-import { BigNumberish } from "starknet";
+import type { BigNumberish } from "starknet";
 
 // Type definition for `orderbook::models::index::Access` struct
 export interface Access {
