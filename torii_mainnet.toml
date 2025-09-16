@@ -1,5 +1,5 @@
 rpc = "https://api.cartridge.gg/x/starknet/mainnet"
-world_address = "0x0299109d4b17f83ea113efd6f8db76b3c5d644c403670c7ca7ed930047273af2"
+world_address = "0x54f7f579d72c4c48fa99396ea88fdcef0a6569d8c1eda754a6d740a506a204b"
 
 [indexing]
 pending = true
@@ -7,6 +7,7 @@ polling_interval = 500
 max_concurrent_tasks = 100
 world_block = 2012297
 contracts = []
+namespace = ["MARKETPLACE"]
 transactions = true
 
 [sql]

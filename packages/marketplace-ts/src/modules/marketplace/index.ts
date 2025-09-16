@@ -269,7 +269,7 @@ export const Marketplace = {
 
 	fetchCollections: async (
 		clients: { [key: string]: ToriiClient },
-		limit: number = 1000,
+		limit = 1000,
 	) => {
 		const collections: Collections = {};
 		await Promise.all(

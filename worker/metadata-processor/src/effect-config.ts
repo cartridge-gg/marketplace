@@ -68,7 +68,7 @@ const MarketplaceConfig = Config.all({
 		Config.withDescription("Address of the marketplace contract"),
 	),
 	toriiUrl: Config.string("MARKETPLACE_TORII_URL").pipe(
-		Config.withDefault("https://api.cartridge.gg/x/marketplace-mainnet/torii"),
+		Config.withDefault("https://api.cartridge.gg/x/arcade-mainnet/torii"),
 		Config.validate({
 			message: "MARKETPLACE_TORII_URL must be a valid URL",
 			validation: (s) => {
