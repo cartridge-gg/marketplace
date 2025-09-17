@@ -1,6 +1,6 @@
 import {
 	createContext,
-	ReactNode,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useEffect,
@@ -10,13 +10,13 @@ import {
 import {
 	ArcadeProvider as ExternalProvider,
 	Registry,
-	RegistryModel,
-	RegistryOptions,
+	type RegistryModel,
+	type RegistryOptions,
 	EditionModel,
 } from "@cartridge/arcade";
 import { constants, RpcProvider, shortString } from "starknet";
-import { Chain } from "@starknet-react/chains";
-import * as torii from "@dojoengine/torii-client";
+import type { Chain } from "@starknet-react/chains";
+import type * as torii from "@dojoengine/torii-client";
 import { hydrateModel } from ".";
 
 const CHAIN_ID = constants.StarknetChainId.SN_MAIN;
@@ -90,6 +90,7 @@ export const ArcadeProvider = ({ children }: { children: ReactNode }) => {
 							symbol: "ETH",
 							decimals: 18,
 						},
+						paymasterRpcUrls: {},
 					};
 				}),
 			);

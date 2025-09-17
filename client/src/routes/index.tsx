@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCollections, type Collection as CollectionType } from "../hooks";
 import { CollectibleCard } from "@cartridge/ui";
-import { Token } from "@dojoengine/torii-client";
+import type { Token } from "@dojoengine/torii-client";
 import { useMemo } from "react";
 import { getChecksumAddress } from "starknet";
 import type { WithCount } from "../contexts/collection";

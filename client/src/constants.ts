@@ -1,4 +1,4 @@
-export const DEFAULT_PROJECT = "marketplace-mainnet";
+export const DEFAULT_PROJECT = "arcade-mainnet";
 export const DEFAULT_PRESET = undefined;
 export const CLIENT_FEE = "2500";
 export const CLIENT_RECEIVER =

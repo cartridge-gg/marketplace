@@ -8,142 +8,142 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as CollectionIndexRouteImport } from "./routes/collection/index";
-import { Route as WalletAddressRouteImport } from "./routes/wallet/$address";
-import { Route as CollectionCollectionAddressRouteImport } from "./routes/collection/$collectionAddress";
-import { Route as TokenCollectionAddressTokenIdRouteImport } from "./routes/token/$collectionAddress/$tokenId";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as CollectionIndexRouteImport } from './routes/collection/index'
+import { Route as WalletAddressRouteImport } from './routes/wallet/$address'
+import { Route as CollectionCollectionAddressRouteImport } from './routes/collection/$collectionAddress'
+import { Route as TokenCollectionAddressTokenIdRouteImport } from './routes/token/$collectionAddress/$tokenId'
 
 const IndexRoute = IndexRouteImport.update({
-	id: "/",
-	path: "/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionIndexRoute = CollectionIndexRouteImport.update({
-	id: "/collection/",
-	path: "/collection/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/collection/',
+  path: '/collection/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WalletAddressRoute = WalletAddressRouteImport.update({
-	id: "/wallet/$address",
-	path: "/wallet/$address",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/wallet/$address',
+  path: '/wallet/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionCollectionAddressRoute =
-	CollectionCollectionAddressRouteImport.update({
-		id: "/collection/$collectionAddress",
-		path: "/collection/$collectionAddress",
-		getParentRoute: () => rootRouteImport,
-	} as any);
+  CollectionCollectionAddressRouteImport.update({
+    id: '/collection/$collectionAddress',
+    path: '/collection/$collectionAddress',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TokenCollectionAddressTokenIdRoute =
-	TokenCollectionAddressTokenIdRouteImport.update({
-		id: "/token/$collectionAddress/$tokenId",
-		path: "/token/$collectionAddress/$tokenId",
-		getParentRoute: () => rootRouteImport,
-	} as any);
+  TokenCollectionAddressTokenIdRouteImport.update({
+    id: '/token/$collectionAddress/$tokenId',
+    path: '/token/$collectionAddress/$tokenId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
-	"/": typeof IndexRoute;
-	"/collection/$collectionAddress": typeof CollectionCollectionAddressRoute;
-	"/wallet/$address": typeof WalletAddressRoute;
-	"/collection": typeof CollectionIndexRoute;
-	"/token/$collectionAddress/$tokenId": typeof TokenCollectionAddressTokenIdRoute;
+  '/': typeof IndexRoute
+  '/collection/$collectionAddress': typeof CollectionCollectionAddressRoute
+  '/wallet/$address': typeof WalletAddressRoute
+  '/collection': typeof CollectionIndexRoute
+  '/token/$collectionAddress/$tokenId': typeof TokenCollectionAddressTokenIdRoute
 }
 export interface FileRoutesByTo {
-	"/": typeof IndexRoute;
-	"/collection/$collectionAddress": typeof CollectionCollectionAddressRoute;
-	"/wallet/$address": typeof WalletAddressRoute;
-	"/collection": typeof CollectionIndexRoute;
-	"/token/$collectionAddress/$tokenId": typeof TokenCollectionAddressTokenIdRoute;
+  '/': typeof IndexRoute
+  '/collection/$collectionAddress': typeof CollectionCollectionAddressRoute
+  '/wallet/$address': typeof WalletAddressRoute
+  '/collection': typeof CollectionIndexRoute
+  '/token/$collectionAddress/$tokenId': typeof TokenCollectionAddressTokenIdRoute
 }
 export interface FileRoutesById {
-	__root__: typeof rootRouteImport;
-	"/": typeof IndexRoute;
-	"/collection/$collectionAddress": typeof CollectionCollectionAddressRoute;
-	"/wallet/$address": typeof WalletAddressRoute;
-	"/collection/": typeof CollectionIndexRoute;
-	"/token/$collectionAddress/$tokenId": typeof TokenCollectionAddressTokenIdRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/collection/$collectionAddress': typeof CollectionCollectionAddressRoute
+  '/wallet/$address': typeof WalletAddressRoute
+  '/collection/': typeof CollectionIndexRoute
+  '/token/$collectionAddress/$tokenId': typeof TokenCollectionAddressTokenIdRoute
 }
 export interface FileRouteTypes {
-	fileRoutesByFullPath: FileRoutesByFullPath;
-	fullPaths:
-		| "/"
-		| "/collection/$collectionAddress"
-		| "/wallet/$address"
-		| "/collection"
-		| "/token/$collectionAddress/$tokenId";
-	fileRoutesByTo: FileRoutesByTo;
-	to:
-		| "/"
-		| "/collection/$collectionAddress"
-		| "/wallet/$address"
-		| "/collection"
-		| "/token/$collectionAddress/$tokenId";
-	id:
-		| "__root__"
-		| "/"
-		| "/collection/$collectionAddress"
-		| "/wallet/$address"
-		| "/collection/"
-		| "/token/$collectionAddress/$tokenId";
-	fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/collection/$collectionAddress'
+    | '/wallet/$address'
+    | '/collection'
+    | '/token/$collectionAddress/$tokenId'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/collection/$collectionAddress'
+    | '/wallet/$address'
+    | '/collection'
+    | '/token/$collectionAddress/$tokenId'
+  id:
+    | '__root__'
+    | '/'
+    | '/collection/$collectionAddress'
+    | '/wallet/$address'
+    | '/collection/'
+    | '/token/$collectionAddress/$tokenId'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-	IndexRoute: typeof IndexRoute;
-	CollectionCollectionAddressRoute: typeof CollectionCollectionAddressRoute;
-	WalletAddressRoute: typeof WalletAddressRoute;
-	CollectionIndexRoute: typeof CollectionIndexRoute;
-	TokenCollectionAddressTokenIdRoute: typeof TokenCollectionAddressTokenIdRoute;
+  IndexRoute: typeof IndexRoute
+  CollectionCollectionAddressRoute: typeof CollectionCollectionAddressRoute
+  WalletAddressRoute: typeof WalletAddressRoute
+  CollectionIndexRoute: typeof CollectionIndexRoute
+  TokenCollectionAddressTokenIdRoute: typeof TokenCollectionAddressTokenIdRoute
 }
 
-declare module "@tanstack/react-router" {
-	interface FileRoutesByPath {
-		"/": {
-			id: "/";
-			path: "/";
-			fullPath: "/";
-			preLoaderRoute: typeof IndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/collection/": {
-			id: "/collection/";
-			path: "/collection";
-			fullPath: "/collection";
-			preLoaderRoute: typeof CollectionIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/wallet/$address": {
-			id: "/wallet/$address";
-			path: "/wallet/$address";
-			fullPath: "/wallet/$address";
-			preLoaderRoute: typeof WalletAddressRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/collection/$collectionAddress": {
-			id: "/collection/$collectionAddress";
-			path: "/collection/$collectionAddress";
-			fullPath: "/collection/$collectionAddress";
-			preLoaderRoute: typeof CollectionCollectionAddressRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/token/$collectionAddress/$tokenId": {
-			id: "/token/$collectionAddress/$tokenId";
-			path: "/token/$collectionAddress/$tokenId";
-			fullPath: "/token/$collectionAddress/$tokenId";
-			preLoaderRoute: typeof TokenCollectionAddressTokenIdRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-	}
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collection/': {
+      id: '/collection/'
+      path: '/collection'
+      fullPath: '/collection'
+      preLoaderRoute: typeof CollectionIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet/$address': {
+      id: '/wallet/$address'
+      path: '/wallet/$address'
+      fullPath: '/wallet/$address'
+      preLoaderRoute: typeof WalletAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collection/$collectionAddress': {
+      id: '/collection/$collectionAddress'
+      path: '/collection/$collectionAddress'
+      fullPath: '/collection/$collectionAddress'
+      preLoaderRoute: typeof CollectionCollectionAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/token/$collectionAddress/$tokenId': {
+      id: '/token/$collectionAddress/$tokenId'
+      path: '/token/$collectionAddress/$tokenId'
+      fullPath: '/token/$collectionAddress/$tokenId'
+      preLoaderRoute: typeof TokenCollectionAddressTokenIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-	IndexRoute: IndexRoute,
-	CollectionCollectionAddressRoute: CollectionCollectionAddressRoute,
-	WalletAddressRoute: WalletAddressRoute,
-	CollectionIndexRoute: CollectionIndexRoute,
-	TokenCollectionAddressTokenIdRoute: TokenCollectionAddressTokenIdRoute,
-};
+  IndexRoute: IndexRoute,
+  CollectionCollectionAddressRoute: CollectionCollectionAddressRoute,
+  WalletAddressRoute: WalletAddressRoute,
+  CollectionIndexRoute: CollectionIndexRoute,
+  TokenCollectionAddressTokenIdRoute: TokenCollectionAddressTokenIdRoute,
+}
 export const routeTree = rootRouteImport
-	._addFileChildren(rootRouteChildren)
-	._addFileTypes<FileRouteTypes>();
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()

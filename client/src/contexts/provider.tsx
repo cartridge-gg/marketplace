@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import { ArcadeProvider } from "@cartridge/marketplace";
 import { MarketplaceProvider } from "./marketplace";
 import { CollectionProvider } from "./collection";

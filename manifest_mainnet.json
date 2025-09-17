@@ -1,8 +1,8 @@
 {
   "world": {
-    "class_hash": "0x1061b9a1632c994a7597cf1ee44cda68429091da490f95630f6dab0c47955c6",
-    "address": "0x299109d4b17f83ea113efd6f8db76b3c5d644c403670c7ca7ed930047273af2",
-    "seed": "Marketplace-0.0.10",
+    "class_hash": "0x7bc7b264612d3ac261df0a6d72a6b73c84b9386ef0095dd340d42afc01bb53c",
+    "address": "0x54f7f579d72c4c48fa99396ea88fdcef0a6569d8c1eda754a6d740a506a204b",
+    "seed": "Marketplace-0.0.11",
     "name": "Cartridge Marketplace",
     "entrypoints": [
       "uuid",
@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x61b50bb6313adc35e70b76b766b0edc0bb1936ff2f5ea8fb16f1cc72d7b8af3",
-      "class_hash": "0x7f5cb70373beb9c2ae448898c206690390f95a0b85ce4238ec082180c7be185",
+      "address": "0x6ffc61cd0e3f7cabb51b3fcb36aecb6635005396df4a4958cf0e7f2f5904aaa",
+      "class_hash": "0x65358dbd0f4ed3e0f841e1499d4c1e1a86fbadc825ee3e076f396f5216eb56c",
       "abi": [
         {
           "type": "impl",
@@ -2105,31 +2105,31 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x4a99378d89c718aaf4728d1bff7dfb258b975598725bf8c425db203bc6907e9",
+      "class_hash": "0x54717e607d2fa4b6b51fbcfbf25f13e6a33627e5feb5825bb332c3bf3d8e3b",
       "tag": "MARKETPLACE-Access",
       "selector": "0x1ae32b3cefa0eb1bfc7bc7765d4b0c71fea05f8edfe72c2e4dfbfbf9ccf2aa5"
     },
     {
       "members": [],
-      "class_hash": "0x7596a82ec3a2f1d23758719a981d4069f98fd745904710e07be52d4db89ed83",
+      "class_hash": "0x15504d88979f5ca8b9fbb2905a1693ee6b73856cbe853e9f6fd8513c4715e01",
       "tag": "MARKETPLACE-Book",
       "selector": "0x6b71d0dbe436e76d464874d7990a0d38ccbaa4f75bbd8f5e44338a166653d9c"
     },
     {
       "members": [],
-      "class_hash": "0x55385e3c74a8f51248187176723a795f695815c7028c91b5a5969c7d3e36769",
+      "class_hash": "0x7ebd8a35f9909dc7767d6d11f14705735714c58e74766819d99a244c38229c",
       "tag": "MARKETPLACE-MetadataAttribute",
       "selector": "0x7658baa4149f9cfff6fd3bff2f099f477425bc0140cc47eeb2fc857264d245d"
     },
     {
       "members": [],
-      "class_hash": "0x2b4a38630290a0de497ff5b24fff30bca4cbb0cc85b315141315ba45caa0961",
+      "class_hash": "0x6f2a794ed0fd80e1c2ecb31f93b15afb7adbf790480bfb3af1cf3aa6a2c45a0",
       "tag": "MARKETPLACE-MetadataAttributeIntegrity",
       "selector": "0x7c2a5e62afd20c94744f664a80bed54d75fbac215d0582879e8852e3c9aa447"
     },
     {
       "members": [],
-      "class_hash": "0x10e5ee4878d12a48b2f28f7e98a421f3190a1e726b72318795e7ff9fc372e38",
+      "class_hash": "0x4ebbbf8de046ea02ec547fb2171702b236e63e33655539b849fd58b96999a32",
       "tag": "MARKETPLACE-Order",
       "selector": "0x61b4c97fb2ee0697bed87a3f5f7e932e5af76c77c88682b9ae67552f32eff69"
     }
@@ -2137,19 +2137,19 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x2036af3a4b90c51e27432f31861935552696b58321cb15761389887e4b8fcb6",
+      "class_hash": "0x482b08f14eaac140ce117745369fa427eedf582db5e32f45a4792e971b5c45a",
       "tag": "MARKETPLACE-Listing",
       "selector": "0x46941a9d898f53447b49e68db8c050602bd4ae1c96f3b7bf4652176fb731603"
     },
     {
       "members": [],
-      "class_hash": "0x151e1aae654d3e87801542bb0b2bab69a8ad77a5a85204b8064706dc18154d1",
+      "class_hash": "0x5e429b7facaba4965f8d4a3558c544054cf02028fb57525ef0c97efff38eb8e",
       "tag": "MARKETPLACE-Offer",
       "selector": "0x2e8cc7c8726fe1500b19d4d0ef351d5b11f3a010a857c074825670c37507c32"
     },
     {
       "members": [],
-      "class_hash": "0x2192ed15e07d8e0101e8e57f1c237695ebdcd9e4aa2ff6e642f6399284fbb43",
+      "class_hash": "0x5cccf59a98d77b27c70509ea911c9fc621ed62cded41570f5b1e2f6d96a5507",
       "tag": "MARKETPLACE-Sale",
       "selector": "0x5258de3665c1c16659a2c4c55edf557c5dd9f2ea0f94cc24c8cd3676a8e9c02"
     }
